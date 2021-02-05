@@ -9,4 +9,5 @@ rmd_subdir: ["text"]
   
 output_dir: "docs"
 
-
+# allow delete merged file
+delete_merged_file: true
