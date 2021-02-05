@@ -85,36 +85,33 @@ $endif$
 % \usepackage[style=authoryear, sorting=nyt, backend=biber, maxcitenames=2, useprefix, doi=false, isbn=false]{biblatex}
 % \newcommand*{\bibtitle}{Works Cited}
 
-\usepackage[square,numbers]{natbib}
-\bibliographystyle{abbrvnat}
-
 %UL 3 Dec 2018: set this from YAML in index.Rmd
-% $if(bib-humanities)$
-% \usepackage[style=authoryear, sorting=nyt, backend=biber, maxcitenames=2, useprefix, doi=false, isbn=false]{biblatex}
-% \newcommand*{\bibtitle}{Works Cited}
-% $else$
-% \usepackage[style=numeric-comp, sorting=none, backend=biber, giveninits]{biblatex}
-% \newcommand*{\bibtitle}{References}
-% $endif$
-% 
-% \renewbibmacro*{doi+eprint+url}{%   
-% \iftoggle{bbx:url}     
-% {\iffieldundef{doi}{\usebibmacro{url+urldate}}{}}     
-% {}%   
-% \newunit\newblock   
-% \iftoggle{bbx:eprint}     
-% {\usebibmacro{eprint}}     
-% {}%   
-% \newunit\newblock   
-% \iftoggle{bbx:doi}     
-% {\printfield{doi}}     
-% {}}
+$if(bib-humanities)$
+\usepackage[style=authoryear, sorting=nyt, backend=biber, maxcitenames=2, useprefix, doi=false, isbn=false]{biblatex}
+\newcommand*{\bibtitle}{Works Cited}
+$else$
+\usepackage[style=numeric-comp, sorting=none, backend=biber, giveninits]{biblatex}
+\newcommand*{\bibtitle}{References}
+$endif$
+
+\renewbibmacro*{doi+eprint+url}{%   
+\iftoggle{bbx:url}     
+{\iffieldundef{doi}{\usebibmacro{url+urldate}}{}}     
+{}%   
+\newunit\newblock   
+\iftoggle{bbx:eprint}     
+{\usebibmacro{eprint}}     
+{}%   
+\newunit\newblock   
+\iftoggle{bbx:doi}     
+{\printfield{doi}}     
+{}}
 
 % This makes the bibliography left-aligned (not 'justified') and slightly smaller font.
 \renewcommand*{\bibfont}{\raggedright\small}
 
 % Change this to the name of your .bib file (usually exported from a citation manager like Zotero or EndNote).
-% \addbibresource{$bibliography$}
+\addbibresource{$bibliography$}
 
 
 % Uncomment this if you want equation numbers per section (2.3.12), instead of per chapter (2.18):
@@ -173,7 +170,7 @@ $endif$
 \usepackage{xcolor}
 \usepackage{subfig}
 
-% \addbibresource{packages.bib}
+\addbibresource{packages.bib}
 
 
 \makeatletter
@@ -315,8 +312,7 @@ $body$
 
 \setlength{\baselineskip}{0pt} % JEM: Single-space References
 
-% {\renewcommand*\MakeUppercase[1]{#1}%
-% \printbibliography[heading=bibintoc,title={\bibtitle}]}
-\bibliography{$bibliography$}
+{\renewcommand*\MakeUppercase[1]{#1}%
+\printbibliography[heading=bibintoc,title={\bibtitle}]}
 
 \end{document}
