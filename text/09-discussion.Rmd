@@ -1,0 +1,234 @@
+---
+output:
+  pdf_document: default
+  word_document: default
+  html_document: default
+bibliography: ../EWS papers.bib
+---
+
+```{block type='savequote', include=knitr::opts_knit$get('rmarkdown.pandoc.to') == 'latex', quote_author='(ref:coward-quote)'}
+
+Well, you live and learn. Then, of course, you die and forget it all.
+
+<!-- ending a line with a lonely backslash inserts a linebreak -->
+```
+(ref:coward-quote) --- Noël Coward
+
+# Discussion {#discussion}
+\minitoc <!-- this will include a mini table of contents-->
+
+\newpage
+## Thesis summary {#sec:ch9s1}
+
+### Motivation for thesis
+  
+Early warning scores are tools used by hospital staff to aid the recognition of deterioration in hospital patients[@Morgan1997].
+They have been used extensively in clinical practice for the past two decades[@Gerry2017].
+They are possibly used more frequently than any other form of clinical prediction model[@Gerry2017].
+When I conceived the idea for this project I observed, anecdotally, that the quality of EWS research was consistently poor, and that EWSs had not appeared to have advanced much over those two decades.
+They remained simple, unsophisticated tools.
+The broad aim of my work was to apply best practice statistical methods to the development and validation of EWSs, and therefore to hopefully develop a much better EWS for use in clinical practice.
+I also wanted to investigate some of the complexities and nuances of EWSs and vital sign data that have previously been largely ignored.
+
+### The existing literature has many flaws
+
+The first step was to assess the quality of the current literature relating to EWSs.
+I carried out a systematic review of papers describing the development or validation of EWSs for adult hospital inpatients (in Chapter \@ref(sr)).
+The aim was to summarise and critically appraise the methodology of these papers.
+There review included 95 papers, and all had substantial flaws.
+Some particularly common problems were identified, such as: key details of the data used to develop or validate the EWSs were often not reported; the sample size (or number of events) was often small; approaches to account for missing data were almost universally poor; development studies rarely reported models that allowed for individualised predictions to be calculated; internal validation was rarely carried out in an appropriate fashion; the assessment of model performance was often simplistic and rarely considered model calibration.
+I made a series of seven recommendations for how these flaws might be addressed in future research.
+This review showed that despite the wide implementation of EWSs into clinical practice the evidence for recommending their use was uncertain.
+Further research was clearly necessary.
+
+### Building up the basics
+
+Instead of moving straight on to developing a new EWS based on the recommendations of the systematic review, I first sought to investigate some of the basic assumptions of EWSs, and some of the complexities associated with research in this area.
+The findings of these early chapters informed the approach I took later on in model development and validation.
+
+#### *Should early warning scores consider the patients age?*
+
+One of the obvious complexities that is rarely accounted for in EWSs is the effect that the age of the patient may have.
+Only 13/34 (38%) of EWSs in the systematic review included age as a predictor variable, and none included any age interaction terms.
+In Chapter \@ref(centiles) I examined the relationship between the distribution of vital signs and the age of the patient.
+This analysis revealed that there is a substantial change in the 'normal' distribution of vital sizes across different ages.
+There were large age effects in both systolic and diastolic blood pressure, pulse pressure, and oxygen saturation.
+There was some evidence of different distributions between men and women (specially for pressure), but not of the same magnitude as the age effects.
+A consequence of the observed age effects is that there is a disparity between how frequently a patient may score for a particular vital sign (e.g. using NEWS) depending on their age.
+For example young patients will rarely score points for low oxygen saturation, whereas elderly patients will frequently score.
+This may lead to slow recognition of deterioration in some age groups and over-estimation of risk in other age groups.
+The need for potentially age-specific EWSs was further highlighted by the validation of the NEWS in Chapter \@ref(validation).
+In Chapter \@ref(validation), looking at the performance of NEWS according to different age bands I found considerable heterogeneity, particularly when predicting death.
+These findings suggested that the inclusion of age in EWSs may be beneficial.
+
+#### *Are vital signs really associated with deterioration?*
+
+I also investigated the very basic assumption of whether vital signs are truly associated with deterioration.
+The idea of EWSs was conceived as a result of: \textit{1. evidence that hospital patients deteriorated and suffered morbidity and mortality whilst on hospital wards}, and \textit{2. that this deterioration can be identified by the patients vital signs changing over the previous few hours}[@Findlay2012; @Hillman2002; @Hogan2012; @Kause2004].
+However, the second point has never been convincingly proven in the literature.
+To address this, in Chapter \@ref(trajectories) I examined the distribution of vital signs over the four day period prior to either hospital discharge, ICU admission, or death.
+To varying degrees all six vital signs which I investigated showed distributional changes prior to either ICU admission or death.
+This reinforced the theory that deterioration is associated with changes in vital signs.
+However there were different magnitudes of change, and differences in the timing of change between the different vital signs.
+The change was most notable and early for respiratory rate.
+This analysis also helped me to identify the 48 hour time horizon, as an appropriate one to use in developing and validating EWSs.
+The systematic review (Chapter \@ref(sr)) found that a great variety of time horizons are used, some which were completely inconsistent with the aim of EWSs (i.e. in-hospital or 30 days).
+My results showed that nearly all vital sign changes occurred within 48 hours of the event, and therefore this was a reasonable time horizon to use in the later chapters.
+
+#### *How should the multiple measurements per patient be accounted for?*
+
+There are several additional complexities for EWS research when compared to standard clinical prediction modelling studies.
+The most notable problem is that each patient has their vital signs measured multiple times throughout their hospital stay, and it is not clear how this clustered data should be used to develop and validate EWSs.
+In Chapter \@ref(simulation), through the use of a simulation study, I compared four alternative approaches to using the clustered data for model validation.
+The results showed that, whilst the magnitude of model performance estimates changed, the ranking of different models was relatively consistent.
+I took this as enough evidence to suggest that the simplest and most data-efficient approach should therefore be used.
+This approach uses all sets of vital sign observations per patient, without needing to make any adjustments.
+
+
+### More patient-specific EWSs are necessary
+
+The majority of EWSs, and particularly the ones in common use (e.g. MEWS, NEWS), are very simple scoring systems.
+The same scoring system is used for all adult hospital inpatients, with the exception of pregnant women.
+Yet the scores are typically very simple, and do not account for the characteristics of the patient (e.g. age, sex, ethnicity), illness, or comorbidities.
+This simple approach is largely related to the historical restriction of paper-based observation charts.
+However, observations are increasingly being documented using electronic systems, so there is no need for simple scoring systems to remain in place.
+To identify potential ways for EWSs to become more patient-specific I chose to examine the discriminatory performance of NEWS (the current gold standard EWS) in a variety of subgroups.
+I considered the patients age, their primary consultant type (as a proxy for the type of illness causing their hospitalisation), and the ward on which their observations were taken.
+There was a large amount of heterogeneity.
+When grouping patients according to consultant treatment type NEWS performed poorly, for example in vascular surgery, cardiology, and urology patients.
+However it was difficult to discern any patterns amongst treatment codes where NEWS performed well or poorly.
+Grouping by hospital ward gave a fairly similar picture - considerable heterogeneity of performance, but no clear patterns.
+When patients were grouped according to their age there was a clearer picture.
+When predicting ICU admission, the performance was similar across all ages.
+However when predicting death the performance was considerably worse in young patients (<40 years), in those aged 51-60 and the older patients (>80 years).
+This result gives motivation for a potential EWS which could be age-specific.
+As noted before, the results in Chapter \@ref(centiles) showed that there is a strong relationship between age and many vital signs.
+These issues may be addressed by including age and vital sign interaction terms in a new EWS - to allow the prognostic value associated with a vital sign to vary according to the age of the patient.
+
+
+### Development of an age-specific EWS
+
+Based on the accumulated knowledge from the previous chapters I was in a position to develop a new EWS, using best-practice statistical methods.
+My approach was to make the EWS age-specific, as previous chapters had shown that this may be an important step in improving the performance of EWSs.
+A series of age-by-vital sign interaction terms allowed for the prognostic value of specific vital signs to vary according to the age of the patient.
+I developed two new models - one to predict ICU admission, and one to predict death - previous chapters had shown they were substantially different outcomes.
+By comparison to the NEWS, the new age-specific models showed large improvements in model performance, even after internal validation to adjust for optimism.
+I used decision curve analyses to assess the clinical impact of using the age-specific EWSs by comparison to NEWS.
+For predicting death the age-specific model improved net benefit from 31% to 40%, and for predicting ICU admission the net-benefit improved from 18% to 32%.
+These are really substantial gains.
+
+## Limitations of this research
+
+There are limitations of the results presented in this thesis, and there is much more interesting work to be done.
+One limitation is that the results I have presented are entirely based upon data from the Oxford University Hospitals NHS Foundation Trust.
+There may be characteristics of this data set that are not representative of the wider population, and therefore the new models, for example, may not work as well as expected.
+This is why external validation is so important, and I will seek to do this in the future.
+Ultimately the best test of a prediction model is using it in clinical practice, and ideally in the context of a randomised controlled trial.
+However these are complex studies to do in the context of EWSs, where there have been few truly randomised trials.
+
+Another limitation relates to the use of longitudinal data in EWSs.
+In development and validation I have used multiple observation sets per patients without adjustment.
+This may be problematic by causing models, or assessment of their performance, to be biased towards the type of patients who contribute more observation sets.
+However, this does actually relate to clinical practice, where each action is taken based on each observation set.
+Furthermore, the simulation study in Chapter \@ref(simulation) indicates it was an acceptable approach.
+I feel that there is much potential in being able to use the longitudinal nature of EWS data for prediction purposes.
+However, as I will discuss in the next section, this is not again a very difficult challenge.
+
+A further limitation of the research in this thesis, and a complication of EWSs in general, is that treatments are given to patients between when predictors are measured and when outcomes are observed.
+This may modify the true relationship between those predictors and outcomes, and therefore the relationships that are observed may be inaccurate.
+For example when a patients blood pressure rises they may be prescribed an ACE inhibitor, which will lower the blood pressure, and potentially reduce their risk.
+Therefore, the data may appear to show that high blood pressure is not linked with any increased risk of outcome - this may be true, or it may be because raised blood pressure is always observed and treated.
+This is undoubtedly problematic, but the scale of the problem is unclear and difficult to assess.
+I will describe some potential ways of countering this problem in the next section.
+
+## Future work {#sec:ch9s2}
+
+There are many avenues for future research that logically follow on from the work contained in this thesis.
+I will summarise a few of these options below.
+
+### External validation and implementation
+
+Having developed the two new EWSs in Chapter \@ref(ageews) it is important that they are used in clinical practice.
+To enable this to happen I will first need to prove that the models work well in data from other hospitals, i.e. an external validation study.
+External validation is necessary because prediction models often work better in the data used to develop them than other settings[@Collins2015].
+I soon hope to have access to data from a number of other UK hospital trusts for this purpose, pending ethical approval.
+The external validation study will again compare the performance of the two new models to the current 'gold standard' NEWS.
+
+After external validation the focus will move on to implementing the models.
+There are arguably two aspects to this.
+Firstly, gaining the approval or backing of policy makers.
+This will likely require publication of the model development and external validation, followed by dialogue with the groups that lead the policy making in this area, such as NHS England, the Royal College of Physicians, and National Institute for Health and Care Excellence (NICE).
+The second aspect is the implementation of the models into the existing hospital protocols and e-Obs systems.
+This may require the input of researchers from other specialties such information technology, implementation science, and human factors, so that the models are implemented in a way that makes them useful and useable to clinical staff.
+
+
+### Dynamic prediction models
+
+At the outset of this project I hoped to explore the use of so called 'dynamic prediction' methods within this thesis, however for reasons which I will explain this proved unfeasible.
+Nonetheless, in the future this approach may be of interest.
+Standard prediction modelling studies typically make predictions based on a patient's current health status.
+However, dynamic prediction methods make predictions based on a patients past health status in addition to their current health status[@Rizopoulos2011].
+This means that the trend within a patient's measurements over time can be directly accounted for when estimating their future risk.
+This approach may offer a distinct advantage when there is variability in 'normal' values between patients.
+There is also potential for this approach to offer earlier prediction, as a trend towards deterioration may be observed before the current values alone cause any concern.
+Dynamic prediction models are typically implemented using a 'joint modelling' approach.
+Where the longitudinal outcome and time-to-event models and 'jointly' modelled, typically through shared random effects.
+However, this is currently extremely computationally intensive[@Hickey2016].
+There have been examples of dynamic prediction models in other disease areas which appear to be promising, but they have all used relatively small data sets[@Keogh2019; @Grand2019; @Studerus2020].
+
+Using a variety of software packages I tried to implement a joint model based on a model with three simple continuous predictors and a time-to-event outcome.
+I reduced the data set to 10,000 patients (from the total of more than 200,000), and none of the models would fit within a week.
+Since the packages could not fit this simple model, based on a much reduced data set, it was not a viable option for my thesis.
+In addition, as currently implemented the type of models that can be implemented in a joint model are somewhat limited.
+For example, modelling non-linear relationships between predictors and outcomes is not easy.
+In standard regression models automated approaches can be used to find the optimal functional form of the relationship, however for joint models these functional forms would need to be pre-specified[@Ferrer2019].
+There is an additional problem, which is that a joint model requires a defined start time, and further observations are taken with reference to this.
+In many of the examples which have used these methods the start time is well defined, as birth or time of diagnosis[@Keogh2019; @Grand2019; @Studerus2020].
+However, with EWSs the time of hospital admission is not a true baseline, as patients will be at different stages of their illness, and perhaps the notion of a start time would be counter-productive.
+
+Whilst, for these reasons, I was not able to implement the joint model in my thesis, it is still a very promising approach.
+As methods advance, and computation time becomes quicker, joint models and dynamic prediction may become a viable option for EWSs.
+For example a recent paper has shown that by taking a two-stage approach, the computation time can be dramatically reduced, with limited bias introduced[@Mauff2020].
+
+
+### Even more patient-specific models
+
+In Chapter \@ref(ageews) I have shown that there is substantial gain in making EWSs more age-specific.
+However, there remains a lot of potential to make EWSs even more sophisticated and patient-specific.
+There are a variety of options for increasing their complexity, which I will now describe:
+\textit{1. Account for the patient's illness (or reason for hospitalisation).}
+In Chapter \@ref(validation) I found that there was considerable heterogeneity in the performance of NEWS between different treatment codes.
+There were not any obvious patterns associated with the performance that could easily be addressed.
+However, undoubtedly there will be some illness or disease factors that could relatively easily be included in a model to further improve the predictive accuracy.
+Alternatively different models may need to be developed for different disease or illness settings, e.g. post surgical patients, or COPD patients.
+\textit{2. Account for co-morbidities or frailty.}
+A patient's risk of deterioration may be affected by their primary illness as described in the previous point, but also by their comorbidities.
+Therefore predictive accuracy may improve further through the addition of variables describing a patients comorbidities.
+This may be through classifying specific comorbidities (e.g. respiratory comorbidities), or through an overall summary measure of comorbidities (e.g. the hospital frailty score[@Gilbert2018], or the Charlson comorbidity index[@Austin2015]).
+\textit{3. Use data from previous hospital admissions.}
+Arguably, looking at a patient's current vital signs with reference to their own normal levels is more informative than with reference to the population normal levels.
+For example, a patient whose blood pressure is raised by comparison to their own normal range, but whose normal range is low, may not trigger using most EWSs.
+A patient's normal range for vital signs could be quantified using data from their previous hospital admissions (if available).
+To assess their most 'healthy' values, data from the last 24 hours of their stay could be used.
+\textit{4. Use laboratory data.}
+EWSs could alternatively become more complex through the use of laboratory data, such as measurements of haemoglobin, white cell count, etc.
+Some EWSs have already taken this approach, with apparent improvements in predictive accuracy[@Redfern2018a; @Churpek2014].
+The fact that blood tests are carried out less frequently, and at different times to vital sign observations may add some complexity to the modelling approach.
+
+### Accounting for treatment
+
+A problem that is common amongst the majority  of clinical prediction modelling studies is that treatment may be given between the time when the covariates are measured and the outcomes are observed.
+This can cause problems, because the treatment will potentially modify the relationship between predictors and outcomes.
+In EWSs this is likely to be true, as clinical staff may respond to abnormal vital signs with drug treatments.
+Not accounting for these treatments will likely lead to poorer model performance in practice than expected.
+However, the solution is not clear.
+Some suggest that the treatment could be explicitly modelled when developing a clinical prediction model, and perhaps by using causal inference approaches[@Groenwold2016; @Pajouheshnia2017; @VanGeloven2020].
+An alternative is to use a mixture model type approach[@Cole2016].
+
+## Concluding remarks
+
+This thesis has provided a great opportunity to take a detailed look at some of the key issues related to the development and validation of EWSs.
+The systematic review shows that the quality of the current literature is very poor.
+I have proposed some better approaches, and shown that these can potentially have a real benefit to clinical practice.
+This is a field that will continue to rapidly evolve, as more and more data becomes available, and greater reliance in put upon electronic tools.
+It is important that statistical methods also advance, to avoid the application of poor and misleading models.

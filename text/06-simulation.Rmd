@@ -1,0 +1,894 @@
+---
+output:
+  html_document: default
+  word_document: default
+  pdf_document: default
+bibliography: ../EWS papers.bib
+---
+
+```{block type='savequote', include=knitr::opts_knit$get('rmarkdown.pandoc.to') == 'latex', quote_author='(ref:christie-quote)'}
+
+Everyone's got to find out for themselves what method suits them best.
+
+<!-- ending a line with a lonely backslash inserts a linebreak -->
+```
+(ref:christie-quote) --- Agatha Christie
+
+# Simulation study to examine different methods to assess model performance {#simulation}
+\minitoc <!-- this will include a mini table of contents-->
+
+\newpage
+## Introduction {#sec:ch6s1}
+
+It is not clear how best to assess the performance of EWSs given that each patient may contribute multiple observation sets.
+There are several different approaches used in the literature.
+Each approach may give a different perspective on how well a model performs.
+I will assess how well the different approaches agree with each other using a simulation study, and hopefully be able to recommend a single approach to use henceforth.
+The findings from this study will inform how I approach the validation of EWSs in Chapters \@ref(validation) and \@ref(ageews).
+
+
+### The problem {#sec:ch6s2}
+
+When evaluating the performance of a clinical prediction model there are typically two aims.
+The first is to know whether the  performance of a model is 'good enough' in that data set, and therefore likely to be useful in clinical practice.
+Typically this is assessed by looking at calibration, discrimination, and overall performance measures.
+Defining what 'good enough' means depends on the clinical setting, and can vary considerably between settings.
+The second aim is to assess which model from a set of multiple (competing) models performs best in that data set, and therefore which should be proposed for use in clinical practice.
+There are many published examples from a variety of clinical settings, which have carried out such evaluations and have led to models being implemented in clinical practice[@HippisleyCox2017; @DAgostino2008; @Harrison2008].
+
+The type of data that is typically used in these studies is fairly straightforward, where each patient contributes one set of predictors and one outcome measurement.
+In instances where a patient may have multiple sets of predictors in the data set, for example repeated visits to the GP in the case of QRISK[@HippisleyCox2017], typically the first visit is chosen per patient.
+However, EWSs are unlike many of these other examples. since the vital sign data on which they are generally based upon are measured repeatedly and frequently throughout the hospital stay of the patient.
+It therefore does not seem appropriate or efficient in the EWS setting to use only the first set of data per patient. 
+There are a few reasons for this.
+First, this approach could remove approximately 90-95% of the available data.
+In the Oxford data there are a mean of 17 observation sets for each admission.
+Second, there is good reason to suspect that using only the first set of observations will not give a representative estimate of the performance assessment, since during the initial part of their hospital stay compared to later on, patients may typically be in a different health state, and the provision and type of nursing and medical care may differ.
+
+However, using all observation sets per admission is not straightforward and creates other problems.
+Without any adjustment, which is typical, the observation sets (i.e. repeated measurements within the same patient) are assumed to be independent from each other, which is likely to be an unrealistic assumption.
+Also, there is further concern that certain types of patient (i.e. older, sicker patients) are likely to have vital signs assessed more frequently, and perhaps have a longer hospital stay, and therefore the data set is weighted disproportionately in favour of this type of patient.
+
+There is no consensus on how to evaluate model performance with this type of data.
+Therefore a wide variety of approaches are used.
+This means that it becomes very difficult to compare the results of multiple studies, and it becomes very difficult to disentangle which model performs best.
+The aim of this chapter is to investigate and understand the consequences of using each approach, look at how well they agree with each other, and make recommendations for which should be used.
+As a secondary aim I will also examine the effect of sample size on the estimates of model performance. 
+
+
+### Proposed solutions in the literature {#sec:ch6s3}
+
+The systematic review in Chapter \@ref(sr) found that the majority of external validation studies (66%) relied on using only a single set of vital sign observations per admission, which was typically the first.
+These were often studies that used 'in-hospital' or 30-day outcome time horizons, which as previously discussed are not appropriate for EWS that aim to identify acute deterioration.
+Multiple observations per admission were included in 27% of external validation studies.
+However, only 9% of these made any adjustment or accounted for including multiple observations per subject.
+
+Jarvis and colleagues wrote a paper comparing the effects of different methods for selecting observation sets[@Jarvis2015d].
+They compared three possible approaches: 1) use all observations sets per admission; 2) randomly sample one observation set per admission, repeat this process 10000 times, and average the performance; 3) randomly identify a single time-point during each admission, select the observation set closest to this, repeat 10000 times, and average the performance. 
+However the study was not a simulation study, but rather a case-study that simply carried out this process once on a large data set.
+Furthermore, the only performance metric assessed was the c-index.
+The ranking of 35 separate EWSs according to the c-index was compared between the three strategies.
+They found that there was little difference in the ranking of EWSs regardless of which strategy was used, with the possible exception of EWSs which included an age term.
+
+A further approach is one described and implemented by Escobar, Kipnis and colleagues [@Escobar2012; @Kipnis2016].
+This approach uses a data set that has regular measurements, as opposed to the typically irregular recording of vital signs.
+Therefore the data set of irregularly recorded vital signs is transformed to one with a set of observations every hour/shift/etc.
+This would be done by starting with the time of hospital admission, and then by counting forward every hour (or shift) a new set of observations would be assumed, until discharge.
+The new observation sets would take the form of the most recent value for each vital sign.
+Thus a patient in hospital for a period of 48 hours would contribute 48 sets of observations (if an hourly period were used).
+This approach could lead to the same 'true' set of vital signs being used in the artificial data set many times, or conversely a 'true' observation set may not be included at all, if another set is recorded shortly afterwards.
+The motivation for this approach is not clear, but is perhaps motivated by the idea that the models developed using this approach may calculate their scores every hour/shift/etc.
+
+### *Validation approaches* to test in this simulation study {#sec:ch6s4}
+
+In the rest of this chapter, for clarity, I will refer to the different approaches for manipulating the data set as 'validation approaches'.
+Although the validation approach which uses the first observation set is most common, it is clearly not useful if the aim of the EWS is to monitor deterioration, as described earlier.
+Thus there appears to be four reasonable approaches from the literature, as listed below, and shown in Figure \ref{fig:diagram1}.
+
+\begin{center}
+\fbox{\begin{varwidth}{\dimexpr\textwidth-2\fboxsep-2\fboxrule\relax}
+Validation approaches to test in simulation study: 
+
+\begin{enumerate}
+  \item \textbf{\textit{All observations}}
+  Use all observation sets (and assume independence). This means that each of the 'true' sets of vital signs will be used in the analysis, without any changes.
+  \item \textbf{\textit{Random observation}}
+  Randomly select one observation set per admission (and bootstrap). This approach will randomly sample one set of vital sign observations per hospital admission. Due to the potential for noise, from reducing the size of the available data, a bootstrapping type approach will be used. This will be done by repeating the method 200 times, and averaging the resulting performance statistics.
+  \item \textbf{\textit{Random time point}}
+  Randomly select a time point during the patients admission and use the observation set nearest to that time point (and bootstrap). This approach is similar to 2, but seeks to remove any potential bias towards the randomly chosen set of observations being more likely to occur in certain periods (e.g. during severe illness). Therefore, a single time point will be randomly chosen during each hospital stay, and then the observation set closest to this will be chosen. Again, a bootstrapping type approach will be used.
+  \item \textbf{\textit{Regular observations transformation}}
+  Transform the data set into six-hourly observations. The new data set will consist of one row every six hours from hospital admission, until the point of discharge or censoring due to death, ICU admission, or cardiac arrest. The vital sign values attributed to each row will be those most recently recorded.
+\end{enumerate}
+\end{varwidth}}
+\end{center}
+
+
+
+```{r diagram1, echo=FALSE, fig.cap="A visual depiction of the four validation approaches", out.width='100%', message=FALSE, warning=FALSE, out.extra=''}
+
+knitr::include_graphics("./diagram1.png")
+
+```
+
+```{r diagram2, echo=FALSE, fig.cap="A visual depiction of how observation sets are linked to outcome events", out.width='100%', message=FALSE, warning=FALSE, out.extra=''}
+
+knitr::include_graphics("./diagram2.png")
+
+```
+
+### Aim of this study {#sec:ch6s5}
+
+The aim of this chapter is to assess the level of agreement between the four validation approaches (mentioned in Section \@ref(sec:ch6s4)) when evaluating the performance of multiple EWSs.
+The idea of 'agreement' is important here, since it is impossible to identify what the 'best' approach is.
+Each approach may assess performance in a different way, but there is no way of knowing which approach relates best to a model working well in clinical practice.
+Therefore the emphasis of this study will be on assessing the agreement between the four candidate approaches.
+If the agreement is good enough then the choice of approach does not matter.
+If there is disagreement then more consideration will be needed.
+
+### Introduction to simulation studies {#sec:ch6s5a}
+
+Instead of attempting to answer this question by using a single data set I will use a simulation study approach.
+Simulation studies use multiple (randomly generated) data sets and apply different statistical methods in each one.
+Typically the results are then compared to a known 'truth'.
+Then properties of the statistical methods can be considered, such as bias.
+The benefit of a simulation study is that we are able to understand the empirical properties of the statistical methods, i.e. how they behave on average when used many times.
+A further benefit of the simulation approach is that we are able to vary important parameters of the data set, in order to assess the empirical performance (of the statistical methods) in a variety of different scenarios.
+
+For the simulation study in this chapter there is no universal 'truth' which can be used as a reference to compare the four validation approaches to.
+Instead I will summarise the degree of agreement between each of the approaches in terms of a set of model performance metrics (c-index, calibration slope, and R^2^).
+If the agreement is sufficiently strong, then a pragmatic choice can be made regarding which approach to recommend for use.
+
+There is also a secondary aim of this simulation study, which is to investigate the effect of sample size on the evaluation of EWSs.
+I will do this by varying the number of event patients and the prevalence of event patients within the study.
+The bias and variability of the performance metrics will then be assessed.
+
+
+## Methods {#sec:ch6s6}
+
+### Data set {#sec:ch6s7}
+
+The data used in this simulation study was based on the HAVEN data set.
+The data were split according to year of admission; 2017 was used for model development, and 2018 was used for validation.
+It is the 2018 validation data that will be sampled from and used in the simulation study.
+Data from other years were discarded (but were included in the imputation process).
+The characteristics of the two cohorts were very similar.
+For the purpose of this simulation study multiple imputation was not computationally feasible to perform within each run of the simulation. 
+Therefore a single imputation (according to the methods described in Section \@ref(sec:ch2s15)) was performed before the simulation, and all subsequent analyses were based on this data set.
+
+\FloatBarrier
+### Prognostic Models {#sec:ch6s8}
+
+Four models of varying complexity were developed using the 2017 development data set.
+All observation sets were  used in the  development, with no adjustment, similar to validation approach 1 described earlier in Section \@ref(sec:ch6s4).
+Each  model was developed using  Cox Regression, with death as the outcome.
+Time was censored 48 hours after the observation set, such that an observation set was only linked to a death if the death occurred  within  48 hours.
+The most simple model had just one predictor, the National Early Warning Score, which itself is a composite of six vital signs.
+The NEWS was  allowed to have a  non-linear relationship  with the  outcome through the use of fractional polynomial terms.
+The next model considered the same vital signs terms which form the NEWS, but modeled each one separately.
+The continuous terms were again allowed to have non-linear relationships with the outcome, through the use of fractional  polynomials.
+The next model included the same  terms  as the previous model, but additionally included age and interactions between age and vital signs.
+Again, fractional  polynomial terms were used for each additional variable.
+The final model added in terms for method of admission (emergency or elective), and type of admission (medical or surgical).
+Each of the models are described in table \@ref(tab:modsim).
+
+```{r echo=FALSE, message=FALSE, warning=FALSE}
+mods = read.csv("C:/Users/stephen.gerry/Dropbox/Steve work/VM/SimStudy_models.csv", header = FALSE)
+
+library(kableExtra)
+
+kable(mods, caption = "(\\#tab:modsim) A description of the terms included in each of the four models", booktabs = T, col.names = c("Model","Variables Included")) %>%
+  column_spec(2, width="30em") %>%
+kable_styling(latex_options = c("hold_position"))
+
+```
+
+\FloatBarrier
+### Data-generating mechanism {#sec:ch6s9}
+
+There are two main ways to create data sets for use in simulation studies.
+The most common method is to take 'draws' from a known model. 
+The alternative is to resample with replacement from an existing data set.
+In both cases this would usually be done many times.
+The benefit of drawing from a model is that the data-generating mechanism is known, and therefore so is the 'truth' of the characteristic (or 'estimand') that is being measured.
+It is also much easier to vary the parameters of the data-generating mechanism when drawing from a model compared to a resampling approach.
+The benefit of the resampling approach is that the data are obviously more clinically realistic because real data are used, whereas complex data can be hard to simulate through a model-based approach.
+
+Due to the complexity of repeated measures vital sign data (and the associated outcomes) I decided to use the resampling approach for this simulation study.
+Despite using the resampling approach it is still possible to sample selectively from certain sub-populations (e.g. patients who have the event of interest), and also to control the number of samples that are selected.
+Therefore a re-sampling strategy was devised to examine the influence of the number and prevalence of events on the agreement between the four validation approaches.
+Sampling was carried out at the patient level, and not the observation set level, therefore the sampled data of a single patient may include multiple sets of vital sign observations.
+
+Patients were randomly drawn (with replacement) from the 2018 validation data set such that the number of event patients in each sample was fixed at 10, 25, 50 or 100, and the prevalence of event patients was fixed at 0.5%, 1%, 2% or 5%, by stratified sampling according to the outcome (i.e. sampling from the event and non-event patients separately to achieve the required numbers shown Table \@ref(tab:dgm)).
+Thus 16 scenarios for the number and prevalence of event patients were examined (Table \@ref(tab:dgm)).
+For each scenario 500 samples were randomly drawn.
+
+
+```{r echo=FALSE, message=FALSE, warning=FALSE}
+dgm = read.csv("C:/Users/stephen.gerry/Dropbox/Steve work/VM/SimStudy_dgm.csv", header = FALSE)
+
+library(kableExtra)
+
+kable(dgm, "latex", caption = "(\\#tab:dgm) Different data generating mechanisms used in the simulation study", booktabs = T, align = 'c', col.names = c("No. event patients","Event patient prevalence","No. non-event patients","Total no. patients")) %>%
+kable_styling(latex_options = c("hold_position","scale_down"))
+
+```
+
+### Analysis within each simulated data set {#sec:ch6s10}
+
+Within each sample (simulated data set) the data were manipulated according to the four validation approaches being investigated (outlined in Section \@ref(sec:ch6s4)), and the performance of each of the four models was measured.
+The performance metrics which I assessed are described in the next section.
+
+Thus, there were 16 assessments of model performance within each simulated data set, i.e. four validation approaches applied to four models.
+
+
+### Performance Metrics {#sec:ch6s11}
+
+The performance of the prognostic models was quantified by assessing aspects of model discrimination (the c‐index), calibration, and overall performance (R^2^).
+These are described in Section \@ref(sec:ch2s16), but I will briefly summarise them again.
+
+Discrimination is the ability of a prognostic model to differentiate between people with different outcomes, such that those without the outcome (e.g., alive) have a lower predicted risk than those with the outcome (e.g., dead). 
+For logistic regression models this is equivalent to the area under the receiver operating characteristic curve. 
+This can be interpreted as the probability that, for a randomly chosen pair of patients where one experiences the event and one does not, the patient who actually experiences the event of interest has a lower predicted value.
+
+The calibration slope was calculated by estimating the regression coefficient in a logistic regression model with the log-odds as the only covariate. 
+If the slope is <1, this indicates that the model is over-predicting risk in the validation set, and if the slope is >1 the model is under-predicting risk.
+
+The R^2^ is an overall performance metric, that typically varies between zero and one,  and can  be interpreted as the  percentage of explained  variation.
+There are several variants of the R^2^ statistic, but Nagelkerke's version was used in this study, which is one of the most widely used.
+
+\FloatBarrier
+### Evaluation {#sec:ch6s12}
+
+The main objective of the study was to assess the effect of different validation approaches on deciding which of the four models performed best/worst.
+This was achieved through ranking the four models according to the performance metrics (previous section), for each of the four validation approaches, and over each of the simulations.
+Overall agreement was then summarised for all validation approaches, and for each pairwise comparison of validation approaches, as the proportion of times that the ranking of models was the same using each validation approaches.
+
+A secondary objective of the study was to evaluate the impact of sample size (more precisely the number of events) on the accuracy, precision and variability of model performance. 
+Given the definitions: $\theta$ is the true value, $\hat\theta_{i}$ is the estimate of $\theta$ from the $i$th repetition and $\bar\theta$ is the average of $\hat\theta_{i}$ over all the estimates; the following properties will be calculated for each of the performance measures over the simulations:
+
+Percentage bias, which is the relative magnitude of the raw bias to the true value, defined as $(\frac{1}{n_{sim}}\displaystyle\sum_{i=1}^{n}\hat{\theta_{i}} - \theta)/\theta$. 
+
+Empirical standard error, which is a summary of the variability of the estimates and does not depend on the true value, defined as $\sqrt{\frac{1}{n_{sim}-1}\displaystyle\sum_{i=1}^{n}(\hat{\theta_{i}} - \bar{\theta}})^2$.
+
+Root mean square error, which is a metric that combines bias and variability, defined as $\sqrt{\frac{1}{n_{sim}}\displaystyle\sum_{i=1}^{n}(\hat{\theta_{i}} - {\theta}})^2$.
+
+The true values (θ) of the performance measures were obtained using the entire validation data set for each model.  
+
+
+\FloatBarrier
+## Results {#sec:ch6s13}
+
+\FloatBarrier
+### 'True' Performance {#sec:ch6s14}
+
+The 'true' performance was assessed using the whole 2018 validation data set.
+Later in the results section I will compare the results from the simulated data sets to these true values in order to assess metrics such as bias.
+Each of the four validation approaches were applied, and the performance of each of the four models was assessed.
+Thus there were 16 assessments of "truth", i.e. four validation approaches applied to four models.
+
+Although these true performance values are not of vital importance in this chapter, i.e. they are only useful as a reference point, I will offer a little interpretation of the results since I believe this will help put the results of the simulation study in to context.
+
+These values are shown in figures \ref{fig:truthc} to \ref{fig:truthslope}.
+For both the c-index and R^2^, the values are higher (indicating better performance) for the more complex models.
+This pattern is true for all four validation approaches.
+However the absolute values are different, with approaches one and four broadly similar, but approaches two and three showing an upwards shift.
+The interpretation for the calibration slope is different, since here the values should be as close to one as possible.
+Since the four models were generated using a method akin to validation approach 1 (using all observations without adjustment), it is not surprising that each of the four models are well calibrated (close to one) using approach 1.
+For the rest of the approaches, all of the models seem to under-predict risk in the validation data set.
+Although there is a shift it is clear that within each validation approach, the ranking of models according to calibration slope is the  same, however it is not clear how to interpret this.
+
+Note that in all of these cases the magnitude of difference between models within each validation approach is not large.
+The c-index and R^2^ are generally close together for models 1 and 2 (the most simple models), and models 3 and 4 (the most complex models).
+
+```{r truthc, echo=FALSE, fig.cap="True c-index values for the four models according to each of the four methods in 2018 validation data set", fig.width=6, fig.height=4, message=FALSE, warning=FALSE, out.extra=''}
+
+library(ggplot2)
+library(gridExtra)
+library(cowplot)
+library(dplyr)
+library(tidyr)
+library(boot)
+
+
+load(file="C:/Users/stephen.gerry/Dropbox/Steve work/VM/SimStudy/truth_results.RData")
+
+truth.c +
+  xlab("Model")
+
+```
+
+```{r truthr2, echo=FALSE, fig.cap="True R\\textsuperscript{2} values for the four models according to each of the four methods in 2018 validation data set", fig.width=6, fig.height=4, message=FALSE, warning=FALSE, out.extra=''}
+
+truth.r2 +
+  xlab("Model")
+
+```
+
+```{r truthslope, echo=FALSE, fig.cap="True calibration slope values for the four models according to each of the four methods in 2018 validation data set", fig.width=6, fig.height=4, message=FALSE, warning=FALSE, out.extra=''}
+
+truth.slope +
+  xlab("Model")
+
+```
+
+\FloatBarrier
+### Agreement of model ranking {#sec:ch6s15}
+
+\FloatBarrier
+#### C-index agreement {#sec:ch6s16}
+
+Figure \ref{fig:sim1} shows the proportion of simulations (out of 500), for each number and prevalence of event patients, where all four validation approaches agreed in terms of how the four models ranked according to the c-index performance.
+It is clear that as the number of event patients increases the agreement between validation approaches improves, however the  prevalence of event patients seems to have no impact.
+Whilst the proportion of simulations that agree may seem relatively low, there are 24 possible ways of ordering the four models, and therefore the agreement due to chance would only be $1/24^3=0.007\%$.
+When there are just 10 event patients the agreement is between 14-17%, which increases to 39-44% when there are 100 event patients.
+
+
+```{r sim1, echo=FALSE, fig.cap="Percentage Agreement in Ranking C-Index of All Methods", fig.width=6, message=FALSE, warning=FALSE, out.extra=''}
+
+load(file="C:/Users/stephen.gerry/Dropbox/Steve work/VM/SimStudy/cindex_plots.RData")
+
+all
+
+```
+
+Figure \ref{fig:simpairc} show each of the six pairwise comparisons between different the validation approaches.
+By definition, the agreement in each of these pairwise comparisons is as good as or better than the overall agreement between the four approaches.
+Methods one (use all observations without adjustment) and four (transformation to regular observations) appear to have very good agreement with each other (figure \ref{fig:simpairc3}), along with approaches two (random observation set) and three (random time point) (figure \ref{fig:simpairc4}), where in both cases the agreement is more than 70% when there are 100 event patients.
+For the comparisons between either of approaches one and four vs either of approaches two and three (i.e. 1 vs 2, 1 vs 3, 2 vs 4, 3 vs 4), the agreement is less good, but still around 50-60% when 100 event patients are considered.
+
+
+```{r simpairc, echo=FALSE, fig.cap="Pairwise Percentage Agreement in Ranking C-Index between Methods", fig.subcap=c('Approach 1 vs 2','Approach 1 vs 3','Approach 1 vs 4','Approach 2 vs 3','Approach 2 vs 4','Approach 3 vs 4'), fig.ncol=2, out.width="50%", fig.show='hold', fig.width=6, message=FALSE, warning=FALSE, out.extra=''}
+
+g1_2
+g1_3
+g1_4
+g2_3
+g2_4
+g3_4
+
+```
+
+\FloatBarrier
+#### R^2^ agreement {#sec:ch6s17}
+
+Similarly to the c-index, the ordering of models according to R^2^ was also assessed.
+Figure \ref{fig:sim8} shows the proportion of simulations where all four approaches agree in terms of how they rank the four models.
+As with  the c-index, the greater the number of event patients, the better the agreement between approaches.
+Unlike the c-index, the prevalence of event patients does have an impact for R^2^, where the agreement is better for lower prevalences.
+This is  likely to be because the total sample size is greater for the lower prevalences, assuming the number of event patients is held constant, and compared to the c-index the precision of the R^2^ depends to a greater extent on the overall sample size.
+
+
+```{r sim8, echo=FALSE, fig.cap="Percentage Agreement in Ranking R\\textsuperscript{2} of All Methods", fig.width=6, message=FALSE, warning=FALSE, out.extra=''}
+
+load(file="C:/Users/stephen.gerry/Dropbox/Steve work/VM/SimStudy/r2_plots.RData")
+
+all
+
+```
+
+Figures \ref{fig:simpairr} shows each of the six pairwise comparisons between different approaches.
+Again, by definition, the agreement in each of these pairwise comparisons is as good as or better than the overall agreement between the four approaches.
+There is a similar pattern as there was with the c-index. 
+Methods one and four appear to have very good agreement with each other (figure \ref{fig:simpairr3}), along with approaches two and three (figure \ref{fig:simpairr4}), where in both cases the agreement is more than 60% when there are 100 event patients.
+For the comparisons between either of approaches one and four vs either of approaches two and three (i.e. 1 vs 2, 1 vs 3, 2 vs 4, 3 vs 4), the agreement is less good, but still at least 47% when 100 event patients are considered, and often considerably better.
+
+
+```{r simpairr, echo=FALSE, fig.cap="Pairwise Percentage Agreement in Ranking R\\textsuperscript{2} between Methods", fig.subcap=c('Approach 1 vs 2','Approach 1 vs 3','Approach 1 vs 4','Approach 2 vs 3','Approach 2 vs 4','Approach 3 vs 4'), fig.ncol=2, out.width="50%", fig.show='hold', fig.width=6, message=FALSE, warning=FALSE, out.extra=''}
+
+g1_2
+g1_3
+g1_4
+g2_3
+g2_4
+g3_4
+
+```
+
+\FloatBarrier
+#### Calibration slope agreement {#sec:ch6s18}
+
+Figure \ref{fig:sim15} shows the proportion of simulations (out of 500), for each number and prevalence of event patients, where all four validation approaches agreed in terms of how the four models ranked according to the calibration slope performance.
+Unlike the c-index and R^2^, the calibration slope agreement is very poor (at best 3%), however there are several likely reasons for this.
+First, a higher calibration slope does not imply better performance, but instead values close to one imply good calibration.
+Second, unlike the c-index and R^2^, the 'true' ranking of models according to calibration slope differs depending on the approach (Figure \ref{fig:truthslope}), and therefore as the sample size gets larger the simulation results are likely to mimic this, and thus will not agree.
+Perhaps this is why the agreement actually gets worse by one or two percent as the number of event patients increases.
+Finally, and perhaps most importantly the 'true' calibration slopes are all very similar within each approach (although not necessarily between approaches), and therefore slightly different rankings are of little importance, and may easily occur by chance.
+
+
+```{r sim15, echo=FALSE, fig.cap="Percentage Agreement in Ranking Calibration Slope of All Methods", fig.width=6, message=FALSE, warning=FALSE, out.extra=''}
+
+load(file="C:/Users/stephen.gerry/Dropbox/Steve work/VM/SimStudy/calslope_plots.RData")
+
+all
+
+```
+
+Figures \ref{fig:simpaircal} shows the pairwise agreement between validation approaches in terms of ranking models by calibration slope.
+It is again true that the highest percentage agreement is between approaches one and four, and approaches two and three (around 20-40%).
+The number of event patients seems to have little impact on the percentage agreement in any of the comparisons.
+Whilst it is generally true that the agreement is marginally better for higher prevalences.
+
+```{r simpaircal, echo=FALSE, fig.cap="Pairwise Percentage Agreement in Ranking Calibration Slope between Methods", fig.subcap=c('Approach 1 vs 2','Approach 1 vs 3','Approach 1 vs 4','Approach 2 vs 3','Approach 2 vs 4','Approach 3 vs 4'), fig.ncol=2, out.width="50%", fig.show='hold', fig.width=6, message=FALSE, warning=FALSE, out.extra=''}
+
+g1_2
+g1_3
+g1_4
+g2_3
+g2_4
+g3_4
+
+```
+
+\FloatBarrier
+### Sample Size {#sec:ch6s19}
+
+A secondary question of the simulation study was to understand what sample size (or more specifically number of event patients) is required when carrying out external validation studies of EWSs.
+Part of this is to understand the effect of the event prevalence.
+
+This section will go through each of the performance metrics in turn (c-index, R^2^ and calibration slope), and examine the empirical performance, and percentage bias.
+
+\FloatBarrier
+#### Effect of sample size on c-index {#sec:ch6s20}
+
+In figures \ref{fig:sim22} to \ref{fig:sim25} the empirical c-index values are shown for validation approaches 1 to 4 respectively.
+The results presented here are limited to the assessment  of model four (for brevity), but the results and conclusions are the same for all models.
+Each figure plots the c-index from each of the 500 simulated data sets for each combination of the number of event patients (10, 25, 50 and 100) and the prevalence of event patients (0.5%, 1%, 2%, and 5%).
+Quartile values are overlaid for each number/prevalence combination, along with the 'true' performance.
+
+For all validation approaches the empirical performance shows, as expected, that there is considerable variation in the sample values when the number of events is small.
+Thus, inaccurate estimation of the true performance is more likely in studies with a low numbers of event patients.
+
+For all approaches there is a clear pattern that, no matter what the number of event patients, as the prevalence increases the average c-index decreases.
+This pattern is more pronounced for approaches one and four compared to two and three.
+On the face of it this is unexpected, since the c-index is known to be independent of the event prevalence.
+Thus, this characteristic must somehow be related to the structure of the data.
+To understand this unexpected relationship, it first has to be understood that the observation sets of event patients which are not linked to the event in the analysis (i.e. those which are more than 48 hours before the event), result in predicted probabilities of the event that are higher on average than those of patients who do not have an event.
+This is because a patient who will die in hospital is more likely to be sicker than the average patient who does not die, even if death is not imminent.
+When the prevalence of event patients increases, these observation sets of event patients but not linked to the event, become a greater proportion of the non-event observation sets.
+Thus, on average, as the prevalence increases the c-index decreases.
+
+The variation of values appears to be less for approaches 2 and 3, than for approaches 1 and 4.
+However this is not because these approaches are inherently less variable, but because the 'true' values are closer to one, which is the upper bound, and therefore the values cannot vary to the same extent.
+
+In addition to the greater variability associated with low sample size, there is also evidence of a systematic bias for higher C-Indices with low sample sizes.
+Again, this is true regardless of the validation approach.
+
+
+```{r sim22, echo=FALSE, fig.cap="Empirical C-Index Performance According to Prevalence and Number of Events for Method 1", fig.width=6, message=FALSE, warning=FALSE, out.extra=''}
+
+load(file="C:/Users/stephen.gerry/Dropbox/Steve work/VM/SimStudy/cindex_plots.RData")
+
+p1
+
+```
+
+```{r sim23, echo=FALSE, fig.cap="Empirical C-Index Performance According to Prevalence and Number of Events for Method 2", fig.width=6, message=FALSE, warning=FALSE, out.extra=''}
+
+p2
+
+```
+
+```{r sim24, echo=FALSE, fig.cap="Empirical C-Index Performance According to Prevalence and Number of Events for Method 3", fig.width=6, message=FALSE, warning=FALSE, out.extra=''}
+
+p3
+
+```
+
+```{r sim25, echo=FALSE, fig.cap="Empirical C-Index Performance According to Prevalence and Number of Events for Method 4", fig.width=6, message=FALSE, warning=FALSE, out.extra=''}
+
+p4
+
+```
+
+\FloatBarrier
+
+The percentage bias, empirical standard error, and root mean square error of the c-index are shown in each of figures \ref{fig:sim26} to \ref{fig:sim29} for approaches one to four respectively.
+With 10 event patients the median percentage bias is around 2%, regardless of approach.
+Although at 5% prevalence the median percentage bias in smaller, and close to zero.
+This is not because higher prevalences give less biased results, but is due to the characteristic discussed previously that higher prevalences result in lower C-Indices.
+Thus, the bias in low sample sizes is 'counter-acted' by this downwards shift.
+
+
+```{r sim26, echo=FALSE, fig.cap="Percentage Bias, Empirical SE, and RMSE of C-Index Performance According to Prevalence and Number of Events for Method 1", fig.width=6, message=FALSE, warning=FALSE, out.extra=''}
+
+library(ggpubr)
+
+ggarrange(bias.1, empse.1, rmse.1, ncol = 3, common.legend = TRUE, legend = "bottom")
+
+```
+
+```{r sim27, echo=FALSE, fig.cap="Percentage Bias, Empirical SE, and RMSE of C-Index Performance According to Prevalence and Number of Events for Method 2", fig.width=6, message=FALSE, warning=FALSE, out.extra=''}
+
+ggarrange(bias.2, empse.2, rmse.2, ncol = 3, common.legend = TRUE, legend = "bottom")
+
+```
+
+```{r sim28, echo=FALSE, fig.cap="Percentage Bias, Empirical SE, and RMSE of C-Index Performance According to Prevalence and Number of Events for Method 3", fig.width=6, message=FALSE, warning=FALSE, out.extra=''}
+
+ggarrange(bias.3, empse.3, rmse.3, ncol = 3, common.legend = TRUE, legend = "bottom")
+
+```
+
+```{r sim29, echo=FALSE, fig.cap="Percentage Bias, Empirical SE, and RMSE of C-Index Performance According to Prevalence and Number of Events for Method 4", fig.width=6, message=FALSE, warning=FALSE, out.extra=''}
+
+ggarrange(bias.4, empse.4, rmse.4, ncol = 3, common.legend = TRUE, legend = "bottom")
+
+```
+
+
+\FloatBarrier
+#### Effect of sample size on R^2^ {#sec:ch6s21}
+
+In figures \ref{fig:sim30} to \ref{fig:sim33} the empirical R^2^ performance is shown for validation approaches 1 to 4 respectively (using all observations without adjustment, random observation set, random time point, transformation to regular observations).
+As before with the c-index, the results presented here are limited to the assessment  of model four, but the conclusions are the same for all models.
+Each figure plots the R^2^ from each of the 500 simulated data sets for each combination of the number of event patients (10, 25, 50 and 100) and the prevalence of event patients (0.5%, 1%, 2%, and 5%).
+Quartile values are overlaid for each combination of number of events and prevalence combination, along with the 'true' performance.
+
+For all approaches the empirical performance shows considerable variation in the sample values when the number of events is small.
+This inaccuracy is problematic, since the observed values may potentially be far from the true values, and could lead to poor decisions being made about recommending models for clinical practice.
+Unlike with the c-index, there is no obvious bias towards better performance when the number of event patients is low.
+
+Again, as with the c-index, there appears to be a relationship with the prevalence of the event patients.
+However, this time higher prevalences give higher R^2^ values on average.
+This pattern is probably observed because Nagelkerke's R^2^ is a scaled R^2^ measure, which means that it is relative to the maximum possible value.
+The maximum possible value is dependent on the likelihood, and this in turn is dependent on the event prevalence.
+Ultimately the point is that pseudo-R^2^ values are difficult to compare between data sets, and instead are more useful when comparing two or models using the same data set[@Steyerberg2009].
+
+
+```{r sim30, echo=FALSE, fig.cap="Empirical R\\textsuperscript{2} Performance According to Prevalence and Number of Events for Method 1", fig.width=6, message=FALSE, warning=FALSE, out.extra=''}
+
+load(file="C:/Users/stephen.gerry/Dropbox/Steve work/VM/SimStudy/r2_plots.RData")
+
+p1
+
+```
+
+```{r sim31, echo=FALSE, fig.cap="Empirical R\\textsuperscript{2} Performance According to Prevalence and Number of Events for Method 2", fig.width=6, message=FALSE, warning=FALSE, out.extra=''}
+
+p2
+
+```
+
+```{r sim32, echo=FALSE, fig.cap="Empirical R\\textsuperscript{2} Performance According to Prevalence and Number of Events for Method 3", fig.width=6, message=FALSE, warning=FALSE, out.extra=''}
+
+p3
+
+```
+
+```{r sim33, echo=FALSE, fig.cap="Empirical R\\textsuperscript{2} Performance According to Prevalence and Number of Events for Method 4", fig.width=6, message=FALSE, warning=FALSE, out.extra=''}
+
+p4
+
+```
+
+\FloatBarrier
+
+The percentage bias, empirical standard error, and root mean square error of the R^2^ are shown in each of figures \ref{fig:sim34} to \ref{fig:sim37} for validation approaches one to four respectively.
+The median percentage bias is independent of the number of event patients, regardless of approach.
+However there is a large effect of prevalence, which was seen previously in figures \ref{fig:sim30} to \ref{fig:sim33}.
+When the prevalence is between 1% and 2%, i.e. similar to the underlying data, the absolute percentage bias is less than 5% regardless of the approach.
+The empirical SE and RMSE are of a similar magnitude to each other, and the results are similar across all four approach.
+They show that the error progressively reduced as the number of event patients increases, with no obvious plateau effect.
+
+```{r sim34, echo=FALSE, fig.cap="Percentage Bias, Empirical SE, and RMSE of R\\textsuperscript{2} Performance According to Prevalence and Number of Events for Method 1", fig.width=6, message=FALSE, warning=FALSE, out.extra=''}
+
+library(ggpubr)
+ggarrange(bias.1, empse.1, rmse.1, ncol = 3, common.legend = TRUE, legend = "bottom")
+
+```
+
+```{r sim35, echo=FALSE, fig.cap="Percentage Bias, Empirical SE, and RMSE of R\\textsuperscript{2} Performance According to Prevalence and Number of Events for Method 2", fig.width=6, message=FALSE, warning=FALSE, out.extra=''}
+
+ggarrange(bias.2, empse.2, rmse.2, ncol = 3, common.legend = TRUE, legend = "bottom")
+
+```
+
+```{r sim36, echo=FALSE, fig.cap="Percentage Bias, Empirical SE, and RMSE of R\\textsuperscript{2} Performance According to Prevalence and Number of Events for Method 3", fig.width=6, message=FALSE, warning=FALSE, out.extra=''}
+
+ggarrange(bias.3, empse.3, rmse.3, ncol = 3, common.legend = TRUE, legend = "bottom")
+
+```
+
+```{r sim37, echo=FALSE, fig.cap="Percentage Bias, Empirical SE, and RMSE of R\\textsuperscript{2} Performance According to Prevalence and Number of Events for Method 4", fig.width=6, message=FALSE, warning=FALSE, out.extra=''}
+
+ggarrange(bias.4, empse.4, rmse.4, ncol = 3, common.legend = TRUE, legend = "bottom")
+
+```
+
+\FloatBarrier
+#### Effect of sample size on Calibration Slope {#sec:ch6s22}
+
+In figures \ref{fig:sim38} to \ref{fig:sim41} the empirical calibration slope performance is shown for validation approaches 1 to 4 respectively.
+Again, the results presented here are limited to the assessment of model four, which was the model with most complexity, but the conclusions are the same for all models.
+Each figure plots the calibration slope from each of the 500 simulated data sets for each combination of the number of event patients (10, 25, 50 and 100) and the prevalence of event patients (0.5%, 1%, 2%, and 5%).
+The quartile values are overlaid for each combination of number of events and prevalence combination, along with values of the 'true' performance.
+
+For all approaches the empirical performance shows considerable variation in the sample values when the number of events is small.
+Thus it is important that evaluations of model calibration are based on a reasonably large data set.
+These results suggest that at least 100 event patients are required to achieve estimated that are not too variable.
+There is no obvious relationship between performance and the number of event patients.
+However there is a relationship between performance and prevalence, where higher prevalences on average produce smaller calibration slopes, but the magnitude of the change is small. As with the c-index, this relationship is most likely due to the greater influence of non-event linked observations from patients who subsequently have the event.
+
+```{r sim38, echo=FALSE, fig.cap="Empirical Calibration Slope Performance According to Prevalence and Number of Events for Method 1", fig.width=6, message=FALSE, warning=FALSE, out.extra=''}
+
+load(file="C:/Users/stephen.gerry/Dropbox/Steve work/VM/SimStudy/calslope_plots.RData")
+
+p1
+
+```
+
+```{r sim39, echo=FALSE, fig.cap="Empirical Calibration Slope Performance According to Prevalence and Number of Events for Method 2", fig.width=6, message=FALSE, warning=FALSE, out.extra=''}
+
+p2
+
+```
+
+```{r sim40, echo=FALSE, fig.cap="Empirical Calibration Slope Performance According to Prevalence and Number of Events for Method 3", fig.width=6, message=FALSE, warning=FALSE, out.extra=''}
+
+p3
+
+```
+
+```{r sim41, echo=FALSE, fig.cap="Empirical Calibration Slope Performance According to Prevalence and Number of Events for Method 4", fig.width=6, message=FALSE, warning=FALSE, out.extra=''}
+
+p4
+
+```
+
+\FloatBarrier
+
+The percentage bias, empirical standard error, and root mean square error of the calibration slope are shown in each of figures \ref{fig:sim42} to \ref{fig:sim45} for approaches one to four respectively.
+With the exception of 10 events, median percentage bias is fairly independent of the number of event patients, regardless of approach.
+However there is a small effect of prevalence, which has been observed previously in figures \ref{fig:sim38} to \ref{fig:sim41}.
+The magnitude of the bias was greater for approaches 2 and 3, reaching nearly 20% in low numbers of event patients, whilst for approaches 1 and 4 the bias was at most 10%.
+The empirical SE and RMSE are of a similar magnitude to each other, and the results are similar across all four approaches.
+They show that the error progressively reduces as the number of event patients increases, with no obvious plateau effect.
+
+```{r sim42, echo=FALSE, fig.cap="Percentage Bias, Empirical SE, and RMSE of  Calibration Slope Performance According to Prevalence and Number of Events for Method 1", fig.width=6, message=FALSE, warning=FALSE, out.extra=''}
+
+library(ggpubr)
+
+ggarrange(bias.1, empse.1, rmse.1, ncol = 3, common.legend = TRUE, legend = "bottom")
+
+```
+
+```{r sim43, echo=FALSE, fig.cap="Percentage Bias, Empirical SE, and RMSE of Calibration Slope Performance According to Prevalence and Number of Events for Method 2", fig.width=6, message=FALSE, warning=FALSE, out.extra=''}
+
+ggarrange(bias.2, empse.2, rmse.2, ncol = 3, common.legend = TRUE, legend = "bottom")
+
+```
+
+```{r sim44, echo=FALSE, fig.cap="Percentage Bias, Empirical SE, and RMSE of Calibration Slope Performance According to Prevalence and Number of Events for Method 3", fig.width=6, message=FALSE, warning=FALSE, out.extra=''}
+
+ggarrange(bias.3, empse.3, rmse.3, ncol = 3, common.legend = TRUE, legend = "bottom")
+
+```
+
+```{r sim45, echo=FALSE, fig.cap="Percentage Bias, Empirical SE, and RMSE of Calibration Slope Performance According to Prevalence and Number of Events for Method 4", fig.width=6, message=FALSE, warning=FALSE, out.extra=''}
+
+ggarrange(bias.4, empse.4, rmse.4, ncol = 3, common.legend = TRUE, legend = "bottom")
+
+```
+
+\FloatBarrier
+### Investigating the use of the Efficiency Curve {#sec:ch6s23}
+
+This section is somewhat separate from the majority of this chapter, but it addresses an important question about the evaluation of EWSs, and the methods that are commonly used.
+As mentioned in Section \@ref(sec:ch2s20) the 'efficiency curve' is a method used to evaluate the performance of EWSs.
+The intention of the method is to evaluate the workload (i.e. proportion of all observation sets about the threshold value) associated with using EWSs.
+There are several examples of the method being used in published papers[@Redfern2018; @Pimentel2019; @Smith2013e; @Prytherch2010a].
+
+I will briefly summarise how the efficiency curve is formulated.
+For each possible value of the EWS, it plots the sensitivity at that value versus the percentage of observation sets that achieve a score (or predicted risk) greater than or equal to that value.
+This is similar to the receiver operating characteristic curve which plots sensitivity against 1 - specificity.
+Both curves are shown in Figure \ref{fig:sim46}.
+In papers which include both types of curve it is apparent that one is very similar to the other when transposed (since the standard practice is to place sensitivity on different axes for ROC and efficiency curves), for example [@Prytherch2010a].
+Therefore one may question how the efficiency curve metric 'workload' differs from the ROC metric 'specificity', or more precisely 1 - specificity, since these are what appear to be identical when the axes are flipped (Figure \ref{fig:sim47}).
+
+\begin{figure}
+\newcommand\MyBox[2]{
+  \fbox{\lower 1.35cm
+    \vbox to 2.7cm{\vfil
+      \hbox to 2.7cm{\hfil\parbox{2.4cm}{#1\\#2}\hfil}
+      \vfil}%
+  }%
+}
+
+\begin{center}
+\noindent
+\renewcommand\arraystretch{1.5}
+\setlength\tabcolsep{0pt}
+\begin{tabular}{c >{\bfseries}r @{\hspace{0.7em}}c @{\hspace{0.4em}}c @{\hspace{0.7em}}l}
+  \multirow{10}{*}{\rotatebox{90}{\parbox{8cm}{\bfseries\centering True outcome}}} & 
+    & \multicolumn{2}{c}{\bfseries Predicted outcome} & \\
+  & & \bfseries event & \bfseries non-event & \bfseries Total \\
+  & \rotatebox[origin=c]{90}{\centering event} & \MyBox{\centering True Positive}{\centering $(a)$} & \MyBox{\centering False Negative}{\centering $(b)$} & $a+b$ \\[4.2em]
+  & \rotatebox[origin=c]{90}{\centering non-event} & \MyBox{\centering False Positive}{\centering $(c)$} & \MyBox{\centering True Negative}{\centering $(d)$} & $c+d$ \\
+  & Total & $a+c$ & $b+d$ & $N$
+\end{tabular}
+\caption{A contingency table showing possible predicted vs observed outcomes}\label{fig:confusion}
+\end{center}
+\end{figure}
+
+
+Sensitivity, specificity, and workload can all be defined as follows (See \ref{fig:confusion} to understand the definition of true/false positive and true/false negative).
+
+$$ \begin{aligned}
+Sensitivity &= \frac{TP}{TP+FP} \\
+\\
+Specificity &= \frac{TN}{TN+FN} \\
+\\
+Workload &= \frac{FP+TP}{N}
+\end{aligned}$$
+
+Workload can be re-framed in terms of sensitivity, specificity, and prevalence as 
+$$ \begin{aligned}
+Workload &= (1-specificity) \times (1-prevalence)  + sensitivity \times prevalence \\
+&= 1 - specificity + prevalence \times (sensitivity + specificity -1)
+\end{aligned}$$
+
+This contains the 1-specificity term which was expected to be there, and which we proposed as almost identical to workload.
+The second term $prevalence \times (sensitivity + specificity -1)$ is maximised when sensitivity and specificity are either both one or both zero, in which case the extra term would be equal to either adding the prevalence, or subtracting the prevalence, respectively.
+When the sensitivity and specificity sum to 1, i.e. the 45 degree line on a ROC curve (equivalent to tossing a coin), the 'extra' term is zero.
+In the setting of EWS studies the prevalence will nearly always be less than 5%, therefore the extra term is typically small.
+Therefore the efficiency and ROC curves are always going to be effectively identical in the context of EWS studies.
+
+
+```{r sim46, echo=FALSE, fig.cap="Example ROC Curve and Efficiency Curve", fig.width=6, fig.height=3, message=FALSE, warning=FALSE, out.extra=''}
+
+load("C:/Users/stephen.gerry/Dropbox/Steve work/VM/SimStudy/efficiency_examples.RData")
+
+grid.arrange(e1,e2,nrow=1)
+
+```
+
+```{r sim47, echo=FALSE, fig.cap="Example ROC Curve and Efficiency Curve with Flipped Axes", fig.width=6, fig.height=3, message=FALSE, warning=FALSE, out.extra=''}
+
+grid.arrange(e1,e3,nrow=1)
+
+```
+
+\FloatBarrier
+
+I will illustrate this point using a simple resampling simulation study.
+Using the 2018 validation data set patients were split into those who had the event and those who did not.
+Then by using stratified sampling I was able to achieve different prevalences of event patients as desired.
+For the purpose of figure \@ref(fig:sim48) 10000 patients were randomly selected with replacement for each panel, and the prevalence of event patients set as 0.5%, 1%, 2%, 5%, 25%, and 50%.
+It is apparent that the two curves are identical for prevalences up to and including 5%.
+When the prevalence of event patients is 25% or 50% the curves are still remarkably similar.
+This is in part because whilst the prevalence of event patients is 50%, the prevalence of *event observations* is much lower (~10%), since the patients who die will have many observations sets recorded outside of the 48 hour window prior to death.
+The finding is also in part due to the finding discussed earlier in the chapter, that as the prevalence of event patients increases the c-index decreases, which means that at 25% and 50% the performance is relatively poor and therefore the $sensitivity + specificity -1$ part of the 'extra' term will be close to zero.
+
+(ref:sim48) ROC and Flipped Efficiency Curves at Different Prevalences of (0.5%, 1%, 2%, 5%, 25%, and 50%) Event Patients 
+
+
+```{r sim48, echo=FALSE, fig.cap='(ref:sim48)', fig.width=6, message=FALSE, warning=FALSE, out.extra=''}
+
+e5
+
+```
+
+The area under the curve can be calculated for both the efficiency and ROC curves.
+By simulating multiple data sets in the fashion described earlier, the two areas can be compared.
+The results reinforce the idea that the two methods are practically identical.
+At 5% prevalence the difference in the area under the curves is on average 0.7%, or 1 in 143, a negligible amount.
+Therefore it seems appropriate to conclude that the efficiency curve has no value in assessing the performance of EWSs.
+
+(ref:sim49) Simulation Results of C-Index vs Area Under Efficiency Curve at Different Prevalences (0.5%, 1%, 2%, and 5%) 
+
+
+```{r sim49, echo=FALSE, fig.cap='(ref:sim49)', fig.width=6, message=FALSE, warning=FALSE, out.extra=''}
+
+load("C:/Users/stephen.gerry/Dropbox/Steve work/VM/SimStudy/efficiency_plots.RData")
+
+grid.arrange(p1,p2)
+
+```
+
+\FloatBarrier
+
+## Discussion {#sec:ch6s24}
+
+In this chapter I presented a simulation study to assess the effect of four different approaches to using vital sign data when evaluating the performance of EWSs (using all observations without adjustment, random observation set, random time point, transformation to regular observations).
+Four 'dummy' models were developed and then assessed using each of the four potential approaches through a resampling simulation study.
+In addition, the prevalence of event patients and the total sample size were varied, to assess the effect of these two factors.
+For a variety of performance metrics (c-index, R^2^, and calibration slope), the degree of agreement between how each validation approach ranked the four models was assessed.
+
+### The agreement between validation approaches {#sec:ch6s25}
+
+The agreement between validation approaches was best when the models were ranked using the c-index.
+When 100 event patients were included, all four approaches ranked the four models identically in approximately 40% of the simulations.
+The agreement was particularly good for approach one versus four, and approach two versus three (approximately 80% for 100 event patients).
+
+The agreement between approaches was also good when models were ranked by the R^2^.
+However, unlike the c-index, the agreement varied considerably depending on the event patient prevalence. 
+With a low prevalence (i.e. 2% or lower) and 100 event patients, the agreement between all four approaches approached 50%.
+When the event prevalence increased to 5%, the agreement was around 30%.
+This effect was attributed to a smaller sample size, and therefore greater variability of estimates, associated with a higher event rate.
+Again, from each of the pairwise comparisons between approaches, the best agreement was for approach one versus four, and approach two versus three (approximately 80% with 100 event patients and 0.5% prevalence).
+
+The agreement between validation approaches was much poorer when models were ranked according to calibration slope.
+The overall agreement between approaches was just 2%.
+However, to rank models according to the calibration slope is not really a meaningful concept.
+Whilst good calibration of a clinical prediction model is essential for the model to be useful in clinical practice, the calibration slope is simply required to be near one, and it is not a case of the higher the better.
+It is most likely that the reason for the poor agreement was that the 'true' ranking of models varied according to approach, unlike the c-index and R^2^.
+A more important finding regarding the calibration slope is apparent from the 'true' performance values.
+Since the four models were developed using approach one (using all observations without adjustment), it is to be expected that the validation calibration is good (close to one) using approach one.
+All other approaches show a degree of over-prediction, which is most noticeable for approach two, followed by approach three, then approach four.
+This is most likely caused in some way by the fact that the different approaches substantially change the ratio between event and non-event observations.
+Method 2 (random observation set), with the worst calibration, gives a calibration slope averaging around 1.25, which is not extremely bad.
+However, these aspects need to be kept in mind when implementing models in practice.
+For example, a model developed using approach one, i.e. at the observation level, will tend to over-predict risks somewhat if evaluated at a patient level.
+
+### The effect of sample size {#sec:ch6s26}
+
+The examination of the effect of sample size within this simulation study was really of a secondary interest here.
+The results were perhaps not-surprising, and were in fact very similar findings from several other studies[@Peek2007; @Vergouwe2005; @Collins2016].
+The number of event patients assessed were 10, 25, 50, and 100.
+For each of the performance metrics there was no obvious plateauing effect in terms of bias or precision across the range of sample sizes, indicating that studies should include at least 100 event patients, and preferably more.
+With the c-index, bias was quite large for small sample sizes, but was negligible at 100 event patients.
+Bias was less of a problem for the R^2^ and calibration slope, but variability much greater, and still considerable at 100 event patients.
+ 
+### Other important findings {#sec:ch6s27}
+
+An interesting and unexpected finding of this simulation study was that there is a notable impact of varying the prevalence of event patients on the performance metrics, and particularly the c-index.
+This is related to the fact that not all observation sets from event patients are coded as event observations, since they may more than 48 hours from the event.
+However, it seems that these observation sets (the ones more than 48 hours before the event, from event patients) result in higher predicted risks, on average, than observation sets from non-event patients.
+Therefore, regardless of the validation approach, the effect of increasing the prevalence of event-patients is that the proportion of total non-event observations coming from the event patients increases.
+On average this leads to poorer performance (lower C-Indices) with higher prevalences of event-patients.
+This could be important, since a validation of an EWS in a high risk setting may seemingly result in poor performance, relative to a healthier population.
+A potential example of this is the study by Pimentel et al, which carried out an external validation of the NEWS and its recent revision NEWS2[@Pimentel2019].
+The analysis was carried out on the basis of approach one.
+The c-index to predict 24 hour mortality was given in patients with documented type 2 respiratory failure (T2RF), and those without.
+The performance of NEWS2 was 0.816 in the first group and 0.833 in the latter.
+However, the patient event rates were substantially different, 11.4% versus 2.3%.
+Therefore, whilst NEWS2 may appear to predict less well in those with T2RF than those without, this may be a misleading finding.
+
+Another secondary finding was the limited value of the so called 'efficiency curve'.
+Mathematically the efficiency curve was shown to be almost identical to a flipped ROC curve.
+The difference is that 'workload' replaces specificity, but these terms can only differ by at most the prevalence of the outcome, which is almost always very low in the context of EWSs.
+A more informative alternative to the efficiency curve is decision curve analysis.
+This was introduced in Section \@ref(sec:ch2s19) and will be used in Chapter \@ref(ageews).
+
+### Strengths and limitations
+
+This study helped to address a question that has been largely ignored in the literature.
+Currently different researchers have taken different approaches to model validation, but there is little knowledge of how they compare.
+This study has addressed that question, and found that there is a good level of agreement between approaches.
+The results corroborate the study from Jarvis et al, which was based on a single dataset[@Jarvis2015d].
+This study uses a much stronger methodology than that study, through the use of a simulation approach.
+This allowed multiple scenarios to be tested, each many times.
+
+There were also some weaknesses with the approach I took.
+I used a resampling approach to simulation, which is well respected and widely used, but does limit the generalisability of the results somewhat.
+The results also limited to a single outcome, which was death, it is possible that the results would have been different if I had also looked at other outcome measures.
+Finally, as I mentioned in the introduction, the study has shown us how well the four approaches *agree*, but has not told us which approach is *best*.
+Therefore it is possible that all four approaches are poor, and a different approach altogether should be chosen.
+The question of which approach is *best* is arguably impossible to answer.
+
+
+## Conclusion {#sec:ch6s28}
+
+Evaluating the performance of EWSs in such complex data is challenging.
+This study compared four approaches for formulating the data set, for the purpose of evaluating model performance.
+The aim was to identify the extent of the agreement between each of the approaches.
+With a sufficiently large sample size, the results suggested that according to the c-index and R^2^, the four approaches ranked the different models the same in approximately 40% of simulations.
+Whilst this is by no means perfect agreement, it is substantially greater than that expected by chance (0.007%).
+Regardless of the approach, the true performance values were actually quite similar, particularly for models one versus two, and three versus four.
+Therefore it is perhaps not surprising that the agreement between approaches is not perfect.
+
+I think the evidence is strong enough to suggest that the approaches are sufficiently similar, and therefore the choice of which approach to use can be a pragmatic one.
+I think that validation approach one should be used as the default, where each set of vital sign observations is used in the analysis without any transformation.
+It is undoubtedly the most simple approach, and this is a substantial benefit.
+If using approaches two, three, and four, there is a considerable possibility of coding errors occurring, which may lead to misleading findings.
+The additional computational burden of the alternative approaches is also of interest. 
+Over the multiple simulated analyses, approaches two and four took more than twice as long to run as approach one, whilst approach three took around 50% longer.
+Finally, approach one also has the benefit that it most accurately reflects clinical practice.
+In reality health professionals are making a prognostic judgement based on the result of each set of vital signs.
+For all of these reasons I will use this approach in Chapter \@ref(validation) (where I will evaluate the performance of NEWS in multiple subgroups) and Chapter \@ref(ageews) (where I will develop and internally validate a new EWS).
+
+
+
+
+
+

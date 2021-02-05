@@ -1,0 +1,28 @@
+Early warning scores (EWSs) are tools used by hospital staff to monitor the health status of patients, and identify those at risk of deterioration.
+They are used extensively around the world.
+Historically they were implemented as part of paper-based observation charts, and were therefore simple tools.
+More recently vital signs are increasingly documented using electronic systems, allowing for more sophisticated EWSs to be introduced.
+
+I carried out a systematic review to assess the methodological quality of previous studies which have developed or validated EWSs.
+The review highlighted a number of common deficiencies.
+All studies were found to be at high risk of bias.
+
+Using the HAVEN data set which included approximately four years' worth of data from the Oxford University Hospitals Trust, I investigated some of the underlying hypotheses of EWSs (and the vital sign data they rely upon).
+Most current EWSs do not account a patient's age, however I found that there are large differences in the normal ranges of most vital signs across the age spectrum, most notably in the case of blood pressure and oxygen saturation.
+I also examined the assumption underlying EWSs, which is that vital signs become increasingly abnormal as a patient deteriorates.
+By assessing the distribution of vital signs over the four days prior to hospital discharge, ICU admission, and death, I was able to observe that the majority of vital signs do become abnormal over the previous 24-48 hours for those patients who went to ICU or died.
+
+The data used in EWS research is more complex than traditional prediction modelling studies because each patient may contribute multiple sets of measurements.
+How best to use this clustered data is not clear, and a number of different approaches are seen in previous studies.
+Using a simulation study, I was able to identify the best approach, and this was what I used going forward.
+
+External validation of the most commonly used EWS (NEWS) revealed that its predictive performance varied considerably depending on the patient's illness, the ward they were on, and their age.
+It was difficult to discern any particular pattern underlying the illness/ward heterogeneity that would identify factors which should be included in a new model.
+However, it was clear that a patient's age should be accounted for.
+
+I developed a new age-specific EWS, which separately predicts ICU admission and death.
+By using age by vital sign interactions I enabled the predictive power of each vital sign to vary according to the age of the patient.
+This model showed substantial improvements in performance compared to NEWS.
+
+
+

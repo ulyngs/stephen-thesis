@@ -1,0 +1,1365 @@
+`r if(knitr:::is_latex_output()) '\\startappendices'`
+
+`r if(!knitr:::is_latex_output()) '# (APPENDIX) Appendix {-}'` 
+
+<!-- If you feel it necessary to include an appendix, it goes here. The first appendix should include the commands above. -->
+
+
+# Systematic review appendix
+
+\FloatBarrier
+
+
+\newpage
+\blandscape
+
+```{r echo=FALSE, message=FALSE, warning=FALSE, out.extra='', results='asis'}
+
+library(kableExtra)
+library(pander)
+
+info=read.csv('C:/Users/stephen.gerry/Dropbox/Steve work/VM/SR/Development_formatted_251019.csv')
+
+info <- subset(info, Was.a.regression.modelling.approach.used. == "Yes")
+
+df <- info[c("Ref", "Outcome.measure", "Outcome.time.horizon")]
+
+row.names(df) <- NULL
+
+colnames(df) <- c("Reference", "Outcome measure", "Prediction horizon")
+
+panderOptions('table.split.cells', 20)
+
+pandoc.table(df, split.table = "Inf", split.cells=20, caption = "Model development outcome measures and time horizons used in the 23 studies that used a regression  modelling approach to develop an early warning score. (\\#tab:dev2)")
+
+```
+
+\blfootnote{ICU: Intensive care unit}
+
+\elandscape
+\newpage
+
+\newpage
+\blandscape
+
+```{r echo=FALSE, message=FALSE, warning=FALSE, out.extra='', results='asis'}
+
+library(kableExtra)
+library(pander)
+
+info=read.csv('C:/Users/stephen.gerry/Dropbox/Steve work/VM/SR/Development_formatted_251019_thesis_special.csv')
+
+df <- info[c("Ref", "No..candidate.predictors", "No..predictors.in.final.model", "Predictors.in.model")]
+
+colnames(df) <- c("Reference", "Number of candidate predictors", "Number of predictors in final model", "Predictors included in the final model")
+
+panderOptions('table.split.cells', 20)
+
+pandoc.table(df, split.table="Inf", split.cells=30, caption = "Predictor variables considered as candidates and included in the final model, reported for the papers reporting the development of an early warning score. (\\#tab:dev3)")
+
+```
+
+\blfootnote{AKI: Acute kidney injury, AST: Aspartate transaminase, BMI: Body mass index, BUN: Blood urea nitrogen, COPS: Comorbidity point score, CRP: C-reactive protein, CT: Computed  tomography, DBP: Diastolic blood pressure, ECG: Electrocardiogram, ELOS: Elapsed length of stay, HIV: Human immunodeficiency virus, HR: Heart rate, ICU: Intensive care unit, LAPS: Laboratory-based Acute Physiology Score, LOS: Length of stay, MEWS: Modified early warning score, MRI: Magnetic resonance imaging, NEWS: National early warning score, PaO2: Partial pressure of oxygen, pCO2: Partial pressure of carbon dioxide, RR: Respiratory rate, SBP: Systolic blood pressure, SpO2: Oxygen saturation, WBC: White blood cell}
+
+\elandscape
+\newpage
+
+\newpage
+\blandscape
+
+```{r echo=FALSE, message=FALSE, warning=FALSE, out.extra='', results='asis'}
+
+library(kableExtra)
+library(pander)
+
+info=read.csv('C:/Users/stephen.gerry/Dropbox/Steve work/VM/SR/Development_formatted_251019.csv')
+
+info <- subset(info, X != c(4,65,80,93,145))
+
+df <- info[c("Ref", "Type.of.modelling.approach", "Model.building.approach", "How.were.continuous.variables.handled.", "Missing.data.referred.to.", "What.missing.data.approach.was.used.")]
+
+rownames(df) <- NULL
+
+colnames(df) <- c("Reference", "Modelling approach", "Variable selection approach", "Handling of continuous variables", "Was missing data referred to", "Missing data approach")
+
+panderOptions('table.split.cells', 10)
+
+pandoc.table(df, split.table = "Inf", split.cells=10, caption = "Details of the methods used by the 29 studies that developed an early warning score using a statistical approach. (\\#tab:dev5)")
+
+
+```
+
+\elandscape
+\newpage
+
+\newpage
+\blandscape
+
+```{r echo=FALSE, message=FALSE, warning=FALSE, out.extra='', results='asis'}
+
+library(kableExtra)
+library(pander)
+
+info=read.csv('C:/Users/stephen.gerry/Dropbox/Steve work/VM/SR/Development_formatted_251019.csv')
+
+info <- subset(info, X != c(4,65,80,93,145))
+
+df <- info[c("Ref", "Were.multiple.sets.of.observations.used.per.patient.", "If.single..which.one.", "No..patients", "No..observation.sets", "No..event.patients", "No..observation.events", "EPV.patient.level", "EPV.obs.level")]
+
+rownames(df) <-  NULL
+
+colnames(df) <- c("Reference", "Multiple observations per patient", "If single, which one", "No. patients", "No. observations", "No. event patients", "No. event observations", "Events patients per variable", "Event observations per variable")
+
+panderOptions('table.split.cells', 10)
+
+pandoc.table(df, split.table = "Inf", split.cells=10, caption = "Sample size reported in the 34 articles describing the  development of an early warning scorer. (\\#tab:dev4)")
+
+
+```
+
+\elandscape
+\newpage
+
+
+\newpage
+\blandscape
+
+```{r echo=FALSE, message=FALSE, warning=FALSE, out.extra='', results='asis'}
+
+library(kableExtra)
+library(pander)
+
+info=read.csv('C:/Users/stephen.gerry/Dropbox/Steve work/VM/SR/Development_formatted_251019.csv')
+
+info <- subset(info, Was.a.regression.modelling.approach.used. == "Yes")
+
+df <- info[c("Ref", "Full.regression.modelling.formula.shown", "Predictor.coefficients.presented", "Were.risk.groups.created.", "Was.a.simplified.model.created.")]
+
+rownames(df) <- NULL
+
+colnames(df) <- c("Reference", "Full regression formula shown", "Predictor coefficients shown", "Risk groups created", "Simplified model created")
+
+panderOptions('table.split.cells', 10)
+
+pandoc.table(df, split.table = "Inf", split.cells=10, caption = "Presentation of model development by the 23 studies developing an early warning score using a regression approach. (\\#tab:dev6)")
+
+
+```
+
+\elandscape
+\newpage
+
+\newpage
+\blandscape
+
+```{r echo=FALSE, message=FALSE, warning=FALSE, out.extra='', results='asis'}
+
+library(kableExtra)
+library(pander)
+
+info=read.csv('C:/Users/stephen.gerry/Dropbox/Steve work/VM/SR/Development_formatted_251019.csv')
+
+df <- info[c("Ref", "Was.apparent.performance.assessed.", "Was.discrimination.tested.", "Was.calibration.tested.", "Was.a.ROC.curve.produced.")]
+
+colnames(df) <- c("Reference", "Apparent performance assessed", "Discrimination assessed", "Calibration assessed", "ROC curve presented")
+
+panderOptions('table.split.cells', 10)
+
+pandoc.table(df, split.table = "Inf", split.cells=10, caption = "Assessment of apparent performance in the 34 studies developing an early warning score. (\\#tab:dev7)")
+
+```
+
+\blfootnote{ROC: Receiver operating characteristic}
+
+\elandscape
+\newpage
+
+\newpage
+\blandscape
+
+```{r echo=FALSE, message=FALSE, warning=FALSE, out.extra='', results='asis'}
+
+library(kableExtra)
+library(pander)
+
+info=read.csv('C:/Users/stephen.gerry/Dropbox/Steve work/VM/SR/Development_formatted_251019.csv')
+
+df <- info[c("Ref", "Was.internal.validation.assessed.", "How.was.internal.validation.carried.out.", "Was.discrimination.tested..1", "Was.calibration.tested..1", "Was.a.ROC.curve.produced..1")]
+
+colnames(df) <- c("Reference", "Internal validation performed", "Internal validation method", "Discrimination assessed", "Calibration assessed", "ROC curve presented")
+
+panderOptions('table.split.cells', 10)
+
+pandoc.table(df, split.table = "Inf", split.cells=10, caption = "Reporting of internal validation in the 34 studies developing an early warning score. (\\#tab:dev8)")
+
+
+```
+
+\elandscape
+\newpage
+
+
+\newpage
+\blandscape
+
+```{r echo=FALSE, message=FALSE, warning=FALSE, out.extra='', results='asis'}
+
+library(kableExtra)
+library(pander)
+
+info=read.csv('C:/Users/stephen.gerry/Dropbox/Steve work/VM/SR/Validation_formatted_160919.csv')
+
+df <- info[c("Ref","Outcomes.and.time.horizons.assessed")]
+
+colnames(df) <- c("Reference","Outcomes and time horizons")
+
+pandoc.table(df, split.table = "Inf", split.cells = 50, type = "multiline", caption = "Outcome measures and time horizons used in the 84 studies externally validating an early warning score. (\\#tab:val2)")
+
+```
+
+\blfootnote{ICU: Intensive care unit, MET: Medical emergency team, RRT: Rapid response team}
+
+\elandscape
+\newpage
+
+\newpage
+\blandscape
+
+```{r echo=FALSE, message=FALSE, warning=FALSE, out.extra='', results='asis'}
+
+library(kableExtra)
+library(pander)
+
+info=read.csv('C:/Users/stephen.gerry/Dropbox/Steve work/VM/SR/Validation_formatted_160919.csv')
+
+df <- info[c("Ref","Were.multiple.sets.of.observations.used.per.patient.","If.single..which.one.","No..patients","No.observation.sets","No..event.patients","No..observation.events")]
+
+colnames(df) <- c("Reference", "Multiple observations per patient", "If single, which one", "No. patients", "No. observations", "No. event patients", "No. event observations")
+
+pandoc.table(df, split.table = "Inf", split.cells = 10, type = "multiline", caption = "Reported sample size used in the 84 studies externally validating an early warning score. (\\#tab:val3)")
+
+
+```
+
+\elandscape
+\newpage
+
+
+```{r echo=FALSE, message=FALSE, warning=FALSE, out.extra='', results='asis'}
+
+library(kableExtra)
+library(pander)
+
+info=read.csv('C:/Users/stephen.gerry/Dropbox/Steve work/VM/SR/Validation_formatted_160919.csv')
+
+df <- info[c("Ref","Missing.data.referred.to.","What.missing.data.approach.was.used.")]
+
+colnames(df) <- c("Reference", "Missing data referred to", "Missing data approach")
+
+pandoc.table(df, split.table = "Inf", split.cells = 10, type = "multiline", caption = "Approach to missing data reported by the 84 that externally validated an early warning score. (\\#tab:val4)")
+
+
+```
+
+\FloatBarrier
+\newpage
+
+## EMBASE search strategy {#sec:appss1}
+
+Database & Platform: Embase (OVID) 1974 to 2017 Week 35
+
+Search date: 30 August 2017
+
+1. ((National or VitalPAC or Modified or Centile or standard\$) adj1 Early adj1 Warning adj1 Scor\$).ti,ab.
+2. (Reading adj1 Modified adj1 Early adj1 Warning adj1 Score).ti,ab.
+3. (Cardiac adj1 Arrest adj1 Risk adj1 Triage).ti,ab.
+4. (Assessment adj1 Score adj2 Sick adj1 patient adj1 Identification adj2 Step-up adj2 Treatment).ti,ab.
+5. (Targeted adj1 Real adj1 Time adj1 Early adj1 Warning adj1 Score).ti,ab.
+6. (Dutch adj1 Early adj1 Nurse adj1 Worry adj1 Indicator adj1 Score).ti,ab.
+7. (Decision adj1 Tree adj1 Early adj1 Warning adj1 Score).ti,ab.
+8. (Advanced adj1 Alert adj1 Monitor).ti,ab.
+9. (Chronic adj1 Respiratory adj1 Early adj1 Warning adj1 Score).ti,ab.
+10. (early adj1 warning adj1 (scor\$ or system\$)).ti,ab.
+11. (track adj2 trigger adj2 (scor\$ or system\$)).ti,ab.
+12. (physiological adj1 scoring adj1 system\$).ti,ab.
+13. (worry adj1 indicator adj1 scor\$).ti,ab.
+14. (physiological adj1 observation adj1 track adj2 trigger adj1 (scor\$ or system\$)).ti,ab.
+15. (patient adj2 risk adj2 scoring adj1 system\$).ti,ab.
+16. (patient adj2 risk adj1 trigger adj1 scoring adj1 system).ti,ab.
+17. (early adj1 detection adj2 patients adj2 risk).ti,ab.
+18. Early Warning Score.kw.
+19. Early Warning Scores.kw.
+20. Early warning system.kw.
+21. Early warning systems.kw.
+22. Track-and-Trigger.kw.
+23. "track and trigger".kw.
+24. Early Warning Score/
+25. Early Warning Scores/
+26. National Early Warning Score/
+27. Modified Early Warning Score/
+28. "Track and Trigger System"/
+29. OR/1-28
+30. Vital Sign/
+31. Scoring System/
+32. Physiologic Monitoring/
+33. (NEWS or ViEWS or CART or SEWS or CREWS or PAR or PART or PSS or AAM).ti,ab.
+34. OR/30-33
+35. ((early or risk or warn\$ or alert\$ or track\$ or trigger) adj2 (scor\$ or system or systems)).ti,ab.
+36. 34 AND 35
+37. (MEWS or R-MEWS or eCART or CEWS or TREWScore or DENWIS or DTEWS or DMEWS or POTTS or PAR-T or ViEWS-L).ti,ab.
+38. (develop\$ or design\$ or creat\$ or build\$ or contruct\$ or validat\$).ti,ab.
+39. Validation Study/
+40. 38 or 39
+41. 36 and 40
+42. 37 and 40
+43. 41 or 42
+44. 29 or 43
+45. ((child OR infant OR pediatrics) NOT adult).sh.
+46. 44 NOT 45
+
+\FloatBarrier
+\newpage
+
+## CINAHL search strategy {#sec:appss2}
+
+Database & Platform: CINAHL (via EbscoHost)
+
+Search date: 30 August 2017
+
+1. TI ((National or VitalPAC or Modified or Centile or standard\*) N1 Early N1 Warning N1 Scor\*) OR AB ((National or VitalPAC or Modified or Centile or standard\*) N1 Early N1 Warning N1 Scor\*) OR IN ((National or VitalPAC or Modified or Centile or standard\*) N1 Early N1 warning N1 Scor\*)
+2. TI (Reading N1 Modified N1 Early N1 Warning N1 Score) OR AB (Reading N1 Modified N1 Early N1 Warning N1 Score) OR IN (Reading N1 Modified N1 Early N1 Warning N1 Score)
+3. TI (Cardiac N1 Arrest N1 Risk N1 Triage) OR AB (Cardiac N1 Arrest N1 Risk N1 Triage) OR IN (Cardiac N1 Arrest N1 Risk N1 Triage)
+4. TI (Assessment N1 Score N2 Sick N1 patient N1 Identification N2 Step-up N2 Treatment) OR AB (Assessment N1 Score N2 Sick N1 patient N1 Identification N2 Step-up N2 Treatment) OR IN (Assessment N1 Score N2 Sick N1 patient N1 Identification N2 Step-up N2 Treatment)
+5. TI (Targeted N1 Real N1 Time N1 Early N1 Warning N1 Score) OR AB (Targeted N1 Real N1 Time N1 Early N1 Warning N1 Score) OR IN (Targeted N1 Real N1 Time N1 Early N1 Warning N1 Score)
+6. TI (Dutch N1 Early N1 Nurse N1 Worry N1 Indicator N1 Score) OR AB (Dutch N1 Early N1 Nurse N1 Worry N1 Indicator N1 Score) OR IN (Dutch N1 Early N1 Nurse N1 Worry N1 Indicator N1 Score)
+7. TI (Decision N1 Tree N1 Early N1 Warning N1 Score) OR AB (Decision N1 Tree N1 Early N1 Warning N1 Score) OR IN  (Decision N1 Tree N1 Early N1 Warning N1 Score)
+8. TI (Advanced N1 Alert N1 Monitor) OR AB (Advanced N1 Alert N1 Monitor) OR IN (Advanced N1 Alert N1 Monitor)
+9. TI (Chronic N1 Respiratory N1 Early N1 Warning N1 Score) OR AB (Chronic N1 Respiratory N1 Early N1 Warning N1 Score) OR IN (Chronic N1 Respiratory N1 Early N1 Warning N1 Score)
+10. TI (early N1 warning N1 (scor\* or system\*)) OR AB (early N1 warning N1 (scor\* or system\*))
+11. TI (track N2 trigger N2 (scor\* or system\*)) OR AB (track N2 trigger N2 (scor\* or system\*))
+12. TI (physiological N1 scoring N1 system\*) OR AB (physiological N1 scoring N1 system\*)
+13. TI (worry N1 indicator N1 scor\*) OR AB (worry N1 indicator N1 scor\*)
+14. TI (physiological N1 observation N1 track N2 trigger N1 (scor\* or system\*)) OR AB (physiological N1 observation N1 track N2 trigger N1 (scor\* or system\*))
+15. TI (patient N2 risk N2 scoring N1 system\*) OR AB (patient N2 risk N2 scoring N1 system\*)
+16. TI (patient N2 risk N1 trigger N1 scoring N1 system) OR AB (patient N2 risk N1 trigger N1 scoring N1 system)
+17. TI (early N1 detection N2 patients N2 risk) OR AB (early N1 detection N2 patients N2 risk)
+18. IN "early warning"
+19. IN "trigger"
+20. S1 OR S2 OR S3 OR S4 OR S5 OR S6 OR S7 OR S8 OR S9 OR S10 OR S11 OR S12 OR S13 OR S14 OR S15 OR S16 OR S17 OR S18 OR S19
+21. MH "Early intervention"
+22. MH "Predictive Value of Tests"
+23. MH "Monitoring, Physiologic"
+24. MH "Nursing Assessment"
+25. MH "Severity of Illness Indices" OR MJ "Severity of illness"
+26. MH "Instrument validation"
+27. MH "Vital signs"
+28. TI (NEWS or ViEWS or CART or SEWS or CREWS or PAR or PART or PSS or AAM) OR AB (NEWS or ViEWS or CART or SEWS or CREWS or PAR or PART or PSS or AAM)
+29. S21 OR S22 OR S23 OR S24 OR S25 OR S26 OR S27 OR S28
+30. TI ((early or risk or warn\* or alert\* or track\* or trigger) N2 (scor\* or system or systems)) OR AB ((early or risk or warn\* or alert\* or track\* or trigger) N2 (scor\* or system or systems))
+31. S29 AND S30
+32. TI (MEWS or R-MEWS or eCART or CEWS or TREWScore or DENWIS or DTEWS or DMEWS or POTTS or PAR-T or ViEWS-L) OR AB (MEWS or R-MEWS or eCART or CEWS or TREWScore or DENWIS or DTEWS or DMEWS or POTTS or PAR-T or ViEWS-L)
+33. TI (develop\* or design\* or creat\* or build\* or contruct\* or validat\*) OR AB (develop\* or design\* or creat\* or build\* or contruct\* or validat\*)
+34. MH "Validation Studies"
+35. S33 OR S34
+36. S31 AND S35
+37. S32 AND S35
+38. S36 OR S37
+39. S20 OR S38
+40. (MH (Child OR Infant OR Pediatrics) OR DH (Child OR Infant OR Pediatrics) NOT MH Adult)
+41. S39 NOT S40
+
+\FloatBarrier
+\newpage
+
+## PsycINFO search strategy {#sec:appss3}
+
+Database & Platform: PsycINFO (OVID) 1967 to August Week 3 2017
+
+Search date: 30 August 2017
+
+1. ((National or VitalPAC or Modified or Centile or standard\$) adj1 Early adj1 Warning adj1 Scor\$).ti,ab,id.
+2. (Reading adj1 Modified adj1 Early adj1 Warning adj1 Score).ti,ab,id.
+3. (Cardiac adj1 Arrest adj1 Risk adj1 Triage).ti,ab,id.
+4. (Assessment adj1 Score adj2 Sick adj1 patient adj1 Identification adj2 Step-up adj2 Treatment).ti,ab,id.
+5. (Targeted adj1 Real adj1 Time adj1 Early adj1 Warning adj1 Score).ti,ab,id.
+6. (Dutch adj1 Early adj1 Nurse adj1 Worry adj1 Indicator adj1 Score).ti,ab,id.
+7. (Decision adj1 Tree adj1 Early adj1 Warning adj1 score).ti,ab,id.
+8. (Advanced adj1 Alert adj1 Monitor).ti,ab,id.
+9. (Chronic adj1 Respiratory adj1 Early adj1 Warning adj1 Score).ti,ab,id.
+10. (early adj1 warning adj1 (scor\$ or system\$)).ti,ab,id.
+11. (track adj2 trigger adj2 (scor\$ or system\$)).ti,ab.
+12. (physiological adj1 scoring adj1 system\$).ti,ab.
+13. (worry adj1 indicator adj1 scor\$).ti,ab.
+14. (physiological adj1 observation adj1 track adj2 trigger adj1 (scor\$ or system\$)).ti,ab.
+15. (patient adj2 risk adj2 scoring adj1 system\$).ti,ab.
+16. (patient adj2 risk adj1 trigger adj1 scoring adj1 system).ti,ab.
+17. (early adj1 detection adj2 patients adj2 risk).ti,ab.
+18. "early warning".id.
+19. "track and trigger".id.
+20. "trigger scor\$".id.
+21. OR/1-20
+22. Warnings/
+23. Monitoring, Physiologic.mh.
+24. Nursing Assessment.mh.
+25. Vital Signs.mh.
+26. Severity of Illness Index.mh.
+27. Monitoring/
+28. "Scoring (Testing)"/
+29. "vital Signs".id.
+30. "severity of illness".id.
+31. (NEWS or ViEWS or CART or SEWS or CREWS or PAR or PART or PSS or AAM).ti,ab.
+32. OR/22-31
+33. ((early or risk or warn\$ or alert\$ or track\$ or trigger) adj2 (scor\$ or system or systems)).ti,ab.
+34. 32 AND 33
+35. (MEWS or R-MEWS or eCART or CEWS or TREWScore or DENWIS or DTEWS or DMEWS or POTTS or PAR-T or ViEWS-L).ti,ab.
+36. (develop\$ or design\$ or creat\$ or build\$ or contruct\$ or validat\$).ti,ab.
+37. 34 and 36
+38. 35 and 36
+39. 37 OR 38
+40. 21 or 39
+41. ((child OR infant OR pediatrics) NOT adult).mh,sh.
+42. 40 NOT 41
+
+\FloatBarrier
+\newpage
+
+## MEDLINE search strategy {#sec:appss4}
+
+Database and Platform: Ovid MEDLINE(R) Epub Ahead of Print, In-Process & Other Non-Indexed Citations, Ovid MEDLINE(R) Daily and Ovid MEDLINE(R) 1946 to Present
+
+Search date: 30 August 2017
+
+1. ((National or VitalPAC or Modified or Centile or standard\$) adj1 Early adj1 Warning adj1 Scor\$).ti,ab.
+2. (Reading adj1 Modified adj1 Early adj1 Warning adj1 Score).ti,ab.
+3. (Cardiac adj1 Arrest adj1 Risk adj1 Triage).ti,ab.
+4. (Assessment adj1 Score adj2 Sick adj1 patient adj1 Identification adj2 Step-up adj2 Treatment).ti,ab.
+5. (Targeted adj1 Real adj1 Time adj1 Early adj1 Warning adj1 Score).ti,ab.
+6. (Dutch adj1 Early adj1 Nurse adj1 Worry adj1 Indicator adj1 Score).ti,ab.
+7. (Decision adj1 Tree adj1 Early adj1 Warning adj1 Score).ti,ab.
+8. (Advanced adj1 Alert adj1 Monitor).ti,ab.
+9. (Chronic adj1 Respiratory adj1 Early adj1 Warning adj1 Score).ti,ab.
+10. (early adj1 warning adj1 (scor\$ or system\$)).ti,ab.
+11. (track adj2 trigger adj2 (scor\$ or system\$)).ti,ab.
+12. (physiological adj1 scoring adj1 system\$).ti,ab.
+13. (worry adj1 indicator adj1 scor\$).ti,ab.
+14. (physiological adj1 observation adj1 track adj2 trigger adj1 (scor\$ or system\$)).ti,ab.
+15. (patient adj2 risk adj2 scoring adj1 system\$).ti,ab.
+16. (patient adj2 risk adj1 trigger adj1 scoring adj1 system).ti,ab.
+17. (early adj1 detection adj2 patients adj2 risk).ti,ab.
+18. Early Warning Score.kw.
+19. Early Warning Scores.kw.
+20. Early Warning System.kw.
+21. Early Warning Systems.kw.
+22. Track-and-Trigger.kw.
+23. "track and trigger".kw.
+24. or/1-23
+25. Predictive Value of Tests/
+26. Monitoring, Physiologic/
+27. Nursing Assessment/mt
+28. Nursing Assessment/st
+29. Nursing Assessment/sn
+30. Severity of Illness Index/
+31. Health Status Indicators/
+32. Point-of-Care-Systems/
+33. (NEWS or ViEWS or CART or SEWS or CREWS or PAR or PART or PSS or AAM).ti,ab.
+34. OR/25-33
+35. ((early or risk or warn\$ or alert\$ or track\$ or trigger) adj2 (scor\$ or system or systems)).ti,ab.
+36. 34 AND 35
+37. (MEWS or R-MEWS or eCART or CEWS or TREWScore or DENWIS or DTEWS or DMEWS or POTTS or PAR-T or ViEWS-L).ti,ab.
+38. (develop\$ or design\$ or creat\$ or build\$ or contruct\$ or validat\$).ti,ab.
+39. Validation Studies.pt.
+40. 38 OR 39
+41. 36 AND 40
+42. 37 AND 40
+43. 41 OR 42
+44. 24 OR 43
+45. ((child OR infant OR pediatrics) NOT adult).sh.
+46. 44 NOT 45
+
+
+
+\FloatBarrier
+\newpage
+
+# Age-specific vital sign centiles appendix
+
+\FloatBarrier
+\newpage
+\blandscape
+
+```{r echo=FALSE, message=FALSE, warning=FALSE}
+
+library(kableExtra)
+
+load(file="C:/Users/stephen.gerry/Dropbox/Steve work/VM/Precursor/SBP_m_table.RData")
+
+kable(sbp_m_table, "latex", caption = "(\\#tab:SBPm) Male Systolic Blood Pressure Centiles", booktabs = T, col.names = c("Age","1st","5th","10th","25th","50th","75th","90th","95th","99th")) %>%
+kable_styling(latex_options = c("hold_position","scale_down"))
+
+```
+
+\FloatBarrier
+\newpage
+
+```{r echo=FALSE, message=FALSE, warning=FALSE}
+
+library(kableExtra)
+
+load(file="C:/Users/stephen.gerry/Dropbox/Steve work/VM/Precursor/SBP_f_table.RData")
+
+kable(sbp_f_table, "latex", caption = "(\\#tab:SBPf) Female Systolic Blood Pressure Centiles", booktabs = T, col.names = c("Age","1st","5th","10th","25th","50th","75th","90th","95th","99th")) %>%
+kable_styling(latex_options = c("hold_position","scale_down"))
+
+```
+
+\FloatBarrier
+\newpage
+
+```{r echo=FALSE, message=FALSE, warning=FALSE}
+
+library(kableExtra)
+
+load(file="C:/Users/stephen.gerry/Dropbox/Steve work/VM/Precursor/DBP_m_table.RData")
+
+kable(dbp_m_table, "latex", caption = "(\\#tab:DBPm) Male Diastolic Blood Pressure Centiles", booktabs = T, col.names = c("Age","1st","5th","10th","25th","50th","75th","90th","95th","99th")) %>%
+kable_styling(latex_options = c("hold_position","scale_down"))
+
+```
+
+\FloatBarrier
+\newpage
+
+```{r echo=FALSE, message=FALSE, warning=FALSE}
+
+library(kableExtra)
+
+load(file="C:/Users/stephen.gerry/Dropbox/Steve work/VM/Precursor/DBP_f_table.RData")
+
+kable(dbp_f_table, "latex", caption = "(\\#tab:DBPf) Female Diastolic Blood Pressure Centiles", booktabs = T, col.names = c("Age","1st","5th","10th","25th","50th","75th","90th","95th","99th")) %>%
+kable_styling(latex_options = c("hold_position","scale_down"))
+
+```
+
+\FloatBarrier
+\newpage
+
+```{r echo=FALSE, message=FALSE, warning=FALSE}
+
+library(kableExtra)
+
+load(file="C:/Users/stephen.gerry/Dropbox/Steve work/VM/Precursor/PP_m_table.RData")
+
+kable(pp_m_table, "latex", caption = "(\\#tab:PPm) Male Pulse Pressure Centiles", booktabs = T, col.names = c("Age","1st","5th","10th","25th","50th","75th","90th","95th","99th")) %>%
+kable_styling(latex_options = c("hold_position","scale_down"))
+
+```
+
+\FloatBarrier
+\newpage
+
+```{r echo=FALSE, message=FALSE, warning=FALSE}
+
+library(kableExtra)
+
+load(file="C:/Users/stephen.gerry/Dropbox/Steve work/VM/Precursor/PP_f_table.RData")
+
+kable(pp_f_table, "latex", caption = "(\\#tab:PPf) Female Pulse Pressure Centiles", booktabs = T, col.names = c("Age","1st","5th","10th","25th","50th","75th","90th","95th","99th")) %>%
+kable_styling(latex_options = c("hold_position","scale_down"))
+
+```
+
+\FloatBarrier
+\newpage
+
+```{r echo=FALSE, message=FALSE, warning=FALSE}
+
+library(kableExtra)
+
+load(file="C:/Users/stephen.gerry/Dropbox/Steve work/VM/Precursor/HR_m_table.RData")
+
+kable(hr_m_table, "latex", caption = "(\\#tab:HRm) Male Heart Rate Centiles", booktabs = T, col.names = c("Age","1st","5th","10th","25th","50th","75th","90th","95th","99th")) %>%
+kable_styling(latex_options = c("hold_position","scale_down"))
+
+```
+
+\FloatBarrier
+\newpage
+
+```{r echo=FALSE, message=FALSE, warning=FALSE}
+
+library(kableExtra)
+
+load(file="C:/Users/stephen.gerry/Dropbox/Steve work/VM/Precursor/HR_f_table.RData")
+
+kable(hr_f_table, "latex", caption = "(\\#tab:HRf) Female Heart Rate Centiles", booktabs = T, col.names = c("Age","1st","5th","10th","25th","50th","75th","90th","95th","99th")) %>%
+kable_styling(latex_options = c("hold_position","scale_down"))
+
+```
+
+\FloatBarrier
+\newpage
+
+```{r echo=FALSE, message=FALSE, warning=FALSE}
+
+library(kableExtra)
+
+load(file="C:/Users/stephen.gerry/Dropbox/Steve work/VM/Precursor/RR_m_table.RData")
+
+kable(rr_m_table, "latex", caption = "(\\#tab:RRm) Male Respiratory Rate Centiles", booktabs = T, col.names = c("Age","1st","5th","10th","25th","50th","75th","90th","95th","99th")) %>%
+kable_styling(latex_options = c("hold_position","scale_down"))
+
+```
+
+\FloatBarrier
+\newpage
+
+```{r echo=FALSE, message=FALSE, warning=FALSE}
+
+library(kableExtra)
+
+load(file="C:/Users/stephen.gerry/Dropbox/Steve work/VM/Precursor/RR_f_table.RData")
+
+kable(rr_f_table, "latex", caption = "(\\#tab:RRf) Female Respiratory Rate Centiles", booktabs = T, col.names = c("Age","1st","5th","10th","25th","50th","75th","90th","95th","99th")) %>%
+kable_styling(latex_options = c("hold_position","scale_down"))
+
+```
+
+\FloatBarrier
+\newpage
+
+```{r echo=FALSE, message=FALSE, warning=FALSE}
+
+library(kableExtra)
+
+load(file="C:/Users/stephen.gerry/Dropbox/Steve work/VM/Precursor/SPO2_m_table.RData")
+
+kable(spo2_m_table, "latex", caption = "(\\#tab:SPO2m) Male Oxygen Saturation Centiles", booktabs = T, col.names = c("Age","1st","5th","10th","25th","50th","75th","90th","95th","99th")) %>%
+kable_styling(latex_options = c("hold_position","scale_down"))
+
+```
+
+\FloatBarrier
+\newpage
+
+```{r echo=FALSE, message=FALSE, warning=FALSE}
+
+library(kableExtra)
+
+load(file="C:/Users/stephen.gerry/Dropbox/Steve work/VM/Precursor/SPO2_f_table.RData")
+
+kable(spo2_f_table, "latex", caption = "(\\#tab:SPO2f) Female Oxygen Saturation Centiles", booktabs = T, col.names = c("Age","1st","5th","10th","25th","50th","75th","90th","95th","99th")) %>%
+kable_styling(latex_options = c("hold_position","scale_down"))
+
+```
+
+\FloatBarrier
+\newpage
+
+```{r echo=FALSE, message=FALSE, warning=FALSE}
+
+library(kableExtra)
+
+load(file="C:/Users/stephen.gerry/Dropbox/Steve work/VM/Precursor/Temp_m_table.RData")
+
+kable(temp_m_table, "latex", caption = "(\\#tab:Tempm) Male Temperature Centiles", booktabs = T, col.names = c("Age","1st","5th","10th","25th","50th","75th","90th","95th","99th")) %>%
+kable_styling(latex_options = c("hold_position","scale_down"))
+
+```
+
+\FloatBarrier
+\newpage
+
+```{r echo=FALSE, message=FALSE, warning=FALSE}
+
+library(kableExtra)
+
+load(file="C:/Users/stephen.gerry/Dropbox/Steve work/VM/Precursor/Temp_f_table.RData")
+
+kable(temp_f_table, "latex", caption = "(\\#tab:Tempf) Female Temperature Centiles", booktabs = T, col.names = c("Age","1st","5th","10th","25th","50th","75th","90th","95th","99th")) %>%
+kable_styling(latex_options = c("hold_position","scale_down"))
+
+```
+
+\FloatBarrier
+\elandscape
+\newpage
+
+\FloatBarrier
+
+# Simulation study appendix
+
+\newpage
+
+
+
+
+```{r simssc1, echo=FALSE, fig.cap="Empirical C-Index Performance According to Prevalence and Number of Events for Method 1 (Model 2)", fig.width=6, fig.height=3, message=FALSE, warning=FALSE, out.extra=''}
+
+load(file="C:/Users/stephen.gerry/Dropbox/Steve work/VM/SimStudy/cindex_plots_model2.RData")
+
+p1
+
+```
+
+```{r simssc2, echo=FALSE, fig.cap="Empirical C-Index Performance According to Prevalence and Number of Events for Method 2 (Model 2)", fig.width=6, fig.height=3, message=FALSE, warning=FALSE, out.extra=''}
+
+p2
+
+```
+
+```{r simssc3, echo=FALSE, fig.cap="Empirical C-Index Performance According to Prevalence and Number of Events for Method 3 (Model 2)", fig.width=6, fig.height=3, message=FALSE, warning=FALSE, out.extra=''}
+
+p3
+
+```
+
+```{r simssc4, echo=FALSE, fig.cap="Empirical C-Index Performance According to Prevalence and Number of Events for Method 4 (Model 2)", fig.width=6, fig.height=3, message=FALSE, warning=FALSE, out.extra=''}
+
+p4
+
+```
+
+\FloatBarrier
+
+```{r simssc5, echo=FALSE, fig.cap="Percentage Bias, Empirical SE, and RMSE of C-Index Performance According to Prevalence and Number of Events for Method 1 (Model 2)", fig.width=6, fig.height=3, message=FALSE, warning=FALSE, out.extra=''}
+
+library(ggpubr)
+
+ggarrange(bias.1, empse.1, rmse.1, ncol = 3, common.legend = TRUE, legend = "bottom")
+
+```
+
+```{r simssc6, echo=FALSE, fig.cap="Percentage Bias, Empirical SE, and RMSE of C-Index Performance According to Prevalence and Number of Events for Method 2 (Model 2)", fig.width=6, fig.height=3, message=FALSE, warning=FALSE, out.extra=''}
+
+ggarrange(bias.2, empse.2, rmse.2, ncol = 3, common.legend = TRUE, legend = "bottom")
+
+```
+
+```{r simssc7, echo=FALSE, fig.cap="Percentage Bias, Empirical SE, and RMSE of C-Index Performance According to Prevalence and Number of Events for Method 3 (Model 2)", fig.width=6, fig.height=3, message=FALSE, warning=FALSE, out.extra=''}
+
+ggarrange(bias.3, empse.3, rmse.3, ncol = 3, common.legend = TRUE, legend = "bottom")
+
+```
+
+```{r simssc8, echo=FALSE, fig.cap="Percentage Bias, Empirical SE, and RMSE of C-Index Performance According to Prevalence and Number of Events for Method 4 (Model 2)", fig.width=6, fig.height=3, message=FALSE, warning=FALSE, out.extra=''}
+
+ggarrange(bias.4, empse.4, rmse.4, ncol = 3, common.legend = TRUE, legend = "bottom")
+
+```
+
+\FloatBarrier
+
+```{r simssc9, echo=FALSE, fig.cap="Empirical C-Index Performance According to Prevalence and Number of Events for Method 1 (Model 3)", fig.width=6, fig.height=3, message=FALSE, warning=FALSE, out.extra=''}
+
+load(file="C:/Users/stephen.gerry/Dropbox/Steve work/VM/SimStudy/cindex_plots_model3.RData")
+
+p1
+
+```
+
+```{r simssc10, echo=FALSE, fig.cap="Empirical C-Index Performance According to Prevalence and Number of Events for Method 2 (Model 3)", fig.width=6, fig.height=3, message=FALSE, warning=FALSE, out.extra=''}
+
+p2
+
+```
+
+```{r simssc11, echo=FALSE, fig.cap="Empirical C-Index Performance According to Prevalence and Number of Events for Method 3 (Model 3)", fig.width=6, fig.height=3, message=FALSE, warning=FALSE, out.extra=''}
+
+p3
+
+```
+
+```{r simssc12, echo=FALSE, fig.cap="Empirical C-Index Performance According to Prevalence and Number of Events for Method 4 (Model 3)", fig.width=6, fig.height=3, message=FALSE, warning=FALSE, out.extra=''}
+
+p4
+
+```
+
+\FloatBarrier
+
+```{r simssc13, echo=FALSE, fig.cap="Percentage Bias, Empirical SE, and RMSE of C-Index Performance According to Prevalence and Number of Events for Method 1 (Model 3)", fig.width=6, fig.height=3, message=FALSE, warning=FALSE, out.extra=''}
+
+library(ggpubr)
+
+ggarrange(bias.1, empse.1, rmse.1, ncol = 3, common.legend = TRUE, legend = "bottom")
+
+```
+
+```{r simssc14, echo=FALSE, fig.cap="Percentage Bias, Empirical SE, and RMSE of C-Index Performance According to Prevalence and Number of Events for Method 2 (Model 3)", fig.width=6, fig.height=3, message=FALSE, warning=FALSE, out.extra=''}
+
+ggarrange(bias.2, empse.2, rmse.2, ncol = 3, common.legend = TRUE, legend = "bottom")
+
+```
+
+```{r simssc15, echo=FALSE, fig.cap="Percentage Bias, Empirical SE, and RMSE of C-Index Performance According to Prevalence and Number of Events for Method 3 (Model 3)", fig.width=6, fig.height=3, message=FALSE, warning=FALSE, out.extra=''}
+
+ggarrange(bias.3, empse.3, rmse.3, ncol = 3, common.legend = TRUE, legend = "bottom")
+
+```
+
+```{r simssc16, echo=FALSE, fig.cap="Percentage Bias, Empirical SE, and RMSE of C-Index Performance According to Prevalence and Number of Events for Method 4 (Model 3)", fig.width=6, fig.height=3, message=FALSE, warning=FALSE, out.extra=''}
+
+ggarrange(bias.4, empse.4, rmse.4, ncol = 3, common.legend = TRUE, legend = "bottom")
+
+```
+
+\FloatBarrier
+
+```{r simssc17, echo=FALSE, fig.cap="Empirical C-Index Performance According to Prevalence and Number of Events for Method 1 (Model 4)", fig.width=6, fig.height=3, message=FALSE, warning=FALSE, out.extra=''}
+
+load(file="C:/Users/stephen.gerry/Dropbox/Steve work/VM/SimStudy/cindex_plots_model4.RData")
+
+p1
+
+```
+
+```{r simssc18, echo=FALSE, fig.cap="Empirical C-Index Performance According to Prevalence and Number of Events for Method 2 (Model 4)", fig.width=6, fig.height=3, message=FALSE, warning=FALSE, out.extra=''}
+
+p2
+
+```
+
+```{r simssc19, echo=FALSE, fig.cap="Empirical C-Index Performance According to Prevalence and Number of Events for Method 3 (Model 4)", fig.width=6, fig.height=3, message=FALSE, warning=FALSE, out.extra=''}
+
+p3
+
+```
+
+```{r simssc20, echo=FALSE, fig.cap="Empirical C-Index Performance According to Prevalence and Number of Events for Method 4 (Model 4)", fig.width=6, fig.height=3, message=FALSE, warning=FALSE, out.extra=''}
+
+p4
+
+```
+
+\FloatBarrier
+
+```{r simssc21, echo=FALSE, fig.cap="Percentage Bias, Empirical SE, and RMSE of C-Index Performance According to Prevalence and Number of Events for Method 1 (Model 4)", fig.width=6, fig.height=3, message=FALSE, warning=FALSE, out.extra=''}
+
+library(ggpubr)
+
+ggarrange(bias.1, empse.1, rmse.1, ncol = 3, common.legend = TRUE, legend = "bottom")
+
+```
+
+```{r simssc22, echo=FALSE, fig.cap="Percentage Bias, Empirical SE, and RMSE of C-Index Performance According to Prevalence and Number of Events for Method 2 (Model 4)", fig.width=6, fig.height=3, message=FALSE, warning=FALSE, out.extra=''}
+
+ggarrange(bias.2, empse.2, rmse.2, ncol = 3, common.legend = TRUE, legend = "bottom")
+
+```
+
+```{r simssc23, echo=FALSE, fig.cap="Percentage Bias, Empirical SE, and RMSE of C-Index Performance According to Prevalence and Number of Events for Method 3 (Model 4)", fig.width=6, fig.height=3, message=FALSE, warning=FALSE, out.extra=''}
+
+ggarrange(bias.3, empse.3, rmse.3, ncol = 3, common.legend = TRUE, legend = "bottom")
+
+```
+
+```{r simssc24, echo=FALSE, fig.cap="Percentage Bias, Empirical SE, and RMSE of C-Index Performance According to Prevalence and Number of Events for Method 4 (Model 4)", fig.width=6, fig.height=3, message=FALSE, warning=FALSE, out.extra=''}
+
+ggarrange(bias.4, empse.4, rmse.4, ncol = 3, common.legend = TRUE, legend = "bottom")
+
+```
+
+\FloatBarrier
+
+```{r simssr1, echo=FALSE, fig.cap="Empirical R\\textsuperscript{2} Performance According to Prevalence and Number of Events for Method 1 (Model 2)", fig.width=6, fig.height=3, message=FALSE, warning=FALSE, out.extra=''}
+
+load(file="C:/Users/stephen.gerry/Dropbox/Steve work/VM/SimStudy/r2_plots_model2.RData")
+
+p1
+
+```
+
+```{r simssr2, echo=FALSE, fig.cap="Empirical R\\textsuperscript{2} Performance According to Prevalence and Number of Events for Method 2 (Model 2)", fig.width=6, fig.height=3, message=FALSE, warning=FALSE, out.extra=''}
+
+p2
+
+```
+
+```{r simssr3, echo=FALSE, fig.cap="Empirical R\\textsuperscript{2} Performance According to Prevalence and Number of Events for Method 3 (Model 2)", fig.width=6, fig.height=3, message=FALSE, warning=FALSE, out.extra=''}
+
+p3
+
+```
+
+```{r simssr4, echo=FALSE, fig.cap="Empirical R\\textsuperscript{2} Performance According to Prevalence and Number of Events for Method 4 (Model 2)", fig.width=6, fig.height=3, message=FALSE, warning=FALSE, out.extra=''}
+
+p4
+
+```
+
+\FloatBarrier
+
+```{r simssr5, echo=FALSE, fig.cap="Percentage Bias, Empirical SE, and RMSE of R\\textsuperscript{2} Performance According to Prevalence and Number of Events for Method 1 (Model 2)", fig.width=6, fig.height=3, message=FALSE, warning=FALSE, out.extra=''}
+
+library(ggpubr)
+
+ggarrange(bias.1, empse.1, rmse.1, ncol = 3, common.legend = TRUE, legend = "bottom")
+
+```
+
+```{r simssr6, echo=FALSE, fig.cap="Percentage Bias, Empirical SE, and RMSE of R\\textsuperscript{2} Performance According to Prevalence and Number of Events for Method 2 (Model 2)", fig.width=6, fig.height=3, message=FALSE, warning=FALSE, out.extra=''}
+
+ggarrange(bias.2, empse.2, rmse.2, ncol = 3, common.legend = TRUE, legend = "bottom")
+
+```
+
+```{r simssr7, echo=FALSE, fig.cap="Percentage Bias, Empirical SE, and RMSE of R\\textsuperscript{2} Performance According to Prevalence and Number of Events for Method 3 (Model 2)", fig.width=6, fig.height=3, message=FALSE, warning=FALSE, out.extra=''}
+
+ggarrange(bias.3, empse.3, rmse.3, ncol = 3, common.legend = TRUE, legend = "bottom")
+
+```
+
+```{r simssr8, echo=FALSE, fig.cap="Percentage Bias, Empirical SE, and RMSE of R\\textsuperscript{2} Performance According to Prevalence and Number of Events for Method 4 (Model 2)", fig.width=6, fig.height=3, message=FALSE, warning=FALSE, out.extra=''}
+
+ggarrange(bias.4, empse.4, rmse.4, ncol = 3, common.legend = TRUE, legend = "bottom")
+
+```
+
+\FloatBarrier
+
+```{r simssr9, echo=FALSE, fig.cap="Empirical R\\textsuperscript{2} Performance According to Prevalence and Number of Events for Method 1 (Model 3)", fig.width=6, fig.height=3, message=FALSE, warning=FALSE, out.extra=''}
+
+load(file="C:/Users/stephen.gerry/Dropbox/Steve work/VM/SimStudy/r2_plots_model3.RData")
+
+p1
+
+```
+
+```{r simssr10, echo=FALSE, fig.cap="Empirical R\\textsuperscript{2} Performance According to Prevalence and Number of Events for Method 2 (Model 3)", fig.width=6, fig.height=3, message=FALSE, warning=FALSE, out.extra=''}
+
+p2
+
+```
+
+```{r simssr11, echo=FALSE, fig.cap="Empirical R\\textsuperscript{2} Performance According to Prevalence and Number of Events for Method 3 (Model 3)", fig.width=6, fig.height=3, message=FALSE, warning=FALSE, out.extra=''}
+
+p3
+
+```
+
+```{r simssr12, echo=FALSE, fig.cap="Empirical R\\textsuperscript{2} Performance According to Prevalence and Number of Events for Method 4 (Model 3)", fig.width=6, fig.height=3, message=FALSE, warning=FALSE, out.extra=''}
+
+p4
+
+```
+
+\FloatBarrier
+
+```{r simssr13, echo=FALSE, fig.cap="Percentage Bias, Empirical SE, and RMSE of R\\textsuperscript{2} Performance According to Prevalence and Number of Events for Method 1 (Model 3)", fig.width=6, fig.height=3, message=FALSE, warning=FALSE, out.extra=''}
+
+library(ggpubr)
+
+ggarrange(bias.1, empse.1, rmse.1, ncol = 3, common.legend = TRUE, legend = "bottom")
+
+```
+
+```{r simssr14, echo=FALSE, fig.cap="Percentage Bias, Empirical SE, and RMSE of R\\textsuperscript{2} Performance According to Prevalence and Number of Events for Method 2 (Model 3)", fig.width=6, fig.height=3, message=FALSE, warning=FALSE, out.extra=''}
+
+ggarrange(bias.2, empse.2, rmse.2, ncol = 3, common.legend = TRUE, legend = "bottom")
+
+```
+
+```{r simssr15, echo=FALSE, fig.cap="Percentage Bias, Empirical SE, and RMSE of R\\textsuperscript{2} Performance According to Prevalence and Number of Events for Method 3 (Model 3)", fig.width=6, fig.height=3, message=FALSE, warning=FALSE, out.extra=''}
+
+ggarrange(bias.3, empse.3, rmse.3, ncol = 3, common.legend = TRUE, legend = "bottom")
+
+```
+
+```{r simssr16, echo=FALSE, fig.cap="Percentage Bias, Empirical SE, and RMSE of R\\textsuperscript{2} Performance According to Prevalence and Number of Events for Method 4 (Model 3)", fig.width=6, fig.height=3, message=FALSE, warning=FALSE, out.extra=''}
+
+ggarrange(bias.4, empse.4, rmse.4, ncol = 3, common.legend = TRUE, legend = "bottom")
+
+```
+
+\FloatBarrier
+
+```{r simssr17, echo=FALSE, fig.cap="Empirical R\\textsuperscript{2} Performance According to Prevalence and Number of Events for Method 1 (Model 4)", fig.width=6, fig.height=3, message=FALSE, warning=FALSE, out.extra=''}
+
+load(file="C:/Users/stephen.gerry/Dropbox/Steve work/VM/SimStudy/r2_plots_model4.RData")
+
+p1
+
+```
+
+```{r simssr18, echo=FALSE, fig.cap="Empirical R\\textsuperscript{2} Performance According to Prevalence and Number of Events for Method 2 (Model 4)", fig.width=6, fig.height=3, message=FALSE, warning=FALSE, out.extra=''}
+
+p2
+
+```
+
+```{r simssr19, echo=FALSE, fig.cap="Empirical R\\textsuperscript{2} Performance According to Prevalence and Number of Events for Method 3 (Model 4)", fig.width=6, fig.height=3, message=FALSE, warning=FALSE, out.extra=''}
+
+p3
+
+```
+
+```{r simssr20, echo=FALSE, fig.cap="Empirical R\\textsuperscript{2} Performance According to Prevalence and Number of Events for Method 4 (Model 4)", fig.width=6, fig.height=3, message=FALSE, warning=FALSE, out.extra=''}
+
+p4
+
+```
+
+\FloatBarrier
+
+```{r simssr21, echo=FALSE, fig.cap="Percentage Bias, Empirical SE, and RMSE of R\\textsuperscript{2} Performance According to Prevalence and Number of Events for Method 1 (Model 4)", fig.width=6, fig.height=3, message=FALSE, warning=FALSE, out.extra=''}
+
+library(ggpubr)
+
+ggarrange(bias.1, empse.1, rmse.1, ncol = 3, common.legend = TRUE, legend = "bottom")
+
+```
+
+```{r simssr22, echo=FALSE, fig.cap="Percentage Bias, Empirical SE, and RMSE of R\\textsuperscript{2} Performance According to Prevalence and Number of Events for Method 2 (Model 4)", fig.width=6, fig.height=3, message=FALSE, warning=FALSE, out.extra=''}
+
+ggarrange(bias.2, empse.2, rmse.2, ncol = 3, common.legend = TRUE, legend = "bottom")
+
+```
+
+```{r simssr23, echo=FALSE, fig.cap="Percentage Bias, Empirical SE, and RMSE of R\\textsuperscript{2} Performance According to Prevalence and Number of Events for Method 3 (Model 4)", fig.width=6, fig.height=3, message=FALSE, warning=FALSE, out.extra=''}
+
+ggarrange(bias.3, empse.3, rmse.3, ncol = 3, common.legend = TRUE, legend = "bottom")
+
+```
+
+```{r simssr24, echo=FALSE, fig.cap="Percentage Bias, Empirical SE, and RMSE of R\\textsuperscript{2} Performance According to Prevalence and Number of Events for Method 4 (Model 4)", fig.width=6, fig.height=3, message=FALSE, warning=FALSE, out.extra=''}
+
+ggarrange(bias.4, empse.4, rmse.4, ncol = 3, common.legend = TRUE, legend = "bottom")
+
+```
+
+\FloatBarrier
+
+```{r simsscal1, echo=FALSE, fig.cap="Empirical Calibration Slope Performance According to Prevalence and Number of Events for Method 1 (Model 2)", fig.width=6, fig.height=3, message=FALSE, warning=FALSE, out.extra=''}
+
+load(file="C:/Users/stephen.gerry/Dropbox/Steve work/VM/SimStudy/calslope_plots_model2.RData")
+
+p1
+
+```
+
+```{r simsscal2, echo=FALSE, fig.cap="Empirical Calibration Slope Performance According to Prevalence and Number of Events for Method 2 (Model 2)", fig.width=6, fig.height=3, message=FALSE, warning=FALSE, out.extra=''}
+
+p2
+
+```
+
+```{r simsscal3, echo=FALSE, fig.cap="Empirical Calibration Slope Performance According to Prevalence and Number of Events for Method 3 (Model 2)", fig.width=6, fig.height=3, message=FALSE, warning=FALSE, out.extra=''}
+
+p3
+
+```
+
+```{r simsscal4, echo=FALSE, fig.cap="Empirical Calibration Slope Performance According to Prevalence and Number of Events for Method 4 (Model 2)", fig.width=6, fig.height=3, message=FALSE, warning=FALSE, out.extra=''}
+
+p4
+
+```
+
+\FloatBarrier
+
+```{r simsscal5, echo=FALSE, fig.cap="Percentage Bias, Empirical SE, and RMSE of Calibration Slope Performance According to Prevalence and Number of Events for Method 1 (Model 2)", fig.width=6, fig.height=3, message=FALSE, warning=FALSE, out.extra=''}
+
+library(ggpubr)
+
+ggarrange(bias.1, empse.1, rmse.1, ncol = 3, common.legend = TRUE, legend = "bottom")
+
+```
+
+```{r simsscal6, echo=FALSE, fig.cap="Percentage Bias, Empirical SE, and RMSE of Calibration Slope Performance According to Prevalence and Number of Events for Method 2 (Model 2)", fig.width=6, fig.height=3, message=FALSE, warning=FALSE, out.extra=''}
+
+ggarrange(bias.2, empse.2, rmse.2, ncol = 3, common.legend = TRUE, legend = "bottom")
+
+```
+
+```{r simsscal7, echo=FALSE, fig.cap="Percentage Bias, Empirical SE, and RMSE of Calibration Slope Performance According to Prevalence and Number of Events for Method 3 (Model 2)", fig.width=6, fig.height=3, message=FALSE, warning=FALSE, out.extra=''}
+
+ggarrange(bias.3, empse.3, rmse.3, ncol = 3, common.legend = TRUE, legend = "bottom")
+
+```
+
+```{r simsscal8, echo=FALSE, fig.cap="Percentage Bias, Empirical SE, and RMSE of Calibration Slope Performance According to Prevalence and Number of Events for Method 4 (Model 2)", fig.width=6, fig.height=3, message=FALSE, warning=FALSE, out.extra=''}
+
+ggarrange(bias.4, empse.4, rmse.4, ncol = 3, common.legend = TRUE, legend = "bottom")
+
+```
+
+\FloatBarrier
+
+```{r simsscal9, echo=FALSE, fig.cap="Empirical Calibration Slope Performance According to Prevalence and Number of Events for Method 1 (Model 3)", fig.width=6, fig.height=3, message=FALSE, warning=FALSE, out.extra=''}
+
+load(file="C:/Users/stephen.gerry/Dropbox/Steve work/VM/SimStudy/calslope_plots_model2.RData")
+
+p1
+
+```
+
+```{r simsscal10, echo=FALSE, fig.cap="Empirical Calibration Slope Performance According to Prevalence and Number of Events for Method 2 (Model 3)", fig.width=6, fig.height=3, message=FALSE, warning=FALSE, out.extra=''}
+
+p2
+
+```
+
+```{r simsscal11, echo=FALSE, fig.cap="Empirical Calibration Slope Performance According to Prevalence and Number of Events for Method 3 (Model 3)", fig.width=6, fig.height=3, message=FALSE, warning=FALSE, out.extra=''}
+
+p3
+
+```
+
+```{r simsscal12, echo=FALSE, fig.cap="Empirical Calibration Slope Performance According to Prevalence and Number of Events for Method 4 (Model 3)", fig.width=6, fig.height=3, message=FALSE, warning=FALSE, out.extra=''}
+
+p4
+
+```
+
+\FloatBarrier
+
+```{r simsscal13, echo=FALSE, fig.cap="Percentage Bias, Empirical SE, and RMSE of Calibration Slope Performance According to Prevalence and Number of Events for Method 1 (Model 3)", fig.width=6, fig.height=3, message=FALSE, warning=FALSE, out.extra=''}
+
+library(ggpubr)
+
+ggarrange(bias.1, empse.1, rmse.1, ncol = 3, common.legend = TRUE, legend = "bottom")
+
+```
+
+```{r simsscal14, echo=FALSE, fig.cap="Percentage Bias, Empirical SE, and RMSE of Calibration Slope Performance According to Prevalence and Number of Events for Method 2 (Model 3)", fig.width=6, fig.height=3, message=FALSE, warning=FALSE, out.extra=''}
+
+ggarrange(bias.2, empse.2, rmse.2, ncol = 3, common.legend = TRUE, legend = "bottom")
+
+```
+
+```{r simsscal15, echo=FALSE, fig.cap="Percentage Bias, Empirical SE, and RMSE of Calibration Slope Performance According to Prevalence and Number of Events for Method 3 (Model 3)", fig.width=6, fig.height=3, message=FALSE, warning=FALSE, out.extra=''}
+
+ggarrange(bias.3, empse.3, rmse.3, ncol = 3, common.legend = TRUE, legend = "bottom")
+
+```
+
+```{r simsscal16, echo=FALSE, fig.cap="Percentage Bias, Empirical SE, and RMSE of Calibration Slope Performance According to Prevalence and Number of Events for Method 4 (Model 3)", fig.width=6, fig.height=3, message=FALSE, warning=FALSE, out.extra=''}
+
+ggarrange(bias.4, empse.4, rmse.4, ncol = 3, common.legend = TRUE, legend = "bottom")
+
+```
+
+\FloatBarrier
+
+```{r simsscal17, echo=FALSE, fig.cap="Empirical Calibration Slope Performance According to Prevalence and Number of Events for Method 1 (Model 4)", fig.width=6, fig.height=3, message=FALSE, warning=FALSE, out.extra=''}
+
+load(file="C:/Users/stephen.gerry/Dropbox/Steve work/VM/SimStudy/calslope_plots_model2.RData")
+
+p1
+
+```
+
+```{r simsscal18, echo=FALSE, fig.cap="Empirical Calibration Slope Performance According to Prevalence and Number of Events for Method 2 (Model 4)", fig.width=6, fig.height=3, message=FALSE, warning=FALSE, out.extra=''}
+
+p2
+
+```
+
+```{r simsscal19, echo=FALSE, fig.cap="Empirical Calibration Slope Performance According to Prevalence and Number of Events for Method 3 (Model 4)", fig.width=6, fig.height=3, message=FALSE, warning=FALSE, out.extra=''}
+
+p3
+
+```
+
+```{r simsscal20, echo=FALSE, fig.cap="Empirical Calibration Slope Performance According to Prevalence and Number of Events for Method 4 (Model 4)", fig.width=6, fig.height=3, message=FALSE, warning=FALSE, out.extra=''}
+
+p4
+
+```
+
+\FloatBarrier
+
+```{r simsscal21, echo=FALSE, fig.cap="Percentage Bias, Empirical SE, and RMSE of Calibration Slope Performance According to Prevalence and Number of Events for Method 1 (Model 4)", fig.width=6, fig.height=3, message=FALSE, warning=FALSE, out.extra=''}
+
+library(ggpubr)
+
+ggarrange(bias.1, empse.1, rmse.1, ncol = 3, common.legend = TRUE, legend = "bottom")
+
+```
+
+```{r simsscal22, echo=FALSE, fig.cap="Percentage Bias, Empirical SE, and RMSE of Calibration Slope Performance According to Prevalence and Number of Events for Method 2 (Model 4)", fig.width=6, fig.height=3, message=FALSE, warning=FALSE, out.extra=''}
+
+ggarrange(bias.2, empse.2, rmse.2, ncol = 3, common.legend = TRUE, legend = "bottom")
+
+```
+
+```{r simsscal23, echo=FALSE, fig.cap="Percentage Bias, Empirical SE, and RMSE of Calibration Slope Performance According to Prevalence and Number of Events for Method 3 (Model 4)", fig.width=6, fig.height=3, message=FALSE, warning=FALSE, out.extra=''}
+
+ggarrange(bias.3, empse.3, rmse.3, ncol = 3, common.legend = TRUE, legend = "bottom")
+
+```
+
+```{r simsscal24, echo=FALSE, fig.cap="Percentage Bias, Empirical SE, and RMSE of Calibration Slope Performance According to Prevalence and Number of Events for Method 4 (Model 4)", fig.width=6, fig.height=3, message=FALSE, warning=FALSE, out.extra=''}
+
+ggarrange(bias.4, empse.4, rmse.4, ncol = 3, common.legend = TRUE, legend = "bottom")
+
+```
+
+
+
+\FloatBarrier
+
+# NEWS validation appendix {#sec:appval1}
+
+```{r message=FALSE, warning=FALSE, include=FALSE}
+
+load(file="C:/Users/stephen.gerry/Dropbox/Steve work/VM/treat_plots.RData")
+
+load(file="C:/Users/stephen.gerry/Dropbox/Steve work/VM/ward_plots.RData")
+
+load(file="C:/Users/stephen.gerry/Dropbox/Steve work/VM/age_plots.RData")
+
+
+```
+
+
+```{r p18, echo=FALSE, fig.cap="Forest plot for 48hr ICU admission c-index by ward", fig.width=6, fig.height=9, message=FALSE, warning=FALSE, out.extra=''}
+
+forest5
+
+```
+
+```{r p189, echo=FALSE, fig.cap="Forest plot for 48hr death c-index by ward", fig.width=6, fig.height=9, message=FALSE, warning=FALSE, out.extra=''}
+
+forest8
+
+```
+
+```{r p19, echo=FALSE, fig.cap="Forest plot for 48hr ICU admission and death composite c-index by ward", fig.width=6, fig.height=9, message=FALSE, warning=FALSE, out.extra=''}
+
+forest7
+
+```
+
+```{r p20, echo=FALSE, fig.cap="Distribution of NEWS according to 48hr ICU admission outcome by ward", fig.width=6, fig.height=9, message=FALSE, warning=FALSE, out.extra=''}
+
+joy5
+
+```
+
+
+
+```{r p21, echo=FALSE, fig.cap="Distribution of NEWS according to 48hr death outcome by ward", fig.width=6, fig.height=9, message=FALSE, warning=FALSE, out.extra=''}
+
+joy7
+
+```
+
+
+```{r p22, echo=FALSE, fig.cap="Distribution of NEWS according to 48hr ICU admission and death composite outcome by ward", fig.width=6, fig.height=9, message=FALSE, warning=FALSE, out.extra=''}
+
+joy8
+
+
+```
+
+
+\newpage
+\blandscape
+
+```{r p25, echo=FALSE, fig.cap="Meta regression of mean systolic blood pressure with ward", fig.width=9, message=FALSE, warning=FALSE, out.extra=''}
+
+plot_grid(bub_sbp5+ggtitle("ICU"), bub_sbp7+ggtitle("Death"), bub_sbp8+ggtitle("Composite"), ncol=3, align="h")
+
+```
+
+```{r p26, echo=FALSE, fig.cap="Meta regression of mean diastolic blood pressure with ward", fig.width=9, message=FALSE, warning=FALSE, out.extra=''}
+
+plot_grid(bub_dbp5+ggtitle("ICU"), bub_dbp7+ggtitle("Death"), bub_dbp8+ggtitle("Composite"), ncol=3, align="h")
+
+```
+
+```{r p27, echo=FALSE, fig.cap="Meta regression of mean heart rate with ward", fig.width=9, message=FALSE, warning=FALSE, out.extra=''}
+
+plot_grid(bub_hr5+ggtitle("ICU"), bub_hr7+ggtitle("Death"), bub_hr8+ggtitle("Composite"), ncol=3, align="h")
+
+```
+
+```{r p279, echo=FALSE, fig.cap="Meta regression of mean respiratory rate with ward", fig.width=9, message=FALSE, warning=FALSE, out.extra=''}
+
+plot_grid(bub_rr5+ggtitle("ICU"), bub_rr7+ggtitle("Death"), bub_rr8+ggtitle("Composite"), ncol=3, align="h")
+
+```
+
+```{r p28, echo=FALSE, fig.cap="Meta regression of mean oxygen saturation with ward", fig.width=9, message=FALSE, warning=FALSE, out.extra=''}
+
+plot_grid(bub_spo25+ggtitle("ICU"), bub_spo27+ggtitle("Death"), bub_spo27+ggtitle("Composite"), ncol=3, align="h")
+
+```
+
+```{r p29, echo=FALSE, fig.cap="Meta regression of mean temperature with ward", fig.width=9, message=FALSE, warning=FALSE, out.extra=''}
+
+plot_grid(bub_temp5+ggtitle("ICU")+xlab("Mean Temperature"), bub_temp7+ggtitle("Death")+xlab("Mean Temperature"), bub_temp8+ggtitle("Composite")+xlab("Mean Temperature"), ncol=3, align="h")
+
+```
+
+```{r p30, echo=FALSE, fig.cap="Meta regression of mean National Early Warning Score with ward", fig.width=9, message=FALSE, warning=FALSE, out.extra=''}
+
+plot_grid(bub_news5+ggtitle("ICU"), bub_news7+ggtitle("Death"), bub_news8+ggtitle("Composite"), ncol=3, align="h")
+
+```
+
+```{r p31, echo=FALSE, fig.cap="Meta regression of mean Charlson Comorbidity Index with ward", fig.width=9, message=FALSE, warning=FALSE, out.extra=''}
+
+plot_grid(bub_cci5+ggtitle("ICU"), bub_cci7+ggtitle("Death"), bub_cci8+ggtitle("Composite"), ncol=3, align="h")
+
+```
+
+```{r p32, echo=FALSE, fig.cap="Meta regression of mean age with ward", fig.width=9, message=FALSE, warning=FALSE, out.extra=''}
+
+plot_grid(bub_age5+ggtitle("ICU")+xlab("Mean Age"), bub_age7+ggtitle("Death")+xlab("Mean Age"), bub_age8+ggtitle("Composite")+xlab("Mean Age"), ncol=3, align="h")
+
+```
+
+```{r p41, echo=FALSE, fig.cap="Meta-regression of mean systolic blood pressure with age", fig.width=9, message=FALSE, warning=FALSE, out.extra=''}
+
+plot_grid(bub_sbp9+ggtitle("ICU"), bub_sbp11+ggtitle("Death"), bub_sbp12+ggtitle("Composite"), ncol=3, align="h")
+
+```
+
+```{r p42, echo=FALSE, fig.cap="Meta regression of mean diastolic bloodpressure with age", fig.width=9, message=FALSE, warning=FALSE, out.extra=''}
+
+plot_grid(bub_dbp9+ggtitle("ICU"), bub_dbp11+ggtitle("Death"), bub_dbp12+ggtitle("Composite"), ncol=3, align="h")
+
+```
+
+```{r p43, echo=FALSE, fig.cap="Meta regression of mean heart rate with age", fig.width=9, message=FALSE, warning=FALSE, out.extra=''}
+
+plot_grid(bub_hr9+ggtitle("ICU"), bub_hr11+ggtitle("Death"), bub_hr12+ggtitle("Composite"), ncol=3, align="h")
+
+```
+
+```{r p44, echo=FALSE, fig.cap="Meta regression of mean respiratory rate with age", fig.width=9, message=FALSE, warning=FALSE, out.extra=''}
+
+plot_grid(bub_rr9+ggtitle("ICU"), bub_rr11+ggtitle("Death"), bub_rr12+ggtitle("Composite"), ncol=3, align="h")
+
+```
+
+```{r p45, echo=FALSE, fig.cap="Meta regression of mean oxygen saturation with age", fig.width=9, message=FALSE, warning=FALSE, out.extra=''}
+
+plot_grid(bub_spo29+ggtitle("ICU"), bub_spo211+ggtitle("Death"), bub_spo212+ggtitle("Composite"), ncol=3, align="h")
+
+```
+
+```{r p46, echo=FALSE, fig.cap="Meta regression of mean temperature with age", fig.width=9, message=FALSE, warning=FALSE, out.extra=''}
+
+plot_grid(bub_temp9+ggtitle("ICU")+xlab("Mean Temperature"), bub_temp11+ggtitle("Death")+xlab("Mean Temperature"), bub_temp12+ggtitle("Composite")+xlab("Mean Temperature"), ncol=3, align="h")
+
+```
+
+```{r p47, echo=FALSE, fig.cap="Meta regression of mean National Early Warning Score with age", fig.width=9, message=FALSE, warning=FALSE, out.extra=''}
+
+plot_grid(bub_news9+ggtitle("ICU"), bub_news11+ggtitle("Death"), bub_news12+ggtitle("Composite"), ncol=3, align="h")
+
+```
+
+```{r p48, echo=FALSE, fig.cap="Meta regression of mean Charlson Comorbidity Index with age", fig.width=9, message=FALSE, warning=FALSE, out.extra=''}
+
+plot_grid(bub_cci9+ggtitle("ICU"), bub_cci11+ggtitle("Death"), bub_cci12+ggtitle("Composite"), ncol=3, align="h")
+
+```
+
+\elandscape
+
+
+

@@ -1,0 +1,970 @@
+---
+output:
+  pdf_document: default
+  word_document: default
+  html_document: default
+bibliography: ../EWS papers.bib
+---
+
+```{block type='savequote', include=knitr::opts_knit$get('rmarkdown.pandoc.to') == 'latex', quote_author='(ref:rowling-quote)'}
+
+Every human life is worth the same, and worth saving.
+
+<!-- ending a line with a lonely backslash inserts a linebreak -->
+```
+
+# Development and Internal Validation of Age Specific Early Warning Score {#ageews}
+\minitoc <!-- this will include a mini table of contents-->
+
+\newpage
+## Introduction {#sec:ch8s1}
+
+Some of the previous chapters have demonstrated that age is an important factor, both in terms of the 'normal' vital sign measurements, and also how well early warning scores work in predicting key outcomes.
+Referring back to chapter \@ref(centiles), where the effect of age on the distribution of vital signs was examined, there were strong relationships particularly for blood pressure and oxygen saturation.
+There was a clear trend of increasing SBP with age, for men and women, with the average blood pressure increased by 10 mmHg for men and 22 mmHg for women.
+Variability in SBP also increased considerably with age.
+There was a U-shaped relationship between age and DBP, with a peak at around 50 years of age for both men and women, although the magnitude of change was greater for men.
+Average SpO2 became lower and more variable with age, with a reduction in average SpO2 of 2% for both men and women from 20 to 90 years.
+These changes in normal vital signs appear to have a strong effect on the use of early warning scores.
+For example young women are at a higher risk than older women for triggering due to low blood pressure, whilst young men and women will very rarely trigger for low oxygen saturation.
+Whist these findings are of some interest, it should not be taken for granted that age needs to be accounted for in EWSs.
+The fact that 'normal' vital signs varies with age, does not necessarily prove that the prognostic value of vital signs also varies according to age.
+Yet it seems likely that this will be the case given the results of chapter \@ref(centiles).
+
+Chapter \@ref(validation) described how the discriminative performance of vital signs varies according to the age of the patient.
+This was described according to three outcomes, 48 hour death, 48 hour ICU admission, and 48 hour composite of death and ICU admission.
+There was a limited effect of age on the ability of NEWS to predict ICU admission.
+However there was a strong effect of age on the ability of NEWS to predict death.
+There was an apparent pattern that predictive performance was good for the young and middle ages, but deteriorates after around 60 years.
+The performance in those aged 51-60 years was noticeably lower.
+Meta-regression analyses did not reveal any clear explanations for the heterogeneity of performance according to age.
+
+The usefulness of accounting for age in EWSs has been debated in the literature, and opinion is divided and contradictory[@Smith2008d; @Churpek2015a].
+In their 2008 paper Smith and colleagues show that mortality is strongly related to age[@Smith2008c].
+They also indicate that the predictive ability of both individual vital signs and the Modified Early Warning Score (MEWS), vary according to the age of the patient.
+They conclude that accounting for age in EWSs would be advantageous.
+However, in their more recent work, Smith and colleagues do not include age in their models[@Prytherch2010a].
+One of the more recent papers the same group suggests that there is little use in accounting for age in EWSs, because they found that EWSs including age tended not to perform any better than those that did not include age[@Jarvis2015d].
+In their 2015 paper Churpek and colleagues find that MEWS is much better at discriminating risk of cardiac arrest in younger patients than in older patients[@Churpek2015a].
+They conclude that age-specific early warning scores may be beneficial.
+
+The systematic review found that few studies have included age at all in their EWSs.
+When they were included it tended to be as a single additional predictor.
+The result of including age as a single component of an EWSs would most likely be that older patients would trigger more frequently than younger patients, given the same physiology.
+This may be beneficial in practice, and reflect a true need, however there is likely to be further gain found in allowing age interactions with vital signs.
+This would allow for the predictive power of each vital sign to vary according to the age of the patient.
+For example, high blood pressure  may be prognostic of a bad outcome for young patients, but not for older patients.
+As was shown in Chapter \@ref(validation) there was a clear differential in risk of adverse outcomes according to age, particularly death, but also ICU admission.
+In order to create EWSs that actually provide a predicted probability, it is essential that age is accounted for.
+Since without including age, the predicted risks would likely be poorly calibrated in some age groups.
+
+The systematic review in Chapter \@ref(sr) identified a number of flaws in the statistical methods and reporting of papers describing the development and validation of EWSs.
+Seven broad recommendations were made for future practice, and naturally they should be followed in this chapter.
+These were as follows:
+
+1. Provide key details of your population
+2. Use a large enough sample size
+3. Describe the amount of missing data and use statistical methods to account for it.
+4. Carefully consider outcome measures and time horizons.
+5. Use best practice statistical methods and report the full model.
+6. Always carry out internal validation of new models.
+7. Test all aspects of model performance.
+
+The majority of the recommendations referred to methodological and reporting practices that have previously been outlined in the TRIPOD Statement, and are part of good practice in clinical prediction modelling studies (i.e. 1, 2, 3, 5, 6, 7).
+Point four is more specific to the EWS research.
+Whilst the majority of these points reflect good and standard practice in clinical prediction modelling studies, they are rarely performed properly in EWS studies, in particular points 3, 5, 6, and 7.
+
+Missing data is a problem in the majority of clinical research, generally where patient data are missing values for some predictors.
+The overwhelming opinion is that multiple imputation is the best and most robust method of analysing such data.
+However in EWS research, as seen in the systematic review, the majority of studies use complete case data, i.e. only using data from patients with complete data.
+This approach may introduce bias, since it effectively makes the assumption that data are missing at random, i.e. those patients with missing data are the same as those with complete data.
+This assumption is often unrealistic, and if missingness is in someway associated with the outcome, then regression coefficients will be biased.
+Imputation methods assume plausible values for missing data, based on observed relationships with observed data.
+Multiple imputation carries out this process multiple times, to reflect the uncertainty with which the missing values are imputed.
+
+Internal validation refers to the process of measuring and adjusting for the optimism associated with model development.
+This is important because it is known that models tend to perform better when tested in the development data.
+However, it is rarely carried out effectively in EWS research.
+
+Many development studies do not report any internal validation, whilst many others carry out an ineffective form of internal validation through splitting the data set into 'training' and 'testing' parts.
+Internal validation is important because it well known that the performance of prediction models is overestimated in data set used to develop them, and internal is useful to estimate the performance of the model in new patients.
+Split sampling is an inefficient approach because the model development is carried out on a reduced sample size, typically half of the original data set[@Steyerberg2001].
+It is also results in a poor estimate of the internal validity, especially if the split is randomly generated, since the testing data set will likely share many of the same characteristics as the training data set.
+Better approaches use the whole data set to develop the model, and then use a re-sampling approach for internal validation, either bootstrapping or cross-validation[@Harrell1996].
+
+The evaluation model performance in clinical risk prediction studies should address all aspects of model performance, particularly discrimination and calibration.
+Discrimination evaluates how well the model distinguishes between patients with and without the outcome.
+Calibration evaluates the reliability of the estimated risks, i.e. if the model predicts a 5% risk, on average 5 out of 100 patients should have the outcome.
+However, in EWS studies there is an over-emphasis on discrimination, whilst calibration is rarely assessed.
+This is perhaps largely down to the fact that EWSs have tended to follow an integer points scale, e.g. 0 to 21 for NEWS, and do not estimate a predicted probability of an event occurring, therefore making calibration impossible to assess.
+Some studies in the systematic review did try to assess calibration in this context, however many did so incorrectly, indicating a poor understanding of what calibration means.
+More recently there has been an understanding that assessing the clinical utility is also important, and this can be done through decision curve analysis, allowing an understanding of which models will lead to the best decisions.
+
+This chapter represents an opportunity to carry out the development and internal validation of a new EWS using the most appropriate, and up-to-date methods.
+
+### Aim {#sec:ch8s2}
+
+The aim of this chapter is to develop a new EWS.
+This EWS will be based upon the knowledge accumulated throughout the thesis thus far.
+The previous chapters have shown that death and ICU admission are substantially different events (see Section \@ref(sec:ch5s14) or Section \@ref(sec:ch7s9)) and there are flaws with using a composite outcome.
+Therefore, since being able to predict both outcome is useful I will actually develop two separate scores, one for each outcome.
+I will then perform an internal validation of these new EWSs and assess their performance by comparison to the NEWS.
+
+
+## Methods {#sec:ch8s3}
+
+### Model Development {#sec:ch8s5}
+
+#### Data
+
+As with the validation study in Chapter \@ref(validation) the analysis will use all of the observation sets in the HAVEN data set.
+The analysis will be carried out at the observation set level, and therefore use multiple observation sets per patient without adjustment.
+As discussed previously in the thesis, this is potentially problematic since the coefficients may be biased towards the type of patient who is more likely to have a long stay (and therefore have more observation sets recorded).
+However, there are several reasons I have chosen to take this approach.
+First, since the models will fully account for the age of the patient (and length of stay is strongly correlated with age), the models should still predict accurately for all types of patients.
+Another argument for using all observation sets per patient, as opposed to a sampling approach, is that it directly mirrors clinical practice - where decisions are made based on every observation set.
+Finally, this approach means that all of the valuable data is used in the analysis.
+
+
+#### Outcome {#sec:ch8s6}
+
+As previously mentioned, the intention of this chapter is to develop two separate models - one for predicting death, and one for predicting ICU admission (see Section \@ref(sec:ch2s4b)).
+In both cases a 48 hour time horizon will be used.
+
+
+#### Predictors {#sec:ch8s7}
+
+The choice of candidate predictors was the same in both models: systolic blood pressure, diastolic blood pressure, heart rate, respiratory rate, oxygen saturation, fraction of inspired oxygen, temperature, oxygen therapy (yes/no), level of consciousness (AVPU), age, and sex.
+No variable selection process was used, but instead all variables were included in the final models.
+In order to allow for the predictive strength of vital signs to vary according to age, interaction terms between each continuous vital sign and age were included. Missing data were imputed using multiple imputation as described in \@ref(sec:ch2s15)
+
+To allow for potentially non-linear relationships between continuous predictors and outcomes fractional polynomial regression methods were used (as described in Section \@ref(sec:ch2s11)).
+Up to two powers per variable were allowed.
+This level of complexity is typically recommended, as it is complex enough to give a good fit, and yet not overly complex such that there is a risk of over-fitting[@Royston2017]. 
+
+#### Model fitting approach {#sec:ch8s8}
+
+Due to the computational time taken to choose the best powers for the fractional polynomial method, a bespoke approach was taken, as follows:
+In the first instance the models were fitted based on a single imputed data set.
+From these models the powers for each coefficient were extracted, which were then entered into standard regression models (i.e. ones which do not seek to choose the best powers).
+These models were estimated using the multiply imputed data sets, in a stacked form, to obtain the final model coefficients[@Morris2015].
+
+
+To predict 48 hour death a Cox Proportional Hazards regression model was used.
+In order calculate predicted risks from a Cox model, first the linear predictor $x_i' \hat{\beta}$ must be calculated by multiplying the model coefficients (the logarithm of the hazard ratios) $\hat{\beta}$ by the predictor values $x_i'$.
+The probability of surviving until time $t$ for patient $i$, $\hat{S}_i(t)$, can be calculated using the following formula 
+
+$$\hat{S}_i(t) = \hat{S}_0(t)^{\exp(x_i' \hat{\beta})}$$
+
+where $$\hat{S}_0(t) = \exp(- \hat{\Lambda}_0(t))$$ is the baseline survival function.
+This is not directly estimated by the Cox Regression model, unlike for example the intercept in a logistic regression model.
+However it can be estimated in a variety of ways, and for the purpose of this chapter will be estimated using the cumulative hazard rate at time $t$. 
+
+
+The ICU prediction model will use a Fine and Gray model, which can account for the competing risk of death.
+
+In the context of competing risks the cumulative incidence $I_{k,i}(t)$ is the main quantity of interest.
+This describes the risk of experiencing an event by cause $k$ until time $t$.
+The cumulative incidence of both events will continue to rise over time.
+
+
+The Fine and Gray method directly models cumulative incidence, and is well established for developing prediction models in the context of competing risks[@Austin2017;@Wolbers2009].
+Instead of estimating the hazard of the event, as in the Cox model, the Fine and Gray method models the sub-distribution hazard of the event of interest.
+Whilst the interpretation of these is not as clear as that of hazard ratios, this is not of primary interest when building prediction models where the aim is to predict outcomes as accurately as possible.
+
+The cumulative incidence of the event $k$, at time $t$, for patient $i$, $I_{k,i}(t)$, is given by the formula
+
+
+$$\hat{I}_{k,i}(t) = 1-exp\left(-{\exp(x_i' \hat{\beta})}\cdot\int_{0}^{t}\hat{\lambda}_{k,0}(s)ds\right)$$
+where $\hat{\beta}$ are model coefficients (logarithm of the sub-distribution hazard ratios), $x_i'$ are the predictor values for patient $i$, and $\int_{0}^{t}\hat{\lambda}_k,_0(s)ds$ is the cumulative sub-distribution baseline hazard.
+
+#### NEWS comparison models {#sec:ch8s9}
+
+Once the new models have been developed it will be important to test their performance.
+However, the performance metrics (e.g. discrimination and calibration) on their own are of limited use.
+It will be much more informative to compare the performance to NEWS - the current 'gold standard' EWS.
+However, as has been described previously (Section \@ref(sec:ch7s10)) the NEWS varies between 0 and 21, and does not give an estimate of absolute risk.
+This makes it difficult to assess many of the common performance metrics, e.g. calibration, R^2^, and decision curve analysis.
+Therefore two re-calibrated NEWS models were also developed, one for each of the outcomes.
+In both cases the NEWS was used as the sole predictor, and was allowed to have a non-linear relationship with the outcome, by using fractional polynomials, as before.
+
+
+### Performance Assessment {#sec:ch8s10}
+
+
+Apparent performance was assessed for each of the models (age-specific ICU, age-specific death, refitted NEWS ICU, and refitted NEWS death).
+The discriminative ability of the models was assessed using the c-index.
+For the ICU outcome, and adapted version was used to account for the competing risk of death.
+Overall performance was assessed using the Brier Score, and Nagelkerke's R^2^.
+The clinical utility was assessed through decision curve analysis, which plots (standardised) net benefit against varying risk thresholds. 
+Calibration was assessed through the calibration plot, although by definition, calibration should be good in the data set used to develop the model.
+
+Each performance metric (excluding DCA) was calculated separately in each of the imputed data sets, and the results were combined using Rubin's' rule.
+
+The modelled coefficients were graphically presented to observe how the age of the patient impacts the predictive power of each vital sign.
+
+The c-index was also calculated and plotted over the 48 hour period before the event using a time-dependent method[@Blanche2013].
+In practice, due to the absence of any censoring, this is equivalent to calculating multiple c-indices, with different time horizons.
+This analysis was repeated with event observations near to the events removed from the data set.
+The timeframes for which event observations were removed were 6, 12, 18, and 24 hours.
+This analysis was intended to give an impression of how well the models predicted further from the event (i.e. 24-48 hours).
+
+
+### Internal Validation {#sec:ch8s11}
+
+In order to assess the optimism of the final model, an interval validation was carried out using a bootstrapping approach[@Steyerberg2001].
+The optimism is the degree to which the model performs better in the data in which it is developed, compared to how it will perform in a different data set.
+The internal validation was performed by creating 50 new data sets of equal size, by sampling patients with replacement from the original data set.
+Within each of these data sets the whole modelling process was repeated as per the main analysis, including multiple imputation, model fitting, and performance assessment.
+The apparent performance of each of the bootstrapped models was assessed ($IV_{app}i$) in the data used to develop it.
+The performance of each of these models was then tested in the original data set ($IV_{test}i$).
+The average difference between these two is called the optimism, i.e.
+
+$$Optimism = 1/n \sum_{o}^{n}IV_{app}i - IV_{test}i$$.
+The optimism can thus be subtracted from the apparent performance of the original model to calculate the optimism corrected performance.
+
+To internally validate the calibration curve a similar process was followed.
+The apparent and test curves were plotted within each bootstrap sample, and the difference was calculated at each percentage point of predicted risk. 
+These differences were averaged to find the optimism at each percentage of predicted risk.
+Finally the apparent calibration curve was plotted, along with an internal validation curve defined by plotting the apparent curve minus the optimism at each percentage point.
+
+### Sample size
+
+Recent methodological work has produced some ways of identify the required sample size to build a clinical prediction model, whilst ensuring that the degree of overfitting remains relatively small.
+My data set is retrospective and therefore the sample size is not changeable.
+However, by estimating the minimum number of patients required I will be able to understand whether or not the models I intend to develop are feasible based on this data.
+
+The calculation will be based on the ICU admission model, since that outcome is rarer than death, and therefore would require a greater sample size.
+I hope to include 35 parameters in the model, including the non-linear terms and interactions.
+The event rate at the observation level is approximately 0.3%.
+The final assumption is that the adjusted R^2^ will be 0.013, based on an initial assessment of the NEWS performance.
+These assumptions would require 23689 observation sets in total.
+Therefore the available sample size should be more than sufficient.
+
+
+## Results {#sec:ch8s12}
+
+Descriptive details of the population have been previously reported in Section \@ref(sec:ch2s6).
+In total 1065 admissions included an ICU admission, 3392 ended in death.
+
+\FloatBarrier
+### Model to predict 48 hour death {#sec:ch8s13}
+
+#### The model coefficients
+
+I will initially describe the model which predicts 48 hour death.
+The model coefficients are shown in Table \@ref(tab:mods). 
+Each continuous variable (or continuous by continuous interaction) was allowed to have up to two fractional polynomial terms.
+This is why there are two coefficients for the majority of the continuous predictors.
+
+\newpage
+
+```{r echo=FALSE, message=FALSE, warning=FALSE}
+coeffs = read.csv("C:/Users/stephen.gerry/Dropbox/Steve work/VM/Age/Death_model.csv", header = FALSE)
+
+library(kableExtra)
+
+kable(coeffs, "latex", caption = "(\\#tab:mods) Death Model Description", booktabs = T, escape = F, col.names = c("Variable","Function","Coefficient")) %>%
+kable_styling(latex_options = c("hold_position","scale_down"))
+
+```
+
+\FloatBarrier
+
+In Figures \ref{fig:plothrsa1} to \@ref(fig:plothrsc2) the hazard ratios associated with each of the continuous variables are plotted.
+The hazard ratios are shown for each decade of age from 20 to 90 separately, to represent the effect of the interaction terms between age and each vital sign.
+Note that although the results are shown for different categories of age, this was only done for easy description of the model, and all continuous variables were kept as such in the modelling process.
+For each decade the hazard ratios are plotted for the range that covered the first to ninety-ninth centiles of the relevant vital sign.
+Figure \@ref(fig:plothrsa1) shows that the risk of death within 48 hours of a set of observations increases steadily with age.
+Figure \@ref(fig:plothrsa2) shows the hazard ratios associated with heart rate.
+There is a clear interaction between age and heart rate, since the different curves are not parallel to each other.
+For the younger patients there is a large increase in the risk of death as heart rate increases.
+However, as patients get older the risk associated with a higher heart rate becomes much less, and for the oldest patients there is little prognostic information associated with changes in heart rate.
+Figure \@ref(fig:plothrsa3) shows that there is a steady increase in risk of death as respiratory rate rises.
+The curves are roughly parallel, suggesting that the relationship between respiratory rate and risk of death is the same for all ages.
+Figure \@ref(fig:plothrsb1) shows the relationship between systolic blood pressure and risk of death.
+The risk of death is greatest when SBP is lowest, although it does not appear to be highly prognostic.
+Whilst the younger patients have the smallest range from first to ninety-ninth percentiles, change in SBP appears to be most prognostic in this group.
+Note that this makes NEWS worse because youngest have greatest risk associated with SBP but hardly ever score.
+Figure \@ref(fig:plothrsb2) shows that there appears to be very little prognostic information associated with DBP, regardless of the age of the patient.
+Figure \@ref(fig:plothrsb3) shows the relationship between temperature and the risk of death.
+It shows that the oldest patients are at greatest risk of death when the temperature is lowest.
+However the very youngest patients are at greatest risk with a high temperature.
+The relationship between death and oxygen saturation is shown in Figure \@ref(fig:plothrsc1).
+There is an increasing risk associated with a lowering of SpO2.
+The relationship is similar regardless of age, although the younger patients do not tend to reach the lower levels of SpO2.
+The relationship between the fraction of inspired oxygen and risk of death is shown in Figure \@ref(fig:plothrsc2).
+For all age groups patients are at lowest risk on room air (21%), and the risk steadily increases as the use of inspired oxygen increases.
+
+\FloatBarrier
+\newpage
+
+```{r plothrsa, echo=FALSE, fig.cap="Adjusted log hazard ratio for risk of 48 hour death", fig.subcap=c('Age adjusted log hazard ratios', 'Heart rate adjusted log hazard ratios by decade of age', 'Respiratory rate adjusted log hazard ratios by decade of age'), fig.ncol=1, out.height="30%", fig.show='hold', message=FALSE, warning=FALSE}
+
+library(gridExtra)
+library(timeROC)
+library(ggplot2)
+library(cowplot)
+
+
+load(file="C:/Users/stephen.gerry/Dropbox/Steve work/VM/Age/death_output.RData")
+
+ageplot
+hr
+rr
+
+```
+
+\FloatBarrier
+
+```{r plothrsb, echo=FALSE, fig.cap="Adjusted log hazard ratio for risk of 48 hour death", fig.subcap=c('Sytolic blood pressure adjusted log hazard ratios by decade of age','Diastolic blood pressure adjusted log hazard ratios by decade of age','Temperature adjusted log hazard ratios by decade of age'), fig.ncol=1, out.height="30%", fig.show='hold', message=FALSE, warning=FALSE}
+
+sbp
+dbp
+temp
+
+```
+
+\FloatBarrier
+
+```{r plothrsc, echo=FALSE, fig.cap="Adjusted log hazard ratio for risk of 48 hour death", fig.subcap=c('Oxygen saturation adjusted log hazard ratios by decade of age','Fraction of inspired oxygen adjusted log hazard ratios by decade of age'), fig.ncol=1, out.height="30%", fig.show='hold', message=FALSE, warning=FALSE}
+
+spo2
+fio2
+
+```
+
+\FloatBarrier
+\newpage
+
+Figure \@ref(fig:plotnewsdeath) shows the form of the refitted NEWS model, where the NEWS is the sole predictor.
+It shows that the relationship between NEWS and risk of 48 hour mortality is fairly strong and linear.
+
+```{r plotnewsdeath, echo=FALSE, fig.cap="Adjusted log hazard ratio for risk of 48 hour death from the refitted NEWS model", fig.width=6, message=FALSE, warning=FALSE, out.extra=''}
+
+load("C:/Users/stephen.gerry/Dropbox/Steve work/VM/Age/death_news_plot.RData")
+
+newsplot_death
+
+```
+
+\FloatBarrier
+\newpage
+
+#### Model performance
+
+\FloatBarrier
+
+Model performance metrics are shown in Table \@ref(tab:dperf).
+For the new age-specific model the apparent performance is shown, as well as the optimism corrected performance assessed through bootstrapping.
+The refitted NEWS model performance is shown for comparison.
+
+As may be expected with such a large data set the optimism is very small for all performance metrics, probably because overfitting is limited.
+Even after correcting for optimism the performance of the new age model is much better than that of the NEWS model.
+Discrimination, assessed using the c-index is 0.032 better, 0.919 versus 0.887, which is a large margin considering the relatively insensitive nature of the c-index.
+Overall performance, assessed using the Brier score (where lower is better) is also better, 0.00705 versus 0.00717, even after correction for optimism.
+The R^2^ value which also assesses overall performance is also better for the new model, 0.319 versus 0.265.
+Both models are well calibrated, as expected, and the new model remains so after internal validation.
+
+
+```{r echo=FALSE, message=FALSE, warning=FALSE}
+perf = read.csv("C:/Users/stephen.gerry/Dropbox/Steve work/VM/Age/Death_perf.csv", header = FALSE)
+perf1 <-  perf[2:6,1:5]
+
+rownames(perf1) <- NULL
+
+library(kableExtra)
+
+kable(perf1, format = "latex",caption = "(\\#tab:dperf) Death Model Performance", booktabs = T, escape = F, col.names = c("Performance metric","Age model apparent","Age model optimism","Age model optimism corrected","NEWS model")) %>%
+kable_styling(latex_options = c("hold_position","scale_down"))
+
+```
+\FloatBarrier
+
+Figure \@ref(fig:plotcal) shows the calibration curves for each model.
+This represents the agreement between the predicted and observed risks of death within 48 hours.
+The new model and the refitted NEWS model show good calibration, since the curves are close to the 45 degree line, however this is expected since models are always well calibrated in their development data.
+The optimism corrected line shows very little difference from the apparent performance line.
+
+```{r plotcal, echo=FALSE, fig.cap="Calibration plot showing observed versus predicted risk of 48 hour death, for NEWS, the age model, and the internal validation of the age model", fig.width=6, message=FALSE, warning=FALSE, out.extra=''}
+
+calplot
+
+```
+
+\FloatBarrier
+
+Figure \@ref(fig:plothist) shows the distribution of predicted risks for the new model (in red on top) and the refitted NEWS model (in blue below).
+The y-axis is shown on a log scale, since the large majority of predicted risks are small.
+Both models cover the whole range of predicted risk, from zero to one.
+However, the NEWS model is highly categorised, due to its finite range of values (0 to 21).
+
+
+```{r plothist, echo=FALSE, fig.cap="Back-to-back histogram of predicted risk of 48 hour death for NEWS and age model", fig.width=6, message=FALSE, warning=FALSE, out.extra=''}
+
+hist
+
+```
+
+\FloatBarrier
+
+Figure \@ref(fig:comp) plots the individual risk prediction of the new model and the refitted NEWS model against each other.
+On average the two models broadly agree, since the 50th centile line is near to the 45 degree line.
+However there is a large spread of disagreement shown by the position of the outer quantiles.
+It is worth noting that the large majority of observations fall in the bottom left corner of the plot, where by definition, the disagreement is less.
+
+```{r comp, echo=FALSE, fig.cap="Plot of predicted risks from NEWS versus predicted risks from age model, along with quantiles (1,10,50,90,99)", fig.width=6, message=FALSE, warning=FALSE, out.extra=''}
+
+avn
+
+```
+
+\FloatBarrier
+
+In Figure \@ref(fig:agecomp) the difference in the two model probabilities (new model minus NEWS) are plotted against the age of the patient.
+The NEWS model tends to predict the same, or higher, for the younger patients (<60).
+For older patients the NEWS model predicts lower risks than the new model.
+
+
+```{r agecomp, echo=FALSE, fig.cap="Individual differences between age and NEWS predicted risks according to patients' age, along with quantiles (1,10,50,90,99)" , fig.width=6, message=FALSE, warning=FALSE, out.extra=''}
+
+avna
+
+```
+\FloatBarrier
+
+Whilst the two models were developed to predict 48 hour death, the performance over shorter time frames is also of interest.
+In Figure \@ref(fig:timeauc) the discrimination (c-index) is plotted over the full range of time frames, from immediately before the event to 48 hours before the event.
+The new model is considerably better across the whole 48 hour time range.
+The difference is greatest at 48 hours (0.032), but at 24 hours the difference is also large (0.028).
+
+```{r timeauc, echo=FALSE, fig.cap="C-index according to time from death for both models", fig.width=6, message=FALSE, warning=FALSE, out.extra=''}
+
+rocplot1
+
+```
+\FloatBarrier
+
+It is clear that both models predict best near to the event of death.
+This is what would be expected since the vital signs are more deranged nearer to the event (see Chapter \@ref(trajectories)).
+To be of clinical use the predictive performance needs to be good early before the event.
+A potential criticism of the way the c-index is evaluated is that the predictive ability at say 48 hours includes the observations that were much closer to the event.
+As a sensitivity analysis the observations close to the death event were progressively removed, and the c-index recalculated.
+This is shown in Figure \@ref(fig:timeauc1) where the shading of the line increases as the observations are progressively removed (up to 6, 12, 18, and 24 hours).
+The results show that the performance of both models gets progressively worse as data observation sets are removed, but only marginally so.
+The reduction in performance at 48 hours is greater for the NEWS model.
+
+
+```{r timeauc1, echo=FALSE, fig.cap="C-index according to time from death for both models, with shaded lines indicating performance when outcomes near to death are removed, over a change of periods (6, 12, 18, and 24 hours)", fig.width=6, message=FALSE, warning=FALSE, out.extra=''}
+
+rocplot2
+
+```
+\FloatBarrier
+#### Decision curve analysis {#sec:ch8s14}
+
+The decision curve analysis (DCA) methodology was summarised in Section \@ref(sec:ch2s19).
+The DCA plot shows the threshold probability on the x-axis against the net benefit on the y-axis.
+The threshold probability refers to the probability (of the outcome) at which the costs (or harms) of intervening are felt be outweighed by the benefits of intervening.
+The net benefit refers to the benefit minus the harm.
+In order to compare on the same scale the harms are converted to the same scale as the benefits, which is usually 'true positives'.
+The exchange rate is calculated according to the threshold probability, i.e. 10% would suggest that nine false positives are equivalent to one true positive.
+So we would be saying that it is nine times more important to identify a true case than it is to falsely flag a non-case.
+As described in Section \@ref(sec:ch2s19) I believe it is easier to interpret standardised net benefit than simply net benefit, and that is what is presented below.
+This means that the highest possible value is always one.
+
+Figure \@ref(fig:dca) shows the DCA plot for both the NEWS and age models.
+As is standard, the Figure also shows separate curves for treating all patients and treating none.
+These serve as useful comparators.
+It is immediately apparent that the curve for the age model is higher than all the other curves over the entire range of threshold values up to 50%.
+This is sufficient information in itself to recommend that this model should be implemented, assuming that our chosen threshold probability lies somewhere in that range.
+It is also apparent that the NEWS model is not harmful (i.e. lower than 'treat none') over the full range of threshold probabilities.
+
+Identifying the threshold value of interest is not easy. 
+Lets initially consider the commonly used NEWS threshold of 7, which corresponds to a probability (of 48 hours death) of 4.2%.
+This threshold suggests that we are happy to record approximately 23 (i.e. 95.8/4.2) sets of observations for every one set truly linked to a dying patient. 
+At this threshold value, the sNB for NEWS is 0.305, and for the age model is 0.395.
+This means that for NEWS the benefit of this strategy is equivalent to identifying 31% of all observation sets truly linked to a dying patient and none that are not linked to a dying patient. 
+For the age model this rises to 40% of observation sets from dying patients will be correctly identified with none incorrectly identified.
+The difference in sNB is 9%, so therefore using the age model compared to using NEWS, at the 4.2% threshold, will lead to an extra 9% of observation sets being correctly identified at linked to a dying patient.
+This relative net-benefit of the age model versus NEWS holds for threshold value ranging from around 3% to 15%.
+Therefore, there is strong evidence that for predicting 48 hour death the age model is substantially more clinically useful. 
+
+```{r dca, echo=FALSE, fig.cap="Decision curve analysis plot for 48 hour death", fig.width=6, message=FALSE, warning=FALSE, out.extra=''}
+
+plot_grid(p1,p2,p3,align="v",rel_heights = c(3/4,3/8,1/8),axis = "lr",nrow=3)
+
+#p3$data
+#subset(p1$data,risk==0.007)
+
+```
+\FloatBarrier
+
+The results in chapter \@ref(validation) showed that the discriminative ability of NEWS varied according to the age of the patient.
+Performance was best in those aged 31-50 and 61-80, but not so good in those 30 or less, 51-60, or greater than 80.
+In Figure \@ref(fig:forestboth) the performance of NEWS, as seen before, is shown in black, whilst the performance of the new model is shown in red.
+What is clear is that whilst the new model performs substantially better in all age groups, the same age-related pattern remains.
+
+```{r forestboth, echo=FALSE, fig.cap="Forest plot of 48hr death c-index by age decade for both models", fig.width=6, message=FALSE, warning=FALSE, out.extra=''}
+
+forest13
+
+```
+\FloatBarrier
+### Model to predict 48 hour ICU admission {#sec:ch8s15}
+
+#### The model coefficients
+
+As described in the methods (Section \@ref(sec:ch8s8)), the initial intention was to use the Fine and Gray approach to fit a model predicting 48 hour ICU admission, which accounted for the potential competing risk of death.
+However, it became apparent that the computational complexity of fitting the Fine and Gray model on such a large data set meant that the model fitting process was prohibitively slow.
+Therefore I chose to examine the gain that the Fine and Gray model offered over a standard Cox model, which does not account for competing risks, and where observations followed by death within 48 hours were censored at that time point.
+
+To do this I randomly sampled a smaller data set consisting of 100,000 observations and fitted both models with the same predictors.
+The coefficients were then compared.
+In total 32 predictors were included in each model.
+Figure \@ref(fig:cr1) shows the comparison of these coefficients.
+It is clear from this that there is very little difference in the estimated coefficients from the two models, as all coefficients lie almost exactly on the line of equivalence.
+
+```{r cr, echo=FALSE, fig.cap="A comparison of the Cox and Fine and Gray model coefficients", fig.subcap=c("A scatter plot comparing coefficients from Cox proportional hazards model and Fine and Gray model, based on a sample of the data set","Percentage difference of Fine and Gray model coefficients compared to Cox model coefficients"), fig.ncol=1, fig.show='hold', out.height="40%", message=FALSE, warning=FALSE, out.extra=''}
+
+load(file="C:/Users/stephen.gerry/Dropbox/Steve work/VM/Age/cox_cr_comp.RData")
+
+cox.cr + xlab("Cox coefficient")
+cox.cr.d
+
+```
+
+\FloatBarrier
+Figure \@ref(fig:cr2) shows a histogram of the percentage change of coefficients from the Fine and Gray model compared to the Cox model.
+The majority of coefficients were within 0.01% (i.e. a change of 1 in 10,000), and all coefficients were within 0.06%.
+It is clear that the coefficients from the two models can be considered essentially equivalent.
+And thus due to the relative computational efficiency of the Cox model, this was chosen as the best approach in this scenario.
+
+\FloatBarrier
+Table \@ref(tab:modsICU) shows the model coefficients for predicting 48 hour ICU admission.
+
+\newpage
+
+```{r echo=FALSE, message=FALSE, warning=FALSE}
+coeffs = read.csv("C:/Users/stephen.gerry/Dropbox/Steve work/VM/Age/ICU_model.csv", header = FALSE)
+
+library(kableExtra)
+
+kable(coeffs, "latex", caption = "(\\#tab:modsICU) ICU Model Description", booktabs = T, escape = F, col.names = c("Variable","Function","Coefficient")) %>%
+kable_styling(latex_options = c("hold_position","scale_down"))
+
+```
+
+\FloatBarrier
+Figure \@ref(fig:plothrsd1) shows the modeled hazard ratio for age to predict ICU admission.
+There is little difference in risk of being admitted to ICU until around 75 years of age, after which the risk of ICU admission reduces.
+Figure \@ref(fig:plothrsd2) shows the relationship between heart rate and risk of ICU admission for different ages.
+As seen in Figure \@ref(fig:plothrsd1) there is little difference in risk of ICU admission until around 75 years of age, which explains why the majority of the curves lie near to each other.
+For all age groups the risk of ICU admission increases linearly with increasing heart rate.
+Figure \@ref(fig:plothrsd3) shows the relationship between respiratory rate and ICU admission.
+The risk of ICU increases as respiratory rate increases.
+There is little sign of an age interaction, as all curves lie roughly parallel.
+Figure \@ref(fig:plothrse1) shows the relationship between blood pressure and risk of ICU admission.
+The risk of the outcome is increased with both low and high blood pressures.
+For the younger patients (<50) the risks associated with low and high SBP are broadly equivalent.
+As patients get older, the predominant risk is associated with low SBP.
+The relationship between diastolic blood pressure and ICU admission is shown in Figure \@ref(fig:plothrse2).
+Here the risk is of the outcome is increased with low DBP, but not high.
+There is little sign of an age interaction.
+The relationship between temperature and risk of ICU admission is shown in Figure \@ref(fig:plothrse3).
+The youngest patients (<40) have an increased risk of ICU admission when temperature increases.
+However, for other patients there is little prognostic value in temperature.
+Figure \@ref(fig:plothrsf1) shows the relationship between oxygen saturation and risk of ICU admission.
+For all ages the risk of ICU admission increases linearly as oxygen saturation decreases.
+Figure \@ref(fig:plothrsf2) shows the relationship between the fraction of inspired oxygen and risk of ICU admission.
+The risk of ICU is lowest at room air (21%) for all age groups, and increases with the use of inspired oxygen until a plateau at around 60%.
+There is some indication that there is greater risk associated with increased use of inspired oxygen for the older patients compared to the younger ones.
+
+\FloatBarrier
+
+```{r plothrsd, echo=FALSE, fig.cap="Adjusted log hazard ratio for risk of 48 hour death", fig.subcap=c('Age adjusted log hazard ratio','Heart rate adjusted log hazard ratios by decade of age','Respiratory rate adjusted log hazard ratios by decade of age'), fig.ncol=1, out.height="30%", fig.show='hold', message=FALSE, warning=FALSE}
+
+load(file="C:/Users/stephen.gerry/Dropbox/Steve work/VM/Age/ICU_output.RData")
+
+ageplot
+hr
+rr
+
+```
+
+\FloatBarrier
+```{r plothrse, echo=FALSE, fig.cap="Adjusted log hazard ratio for risk of 48 hour death", fig.subcap=c('Systolic blood pressure adjusted log hazard ratios by decade of age','Diastolic blood pressure adjusted log hazard ratios by decade of age','Temperature adjusted log hazard ratios by decade of age'), fig.ncol=1, out.height="30%", fig.show='hold', message=FALSE, warning=FALSE}
+
+load(file="C:/Users/stephen.gerry/Dropbox/Steve work/VM/Age/ICU_output.RData")
+
+sbp
+dbp
+temp
+
+```
+
+\FloatBarrier
+```{r plothrsf, echo=FALSE, fig.cap="Adjusted log hazard ratio for risk of 48 hour death", fig.subcap=c('Oxygen saturation adjusted log hazard ratios by decade of age','Fraction of inspired oxygen adjusted log hazard ratios by decade of age'), fig.ncol=1, out.height="30%", fig.show='hold', message=FALSE, warning=FALSE}
+
+load(file="C:/Users/stephen.gerry/Dropbox/Steve work/VM/Age/ICU_output.RData")
+
+spo2
+fio2
+
+```
+
+\FloatBarrier
+\newpage
+
+Figure \@ref(fig:plotnewsicu) shows the form of the refitted NEWS model, where the NEWS is the sole predictor.
+It shows that the relationship between NEWS and the risk of 48 hour ICU admission is fairly linear until the NEWS reaches approximately 14, and thereafter the risk starts to decline.
+This is presumably because the patients with very high NEWS values are deemed too sick to be admitted to ICU.
+
+```{r plotnewsicu, echo=FALSE, fig.cap="Adjusted log hazard ratio for risk of 48 hour ICU admission from the refitted NEWS model", fig.width=6, message=FALSE, warning=FALSE, out.extra=''}
+
+load("C:/Users/stephen.gerry/Dropbox/Steve work/VM/Age/icu_news_plot.RData")
+
+newsplot_icu
+
+```
+
+\FloatBarrier
+\newpage
+
+#### Model performance
+
+\FloatBarrier
+Model performance metrics are shown in Table \@ref(tab:perfICU).
+The new model substantially out-performs the NEWS model, even after correction for optimism.
+The c-index was better by 0.036 (0.884 vs 0.848).
+The Brier score of the new model and the NEWS model were similar (0.00308).
+The R^2^ was much higher for the new model than the NEWS model, 0.211 vs 0.155.
+Both models were well calibrated, even after correction for optimism in the new model.
+
+
+```{r echo=FALSE, message=FALSE, warning=FALSE}
+perf = read.csv("C:/Users/stephen.gerry/Dropbox/Steve work/VM/Age/ICU_perf.csv", header = FALSE)
+perf1 <-  perf[2:6,1:5]
+
+rownames(perf1) <- NULL
+
+library(kableExtra)
+
+kable(perf1, "latex", caption = "(\\#tab:perfICU) ICU Model Performance", booktabs = T, escape = F, col.names = c("Performance metric","Age model apparent","Age model optimism","Age model optimism corrected","NEWS model")) %>%
+kable_styling(latex_options = c("hold_position","scale_down"))
+
+```
+\FloatBarrier
+
+Figure \@ref(fig:plotcalICU) shows the calibration curves for each model.
+It shows the agreement between the predicted and observed risks of death within 48 hours.
+The NEWS model is well calibrated, but as seen earlier (in Figure \@ref(fig:plotnewsicu)) the highest possible risk prediction is only 5% which is associated with a NEWS value of approximately 15.
+The age-specific model is well calibrated up to 20%, after which the model tends to over-predict.
+I believe this is probably because of the competing risk of death.
+As the predicted risk of ICU admission increase the risk of death is increasing too, and therefore fewer patients are admitted to ICU than expected because some have died.
+This shows that perhaps there would have been some benefit of using a competing risk regression approach if it were possible to fit the model on the full data set.
+However, there is no real need for concern over this apparent mis-calibration of higher risks, because as will be shown later in Section \@ref(sec:dcaicu) the level of risk that would trigger escalation of care is likely to be very low.
+The optimism corrected line shows little difference from the apparent performance line over the first 15-20%, after which there is some separation.
+
+```{r plotcalICU, echo=FALSE, fig.cap="Calibration plot showing observed versus predicted risk of 48 hour ICU admission, for NEWS, the age model, and the internal validation of the age model", fig.width=6, message=FALSE, warning=FALSE, out.extra=''}
+
+calplot
+
+```
+
+\FloatBarrier
+In Figure \@ref(fig:plothistICU) the distributions of predicted risks from the two models are plotted back-to-back.
+It is apparent that the NEWS model only covers a small range of the probability scale.
+The highest predicted risk of ICU admission is 5%, when the NEWS is 15.
+In contrast the new model gives predictions that span the full probability range.
+
+```{r plothistICU, echo=FALSE, fig.cap="Back-to-back histogram of predicted risk of 48 hour ICU admission for NEWS and age model", fig.width=6, message=FALSE, warning=FALSE, out.extra=''}
+
+hist
+
+```
+
+\FloatBarrier
+In Figure \@ref(fig:compICU), where the predicted probability from the new model and the NEWS model are compared, it is again clear that the probability range of the NEWS model is extremely small.
+Over that small range the two models agree on average, but the variability is large.
+
+```{r compICU, echo=FALSE, fig.cap="Plot of predicted risks from NEWs versus predicted risks from age model, along with quantiles (1,10,50,90,99)", fig.width=6, message=FALSE, warning=FALSE, out.extra=''}
+
+avn
+
+```
+\FloatBarrier
+Figure \@ref(fig:agecompICU) shows the degree of difference in predictions from the two models according to the age of the patient.
+Notice that the new model can give much higher predictions than NEWS, but NEWS is rarely much higher than the new model.
+This is again due to the NEWS model having a very narrow range of predictions.
+Generally, the agreement between the two models very good, since the quantile curves are all close to zero.
+This is primarily because ICU admission is a relatively rare event and therefore most patients have a small risk.
+After around 75 years of age there is a slight change in the shape of the curves, where the NEWS model tends to predict higher risk than the new model. 
+
+```{r agecompICU, echo=FALSE, fig.cap="Individual differences between age and NEWS predicted risks according to patients' age, along with quantiles (1,10,50,90,99)" , fig.width=6, message=FALSE, warning=FALSE, out.extra=''}
+
+avna
+
+```
+\FloatBarrier
+The c-index over time horizons ranging from 0 to 48 hours in shown in Figure \@ref(fig:timeaucICU).
+The new model shows substantially better performance than the NEWS model at all time horizons.
+The difference between the two models is greatest at 48 hours.
+
+```{r timeaucICU, echo=FALSE, fig.cap="C-index according to time from ICU admission for both models", fig.width=6, message=FALSE, warning=FALSE, out.extra=''}
+
+rocplot1
+
+```
+\FloatBarrier
+As done previously for the death models, in Figure \@ref(fig:timeauc2ICU) the events closest to the event (within 6, 12, 18, and 24 hours) are progressively removed.
+There is a greater reduction in performance here for the ICU model than there was for the death model.
+However, as with the death model, the reduction in performance in lesser for the new model than the age model.
+
+```{r timeauc2ICU, echo=FALSE, fig.cap="C-index according to time from ICU admission for both models, with shaded lines indicating performance when outcomes near to ICU admission are removed, over a change of periods (6, 12, 18, and 24 hours)", fig.width=6, message=FALSE, warning=FALSE, out.extra=''}
+
+rocplot2
+
+```
+\FloatBarrier
+
+#### Decision curve analysis {#sec:dcaicu}
+
+The decision curve analysis is shown in Figure \@ref(fig:dcaICU).
+As with the death outcome, there is a clear benefit of the age-specific model over and above the NEWS model.
+At a threshold of 15% there is no benefit of the model over taking no observations.
+The threshold value associated with a NEWS of seven is tiny for predicting ICU admission, just 1.6%.
+This suggests a willingness to record 62 sets of vital sign observations for every one set that is from a patient needing to go to ICU.
+At this threshold, the NEWS has a sNB of 0.175 or 18%, and for the age model it is 0.316 or 32%.
+Therefore, the benefit of using the age model over the NEWS model at this threshold is 14%, i.e. an extra 14% of observation sets from a patient who will be admitted to ICU are identified, with no additional observation sets incorrectly identifying patients as at risk when they are not.
+
+
+```{r dcaICU, echo=FALSE, fig.cap="Decision curve analysis plot for 48 hour ICU admission", fig.width=6, message=FALSE, warning=FALSE, out.extra=''}
+
+plot_grid(p1,p2,p3,align="v",rel_heights = c(3/4,3/8,1/8),axis = "lr",nrow=3)
+
+```
+
+\FloatBarrier
+In Figure \@ref(fig:forestbothICU) the discriminative performance of the two models is shown by different age groups.
+The new model out-performs the NEWS model in every age group.
+The improvements are broadly consistent across the different groups.
+
+```{r forestbothICU, echo=FALSE, fig.cap="Forest plot of 48hr ICU admission c-index by age decade for both models", fig.width=6, message=FALSE, warning=FALSE, out.extra=''}
+
+forest13
+
+```
+
+
+\FloatBarrier
+## Discussion {#sec:ch8s16}
+
+Throughout this thesis there have been a number of indications that age may be an important factor which should be accounted for in the identification of deteriorating patients:
+- From chapter \ref{centiles}, and other studies, it is clear that the distribution of vital signs changes as patients get older.
+This was particularly true for systolic and diastolic blood pressure, and oxygen saturation.
+- Chapter \ref{validation} showed that the risk of death or ICU admission following a set of observations varies considerably according to age.
+The risk of death increases markedly as patients get older, whilst the risk of ICU admission decreases after 70 years of age.
+- Finally, in chapter \ref{validation} it was clear that the predictive performance of NEWS varies considerably according to the age of the patient.
+This was particularly true for predicting 48 hour death.
+
+Despite all of these factors very few EWSs include age a predictor, or modify the score in any way to account for age.
+In the systematic review in Chapter \ref{sr} only 13 out of the 34 model development studies included age in the final model.
+
+The previous chapters have also identified that ICU admission and death are substantially different events.
+In chapter \ref{trajectories} it was shown that the trajectories of vital signs leading up to those events were quite different.
+Chapter \ref{validation} showed that due to the imbalance in incidence of the two outcomes, with death being much more common, a composite outcome was dominated by death.
+
+The aim of this chapter was to develop separate models to predict 48 hour death and 48 hour ICU admission.
+These models were designed to fully account for the age of the patient, through interaction terms.
+In addition the methodology used in the chapter was intended to follow best practice.
+In doing so showing that the problems identified with the current literature in the systematic review, can be done well, using the best practice methods.
+These methods include things such as multiple imputation for missing data, non-linear relationships between predictor and outcome, and bootstrap internal validation.
+
+### Summary of results {#sec:ch8s17}
+
+Two new models were developed, using commonly measured vital signs, to predict ICU admission or death within 48 hours of the observations being taken.
+The models included the main effect of each vital sign, but also included interactions between each vital sign and age.
+In addition, all continuous terms were allowed to have a non-linear relationship with the outcome.
+
+The coefficients were presented graphically, and it is clear that the strength of relationship between each vital sign and outcome varies.
+This is in contrast to the traditional EWS where each vital sign is given the same weighting (typically three points).
+It was also apparent that there were differences in which vital signs most strongly predicted the different events (death and ICU admission).
+In predicting death the strongest predictors appeared to be heart rate and age, whilst there were moderately strong relationships with respiratory rate, systolic blood pressure, temperature, oxygen saturation, and fraction of inspired oxygen.
+There were noticeable age interactions with heart rate and temperature.
+For predicting ICU admission the strongest predictors were heart rate, respiratory rate and fraction of inspired oxygen.
+There were moderate relationships with systolic blood pressure, and temperature.
+The only noticeable age interaction was with temperature.
+
+For risk prediction models to be implemented in practice it is important for them to estimate individualized risk predictions, i.e. for a given patient the chance of the event occurring, given their observed variables.
+The majority of EWSs do not provide this (ref SR).
+To enable a comparison with NEWS two models, one for each outcome, were developed using NEWS as the sole predictor.
+This highlighted some inadequacies with NEWS, particularly when used to predict ICU admission.
+Whilst a model would ideally have the potential to provide predictions covering the entire span from 0% to 100%, the highest possible prediction from the ICU NEWS model is 5% (when the NEWS is 15, after which the risk of ICU admission reduces). 
+The recommended NEWS thresholds of five and seven are associated with risks of ICU admission of 0.7% and 1.6% risks, and risks of death of 1.5% and 4.2%.
+These are all low, and may therefore lead to many false positives, and fatigue.
+
+By comparison to NEWS the new models developed in this chapter offer much better predictive performance.
+In terms of discrimination the c-index improved from 0.89 to 0.92 when predicting death, and 0.85 to 0.88 when predicting ICU admission.
+These are large improvements given the c-index is generally accepted to be insensitive to improvements in predictive performance[@Pepe2013].
+The overall performance measured with the R^2^ increases from 0.27 to 0.32 when predicting death, and 0.16 to 0.21 when 
+ICU admission.
+
+Decision curve analysis is a recent way of assessing the clinical usefulness of a risk prediction model.
+It looks at the benefit of using a model at a range of threshold probabilities.
+The results showed that for all realistically possible thresholds, the new models offered substantially greater benefit than the NEWS models.
+
+
+### Benefit of accounting for age {#sec:ch8s18}
+
+The results from this chapter have shown that substantial gain can be made by appropriately accounting for the age of the patient when calculating their risk of death or ICU admission within 48 hours.
+This goes against what some of the recent literature says, suggesting there is little gain from using age.
+However the methodology underlying these papers is limited, and they did not make full use of age.
+
+In this chapter there were two key ways in which age was accounted for.
+The first, and simplest way, was simply to include age as a predictor.
+When predicting 48 hour death, the age of the patient is a very strong predictor of the outcome, with a fairly linearly increasing risk as age increases (Figure \@ref(fig:plothrsa1)).
+The relationship between age and risk of 48 hour ICU admission was not so strong, but there was a notable decrease in risk of the outcome after 75 years (Figure \@ref(fig:plothrsd1)).
+The effect of including these age terms was evident, by comparison to NEWS, in Figure \@ref(fig:agecomp), where the difference between the two death models were plotted according to the age of the patient.
+In younger patients NEWS tends to predict higher risks than the new model, whilst for older patients NEWS tends to predict lower risks.
+A similar plot in Figure \@ref(fig:agecompICU), shows that for predicting ICU admission NEWS tends to predict a higher risk in older patients.
+In both of these cases, it is likely that the new models are making better and more accurate predictions.
+
+```{r calibnew, echo=FALSE, fig.cap="", fig.width=6, message=FALSE, warning=FALSE, out.extra=''}
+
+load("C:/Users/stephen.gerry/Dropbox/Steve work/VM/Age/death_cal_age_sub.RData")
+
+load("C:/Users/stephen.gerry/Dropbox/Steve work/VM/Age/icu_cal_age_sub.RData")
+
+
+library(gridExtra)
+library(cowplot)
+
+grid.arrange(
+risk.icu + theme_bw(base_size = 9)+theme(legend.position="none"),
+risk.d + theme_bw(base_size = 9)+theme(legend.position="none")
+, ncol=2, widths = c(1, 1))
+
+
+```
+
+The second way in which age was accounted for was through the inclusion of interaction terms between vital signs and age.
+The rationale behind this was to allow for vital signs to have different relationships with the outcome depending on the age of the patient.
+This was most evident for heart rate when predicting death.
+For the younger patients a high heart rate was highly prognostic of death, however as patients got older the prognostic strength decreased, until it lost virtually all of its prognostic value for the oldest patients.
+In predicting death there were also clear age interactions with systolic blood pressure and temperature.
+For the ICU model, there were interactions between age and temperature, systolic blood pressure, and fraction of inspired oxygen.
+In the case of temperature and SBP, higher values were prognostic for younger patients, but not less so as age increases.
+Whilst higher values of the fraction of inspired oxygen were less prognostic for younger patients than for the older ones.
+
+### Gold-standard practice is feasible {#sec:ch8s19}
+
+The systematic review in chapter \ref{sr} identified many flaws with the methodology underlying the current literature, both for model development and model validation.
+Many of the flaws observed in the EWS literature are common across clinical prediction models in other clinical areas.
+Yet, there were a number of areas where the EWS literature was particularly poor, with almost no papers following best practice.
+These areas include approaches to account for missing data, a proper evaluation of model performance, methods used for internal validation, and other more sophisticated statistical methods, such as including non-linear relationships, and accounting for competing risks.
+Whilst the primary aim of this chapter was to develop a new model (or models) that will be clinically useful, it is also important to demonstrate that the best practice methods of clinical prediction modelling are possible and of value in the context of EWSs. I will briefly discuss some of these issues below, and how they were handled in this chapter.
+
+#### Missing data {#sec:ch8s20}
+
+As identified in the systematic review, the majority of EWS papers report whether missing data occurred, but very few use appropriate analysis methods to account for it.
+The most common approach is the complete case approach, where patients or sets of observations containing any missing data are discarded.
+This is known to be potentially biased and inefficient, and instead multiple imputation is widely regarded as the best method.
+In the systematic review none of the 34 model development studies reported using multiple imputation.
+There are perhaps several possible reasons why people chose not to use multiple imputation methods, including a lack of expertise, the added complexity, the added computational requirement, or a perception that imputation requires unlikely assumptions to be true.
+Whilst multiple imputation does add complexity and an extra computational burden, these are not valid reasons to reject the method, if it is not prohibitive.
+The standard approach for multiple imputation in model development is where separate models are fitted in each imputed data set and model coefficients are averaged to obtain the final model
+However, using this method in combination with fractional polynomial methods is not easy, since the m different models may contain different power terms, and therefore averaging the models is not possible.
+In this chapter I used a stacking approach as an alternative, where the m imputed data sets are appended together to create one new data set m-times as long as the original.
+Whilst this approach would result in standard errors that are too small, this does not typically matter in the context of prediction model development, where the interest is solely in the model coefficients.
+For the purpose of model performance assessment I used the more standard approach of separately calculating the performance statistics in each imputed data set separately, and then combining the results using Rubin's rule.
+As discussed earlier in the thesis, there are now excellent methods now available to make use of and benefit from the longitudinal nature of the data set.
+
+#### Internal validation {#sec:ch8s21}
+
+Internal validation is an important part of model development in which the optimism of the model development process is estimated.
+Many of the development papers included an assessment of internal validity but typically a split-sample approach was used.
+This approach is known to be inefficient and does not provide a good assessment of the model optimism.
+Instead better approaches are ones which use re-sampling techniques, such as bootstrapping or cross-validation.
+In this chapter I used a bootstrapping approach.
+Concerns about bootstrapping are typically based on the computational complexity, since the method relies on repeating the analysis process multiple times based on re-sampled data sets.
+The number of repeats is debated, but generally 200 or more are preferred.
+I found that whilst feasible to implement he complexity and size of the data set, meant that only 50 repeats were practical to run.
+Each repeat took approximately one week to run.
+Whilst it is possible to parallelise these processes, i.e. run multiple repeats simultaneously, the RAM requirements for each repeat meant than I could only run a limited number (3-4) of processes at the same time.
+Despite these issues it was possible to carry out a bootstrap internal validation for these complex models using a very large data set.
+The results showed that the optimism of the performance metrics was generally small, although larger for the ICU model than the death model.
+This was probably because the ICU admission was less common.
+
+#### Performance assessment {#sec:ch8s22}
+
+The systematic review showed that the assessment of EWSs it currently dominated by measures of discrimination, and particularly the c-index (also called the C-statistic or AUROC).
+Many important metrics are rarely or never reported, such as measures of calibration, overall performance and clinical utility.
+Arguably, the main reason for this is that most EWSs hold to the original design, which is where each vital sign scores between zero and three points, and these add added together to calculate a total score.
+There is nothing to link this integer score to an estimate of risk, and therefore it is not possible to calculate many of those performance metrics that are often missing.
+As discussed earlier, the ability of an EWS to estimate a patients risk is not just important in order to evaluate its predictive performance, but primarily to enable to score to be useful clinically.
+Since the NEWS does not estimate risks I fitted models with the EWS as the sole predictor, to obtain estimates of risk from it.
+Assessing the predictive performance of a score is relatively straight forward once the risk estimates are provided.
+These can largely be calculated using standard software packages, particularly measures such as the c-index, Brier score, R^2^, etc.
+Assessing calibration can be more difficult, and it is often overlooked.
+The best way to assess calibration is through a plot of the observed versus predicted risks of an event.
+Decision curve analysis is a relatively new way of assessing the performance of prediction models. 
+Despite the apparent usefulness of this method the uptake has been relatively low.
+This most likely stems from a poor understanding of how to interpret the results.
+
+
+#### Competing risks {#sec:ch8s23}
+
+The systematic review found that whilst ICU admission was a relatively common outcome, no studies had accounted for the potential for death to be a competing risk.
+Again, this is an area which is poorly handled in prediction models in many different clinical domains.
+Where death is the competing risk, a standard Cox proportional hazards model would censor at the point of death, and therefore the assumption is of an immortal population.
+Thus, not accounting for competing risks could lead to inaccurate absolute risk predictions (typically an over-prediction of risk), which may lead to serious problems when the model is implemented in practice.
+The solution is to use methods that can account for competing risks in the model, such as cause-specific hazards, or Fine and Gray cumulative incidence.
+Nowadays, such methods are available in most statistical software packages.
+
+In this chapter I intended to use the Fine and Gray approach, however it became apparent that fitting the model was prohibitively slow.
+Therefore I decided to explore whether the competing risk approach was necessary and added any benefit.
+Using a subset of the data, a comparison of the Fine and Gray and Cox proportional hazards models revealed almost identical coefficients.
+I therefore took the pragmatic decision of using the Cox model.
+This agrees with previous findings (Wolbers), where Wolbers found there to be limited benefit of competing risk approaches when the competing risk was rare.
+Whilst it is true in the example contained within this chapter that the competing risk approach is unnecessary, this may not hold true for other examples, for example where the population is more frail and thus the competing risk (death) is more common.
+There is a suggestion that this is true in those aged over 90 when using the new ICU model, where the model seems to over-predict the risk.
+A post-hoc assessment of the observations from patients over 90 years old and with more than a 1% risk of ICU admission within 48 hours, reveals that around a third of these will actually be linked to death within 48 hours. 
+
+### Strengths and limitations
+
+As I have already described at length, one of the key aims of this chapter was to show that a best practice statistical approach to developing and validating EWSs is possible and beneficial.
+I believe this aim was achieved as I have I have discussed in the previous section, and this is really the key strength of this chapter.
+Another strength is the large data set on which the analyses were based.
+Although, arguably, an even larger sample size would have been beneficial, as there appeared to be a certain degree of overfitting for the ICU admission model.
+A further limitation of this chapter is the lack of an external validation of the models, i.e. testing in data from another hospital trust.
+This may be necessary before the models will be accepted for implementation in practice.
+Nevertheless I did carry out a robust internal validation of both models, which indicated that they should perform well in other settings too.
+A further limitation is the way that I dealt with the clustered observation sets within patients.
+My approach was to include all observations and treat them independently.
+Naturally, this may introduce a certain degree of bias, as certain patients (or types of patients) are more greatly represented than others.
+However this does reflects clinical practice.
+I am confident that, since the models are relatively sophisticated, any potential biases will be diluted and they will predict well for the majority of patients.
+
+## Conclusion {#sec:ch8s24}
+
+In summary, it is clear from this chapter that accounting for the age of the patient can substantially improve the performance of EWSs.
+Two models were developed to separately predict death and ICU admission within 48 hours.
+These models can be of real clinical benefit by comparison to the NEWS.
+The decision curve analysis showed that to predict death the age-specific model was equivalent to a strategy that identified an additional 9% of the true positives, and to predict ICU admission the age-specific model would identify an additional 14% of the true positives.
+
+The systematic review in Chapter \@ref(sr) identified that the methods for development and validation of EWSs are often flawed.
+In this chapter I have shown that the best practice methods can be implemented in the context of EWSs, and that they are also beneficial and not merely a 'tick-box' exercise.
+
+
+
+
+
+
+
+
+
+
+
+
+

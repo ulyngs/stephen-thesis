@@ -1,0 +1,2031 @@
+---
+output:
+  html_document: default
+  word_document: default
+  pdf_document: default
+bibliography: ../EWS papers.bib
+---
+
+```{block type='savequote', include=knitr::opts_knit$get('rmarkdown.pandoc.to') == 'latex', quote_author='(ref:lounsbrough-quote)'}
+
+And if I am somehow apt to confuse such rubbish with wisdom, I will think myself wise but find myself living in a landfill.
+
+<!-- ending a line with a lonely backslash inserts a linebreak -->
+```
+(ref:lounsbrough-quote) --- Craig D. Lounsbrough
+
+# A systematic review and critical appraisal of studies developing and validating early warning scores {#sr}
+\minitoc <!-- this will include a mini table of contents-->
+
+```{r message=FALSE, warning=FALSE, include=FALSE, results='asis'}
+
+library(Hmisc)
+library(arsenal)
+library(dplyr)
+library(ggplot2)
+
+data=read.csv('C:/Users/stephen.gerry/Dropbox/Steve work/VM/SR/EWSSystematicReview_DATA_2019-10-25_1117.csv')
+
+data <- subset(data, study_id != 10 & study_id != 14 & study_id != 61 & study_id != 81 & study_id != 116)
+
+label(data$study_id)="Study ID"
+label(data$study_surname)="First authors surname"
+label(data$study_year)="Year published"
+label(data$study_include)="Include Study?"
+label(data$study_exclude_reason)="Why should study be excluded?"
+label(data$study_type)="Type of study"
+label(data$dev_aim)="What is the aim of the model?"
+label(data$dev_target)="What is the target population of the model?"
+label(data$dev_name)="What is the name of the score?"
+label(data$dev_how)="How was the model developed?"
+label(data$dev_design)="What was the study design?"
+label(data$dev_design_oth)="Other"
+label(data$dev_source)="What was the source of the data?"
+label(data$dev_date_start)="What year did data collection start?"
+label(data$dev_date_fin)="What year did data collection finish?"
+label(data$dev_patients)="Number of patients"
+label(data$dev_obs)="Number of obs sets"
+label(data$dev_events)="Number of events (where appropriate) patient level"
+label(data$dev_events_ob)="Number of events (where appropriate) observation level"
+label(data$dev_age)="Mean (or median) age of patient population."
+label(data$dev_male)="Percentage of patient population who are male"
+label(data$dev_mult)="Were multiple sets of observations used per patient?"
+label(data$dev_mult_adj)="Was any adjustment made for the multiple observations per patient?"
+label(data$dev_single)="How was the single observation per patient chosen?"
+label(data$dev_missing)="Was missing data referred to?"
+label(data$dev_missing_app)="What approach was taken to handle missing data?"
+label(data$dev_reg)="Was a regression modelling approach used?"
+label(data$dev_reg_no)="Describe what approach was used"
+label(data$dev_reg_out)="What was the primary outcome?"
+label(data$dev_reg_out_cat___0)="What was the primary outcome category? (choice=24hr Mortality)"
+label(data$dev_reg_out_cat___1)="What was the primary outcome category? (choice=48hr Mortality)"
+label(data$dev_reg_out_cat___2)="What was the primary outcome category? (choice=In-hospital Mortality)"
+label(data$dev_reg_out_cat___3)="What was the primary outcome category? (choice=24hr ICU admission)"
+label(data$dev_reg_out_cat___4)="What was the primary outcome category? (choice=48hr ICU admission)"
+label(data$dev_reg_out_cat___5)="What was the primary outcome category? (choice=Any ICU admission)"
+label(data$dev_reg_out_cat___6)="What was the primary outcome category? (choice=24hr Composite Death/ICU admission)"
+label(data$dev_reg_out_cat___7)="What was the primary outcome category? (choice=48hr Composite Death/ICU admission)"
+label(data$dev_reg_out_cat___8)="What was the primary outcome category? (choice=Any Composite Death/ICU admission)"
+label(data$dev_reg_out_cat___9)="What was the primary outcome category? (choice=Other)"
+label(data$dev_reg_out_cat1)="What was the primary outcome category (type 2)?"
+label(data$dev_reg_time_cat)="What was the primary outcome time point?"
+label(data$dev_reg_type)="What type of regression approach was used?"
+label(data$dev_reg_type_oth)="Other"
+label(data$dev_reg_vars)="How many variables entered the model building procedure?"
+label(data$dev_reg_model)="What model building strategy was used?"
+label(data$dev_reg_model_oth)="Other"
+label(data$dev_reg_vars_final)="How many variables were included in the final model?"
+label(data$dev_reg_vars_list___0)="Which variables were included in the final model? (choice=Systolic blood pressure)"
+label(data$dev_reg_vars_list___1)="Which variables were included in the final model? (choice=Diastolic blood pressure)"
+label(data$dev_reg_vars_list___2)="Which variables were included in the final model? (choice=Respiratory rate)"
+label(data$dev_reg_vars_list___3)="Which variables were included in the final model? (choice=Heart rate)"
+label(data$dev_reg_vars_list___4)="Which variables were included in the final model? (choice=Oxygen saturation)"
+label(data$dev_reg_vars_list___5)="Which variables were included in the final model? (choice=Temperature)"
+label(data$dev_reg_vars_list___6)="Which variables were included in the final model? (choice=Age)"
+label(data$dev_reg_vars_list___7)="Which variables were included in the final model? (choice=Sex)"
+label(data$dev_reg_vars_list___8)="Which variables were included in the final model? (choice=Oxygen therapy)"
+label(data$dev_reg_vars_list___9)="Which variables were included in the final model? (choice=Level of consciousness)"
+label(data$dev_reg_vars_list___10)="Which variables were included in the final model? (choice=Other(s))"
+label(data$dev_reg_vars_list_oth)="Other(s)"
+label(data$dev_reg_force)="Were any known risk factors forced into the final model?"
+label(data$dev_reg_int)="Were any interaction terms examined?"
+label(data$dev_reg_int_spec)="Specify"
+label(data$dev_reg_nl)="Were any non-linear terms examined?"
+label(data$dev_reg_nl_spec)="Specify"
+label(data$dev_reg_col)="Was collinearity mentioned?"
+label(data$dev_reg_ass)="Were model assumptions assessed?"
+label(data$dev_reg_coef)="For the final model, were regression coefficients/odds ratios/hazard ratios reported?"
+label(data$dev_reg_coef_int)="Was the intercept or baseline hazard reported?"
+label(data$dev_reg_risk_pred)="Does the model allow absolute risks to be calculated?"
+label(data$dev_reg_risk)="Were risk groups created?"
+label(data$dev_reg_risk_no)="How many?"
+label(data$dev_reg_risk_how)="What method was used o create risk groups?"
+label(data$dev_reg_sim)="Was a simplified model created?"
+label(data$dev_reg_sim_rat)="Is a rationale given?"
+label(data$dev_reg_sim_how)="Do they describe how?"
+label(data$dev_fin)="List variables and weights of final model"
+label(data$dev_app)="Was apparent performance assessed?"
+label(data$dev_app_dis___0)="How was model discrimination tested? (choice=Not assessed)"
+label(data$dev_app_dis___1)="How was model discrimination tested? (choice=C-statistic (AUROC))"
+label(data$dev_app_dis___2)="How was model discrimination tested? (choice=Discrimination slope)"
+label(data$dev_app_dis___3)="How was model discrimination tested? (choice=Other)"
+label(data$dev_app_c)="What was the C-statistic?"
+label(data$dev_app_cal___0)="How was model calibration tested? (choice=Not assessed)"
+label(data$dev_app_cal___1)="How was model calibration tested? (choice=Plot)"
+label(data$dev_app_cal___2)="How was model calibration tested? (choice=Table)"
+label(data$dev_app_cal___3)="How was model calibration tested? (choice=HL Test)"
+label(data$dev_app_cal___4)="How was model calibration tested? (choice=Slope)"
+label(data$dev_app_cal___5)="How was model calibration tested? (choice=Intercept)"
+label(data$dev_app_cal___6)="How was model calibration tested? (choice=Kappa)"
+label(data$dev_app_cal___7)="How was model calibration tested? (choice=Other)"
+label(data$dev_app_oth___0)="What other methods were used to assess model performance? (choice=R-squared)"
+label(data$dev_app_oth___1)="What other methods were used to assess model performance? (choice=Brier score)"
+label(data$dev_app_oth___2)="What other methods were used to assess model performance? (choice=Predictive values)"
+label(data$dev_app_oth___3)="What other methods were used to assess model performance? (choice=Sensitivity)"
+label(data$dev_app_oth___4)="What other methods were used to assess model performance? (choice=Specificity)"
+label(data$dev_app_oth___5)="What other methods were used to assess model performance? (choice=Decision curve analysis)"
+label(data$dev_app_oth___6)="What other methods were used to assess model performance? (choice=Odds Ratios)"
+label(data$dev_app_oth___7)="What other methods were used to assess model performance? (choice=Efficiency Curves)"
+label(data$dev_app_oth___8)="What other methods were used to assess model performance? (choice=Other)"
+label(data$dev_app_oth_spec)="Specify"
+label(data$dev_app_roc)="Was a ROC curve produced?"
+label(data$dev_app_out)="List any other outcomes assessed."
+label(data$dev_int)="Was internal validation assessed?"
+label(data$dev_int_how)="what method was used for internal validation?"
+label(data$dev_int_dis___0)="How was model discrimination tested? (choice=Not assessed)"
+label(data$dev_int_dis___1)="How was model discrimination tested? (choice=C-statistic (AUROC))"
+label(data$dev_int_dis___2)="How was model discrimination tested? (choice=Discrimination slope)"
+label(data$dev_int_dis___3)="How was model discrimination tested? (choice=Other)"
+label(data$dev_int_c)="What was the C-statistic?"
+label(data$dev_int_cal___0)="How was model calibration tested? (choice=Not assessed)"
+label(data$dev_int_cal___1)="How was model calibration tested? (choice=Plot)"
+label(data$dev_int_cal___2)="How was model calibration tested? (choice=Table)"
+label(data$dev_int_cal___3)="How was model calibration tested? (choice=HL Test)"
+label(data$dev_int_cal___4)="How was model calibration tested? (choice=Slope)"
+label(data$dev_int_cal___5)="How was model calibration tested? (choice=Intercept)"
+label(data$dev_int_cal___6)="How was model calibration tested? (choice=Kappa)"
+label(data$dev_int_cal___7)="How was model calibration tested? (choice=Other)"
+label(data$dev_int_oth___0)="What other methods were used to assess model performance? (choice=R-squared)"
+label(data$dev_int_oth___1)="What other methods were used to assess model performance? (choice=Brier score)"
+label(data$dev_int_oth___2)="What other methods were used to assess model performance? (choice=Predictive values)"
+label(data$dev_int_oth___3)="What other methods were used to assess model performance? (choice=Sensitivity)"
+label(data$dev_int_oth___4)="What other methods were used to assess model performance? (choice=Specificity)"
+label(data$dev_int_oth___5)="What other methods were used to assess model performance? (choice=Decision curve analysis)"
+label(data$dev_int_oth___6)="What other methods were used to assess model performance? (choice=Odds Ratios)"
+label(data$dev_int_oth___7)="What other methods were used to assess model performance? (choice=Efficiency Curves)"
+label(data$dev_int_oth___8)="What other methods were used to assess model performance? (choice=Other)"
+label(data$dev_int_oth_spec)="Specify"
+label(data$dev_int_roc)="Was a ROC curve produced?"
+label(data$val_no)="How many scores are validated?"
+label(data$val_dev)="Was the developed score validated?"
+label(data$val_score1)="Details of score being validated no.1"
+label(data$val_score2)="Details of score being validated no. 2"
+label(data$val_score3)="Details of score being validated no. 3"
+label(data$val_score4)="Details of score being validated no. 4"
+label(data$val_score5)="Details of score being validated no. 5"
+label(data$val_score6)="Details of score being validated no. 6"
+label(data$val_score7)="Details of score being validated no. 7"
+label(data$val_score8)="Details of score being validated no. 8"
+label(data$val_score9)="Details of score being validated no. 9"
+label(data$val_score10)="Details of score being validated no. 10"
+label(data$val_score11)="Details of score being validated no. 11"
+label(data$val_score12)="Details of score being validated no. 12"
+label(data$val_score13)="Details of score being validated no. 13"
+label(data$val_score14)="Details of score being validated no. 14"
+label(data$val_score15)="Details of score being validated no. 15"
+label(data$val_score16)="Details of score being validated no. 16"
+label(data$val_score17)="Details of score being validated no. 17"
+label(data$val_score18)="Details of score being validated no. 18"
+label(data$val_score19)="Details of score being validated no. 19"
+label(data$val_score20)="Details of score being validated no. 20"
+label(data$val_score21)="Details of score being validated no. 21"
+label(data$val_score22)="Details of score being validated no. 22"
+label(data$val_score23)="Details of score being validated no. 23"
+label(data$val_score24)="Details of score being validated no. 24"
+label(data$val_score25)="Details of score being validated no. 25"
+label(data$val_score26)="Details of score being validated no. 26"
+label(data$val_score27)="Details of score being validated no. 27"
+label(data$val_score28)="Details of score being validated no. 28"
+label(data$val_score29)="Details of score being validated no. 29"
+label(data$val_score30)="Details of score being validated no. 30"
+label(data$val_same)="Was the same data that was used for development used for validation?"
+label(data$val_targ)="What population is the score being validated in?"
+label(data$val_design)="What was the study design?"
+label(data$val_design_oth)="Other"
+label(data$val_source)="What was the source of the data?"
+label(data$val_date_start)="What year did data collection start?"
+label(data$val_date_fin)="What year did data collection finish?"
+label(data$val_pri_outcome)="What was the primary outcome?"
+label(data$val_pri_outcome_cat___0)="What was the primary outcome category? (choice=24hr Mortality)"
+label(data$val_pri_outcome_cat___1)="What was the primary outcome category? (choice=48hr Mortality)"
+label(data$val_pri_outcome_cat___2)="What was the primary outcome category? (choice=In-hospital Mortality)"
+label(data$val_pri_outcome_cat___3)="What was the primary outcome category? (choice=24hr ICU admission)"
+label(data$val_pri_outcome_cat___4)="What was the primary outcome category? (choice=48hr ICU admission)"
+label(data$val_pri_outcome_cat___5)="What was the primary outcome category? (choice=Any ICU admission)"
+label(data$val_pri_outcome_cat___6)="What was the primary outcome category? (choice=24hr Composite Death/ICU admission)"
+label(data$val_pri_outcome_cat___7)="What was the primary outcome category? (choice=48hr Composite Death/ICU admission)"
+label(data$val_pri_outcome_cat___8)="What was the primary outcome category? (choice=Any Composite Death/ICU admission)"
+label(data$val_pri_outcome_cat___9)="What was the primary outcome category? (choice=Other)"
+label(data$val_pri_outcome_cat1)="What was the primary outcome category (type 2)?"
+label(data$val_pri_time_cat)="What was the primary outcome time point?"
+label(data$val_sec_outcome)="List any secondary outcomes"
+label(data$val_patients)="Number of patients"
+label(data$val_obs)="Number of obs sets"
+label(data$val_events)="Number of events (where appropriate)"
+label(data$val_age)="Mean (or median) age of patient population."
+label(data$val_male)="Proportion of patient population who are male"
+label(data$val_mult)="Were multiple sets of observations used per patient?"
+label(data$val_mult_adj)="Was any adjustment made for the multiple observations per patient?"
+label(data$val_single)="How was the single observation per patient chosen?"
+label(data$val_missing)="Was missing data referred to?"
+label(data$val_missing_app)="What approach was taken to handle missing data?"
+label(data$val_reest)="Were coefficients re-estimated or refitted on current dataset?"
+label(data$val_dis___0)="How was model discrimination tested? (choice=Not assessed)"
+label(data$val_dis___1)="How was model discrimination tested? (choice=C-statistic (AUROC))"
+label(data$val_dis___2)="How was model discrimination tested? (choice=Discrimination slope)"
+label(data$val_dis___3)="How was model discrimination tested? (choice=Other)"
+label(data$val_c1)="What was the C-statistic for score 1"
+label(data$val_c2)="What was the C-statistic for score 2"
+label(data$val_c3)="What was the C-statistic for score 3"
+label(data$val_c4)="What was the C-statistic for score 4"
+label(data$val_c5)="What was the C-statistic for score 5"
+label(data$val_c6)="What was the C-statistic for score 6"
+label(data$val_c7)="What was the C-statistic for score 7"
+label(data$val_c8)="What was the C-statistic for score 8"
+label(data$val_c9)="What was the C-statistic for score 9"
+label(data$val_c10)="What was the C-statistic for score 10"
+label(data$val_c11)="What was the C-statistic for score 11"
+label(data$val_c12)="What was the C-statistic for score 12"
+label(data$val_c13)="What was the C-statistic for score 13"
+label(data$val_c14)="What was the C-statistic for score 14"
+label(data$val_c15)="What was the C-statistic for score 15"
+label(data$val_c16)="What was the C-statistic for score 16"
+label(data$val_c17)="What was the C-statistic for score 17"
+label(data$val_c18)="What was the C-statistic for score 18"
+label(data$val_c19)="What was the C-statistic for score 19"
+label(data$val_c20)="What was the C-statistic for score 20"
+label(data$val_c21)="What was the C-statistic for score 21"
+label(data$val_c22)="What was the C-statistic for score 22"
+label(data$val_c23)="What was the C-statistic for score 23"
+label(data$val_c24)="What was the C-statistic for score 24"
+label(data$val_c25)="What was the C-statistic for score 25"
+label(data$val_c26)="What was the C-statistic for score 26"
+label(data$val_c27)="What was the C-statistic for score 27"
+label(data$val_c28)="What was the C-statistic for score 28"
+label(data$val_c29)="What was the C-statistic for score 29"
+label(data$val_c30)="What was the C-statistic for score 30"
+label(data$val_cal___0)="How was model calibration tested? (choice=Not assessed)"
+label(data$val_cal___1)="How was model calibration tested? (choice=Plot)"
+label(data$val_cal___2)="How was model calibration tested? (choice=Table)"
+label(data$val_cal___3)="How was model calibration tested? (choice=HL Test)"
+label(data$val_cal___4)="How was model calibration tested? (choice=Slope)"
+label(data$val_cal___5)="How was model calibration tested? (choice=Intercept)"
+label(data$val_cal___6)="How was model calibration tested? (choice=Kappa)"
+label(data$val_cal___7)="How was model calibration tested? (choice=Other)"
+label(data$val_oth___0)="What other methods were used to assess model performance? (choice=R-squared)"
+label(data$val_oth___1)="What other methods were used to assess model performance? (choice=Brier score)"
+label(data$val_oth___2)="What other methods were used to assess model performance? (choice=Predictive values)"
+label(data$val_oth___3)="What other methods were used to assess model performance? (choice=Sensitivity)"
+label(data$val_oth___4)="What other methods were used to assess model performance? (choice=Specificity)"
+label(data$val_oth___5)="What other methods were used to assess model performance? (choice=Decision curve analysis)"
+label(data$val_oth___6)="What other methods were used to assess model performance? (choice=Odds Ratios)"
+label(data$val_oth___7)="What other methods were used to assess model performance? (choice=Efficiency Curves)"
+label(data$val_oth___8)="What other methods were used to assess model performance? (choice=Other)"
+label(data$val_oth_spec)="Specify"
+label(data$val_roc)="Was a ROC curve produced?"
+label(data$prob1_1___0)="Were appropriate data sources used, e.g. cohort, RCT or nested case-control study? data? (choice=Yes/Probably yes)"
+label(data$prob1_1___1)="Were appropriate data sources used, e.g. cohort, RCT or nested case-control study? data? (choice=No/Probably No)"
+label(data$prob1_1___2)="Were appropriate data sources used, e.g. cohort, RCT or nested case-control study? data? (choice=No information)"
+label(data$prob1_2___0)="Were all inclusions and exclusions of participants appropriate? (choice=Yes/Probably yes)"
+label(data$prob1_2___1)="Were all inclusions and exclusions of participants appropriate? (choice=No/Probably No)"
+label(data$prob1_2___2)="Were all inclusions and exclusions of participants appropriate? (choice=No information)"
+label(data$prob1_3___0)="Were participant selection criteria similar to the model development study? (choice=Yes/Probably yes)"
+label(data$prob1_3___1)="Were participant selection criteria similar to the model development study? (choice=No/Probably No)"
+label(data$prob1_3___2)="Were participant selection criteria similar to the model development study? (choice=No information)"
+label(data$prob2_1___0)="Were predictors defined and assessed in a similar way for all participants? (choice=Yes/Probably yes)"
+label(data$prob2_1___1)="Were predictors defined and assessed in a similar way for all participants? (choice=No/Probably No)"
+label(data$prob2_1___2)="Were predictors defined and assessed in a similar way for all participants? (choice=No information)"
+label(data$prob2_2___0)="Were predictors defined and assessed in a similar way to predictors in the development model? (choice=Yes/Probably yes)"
+label(data$prob2_2___1)="Were predictors defined and assessed in a similar way to predictors in the development model? (choice=No/Probably No)"
+label(data$prob2_2___2)="Were predictors defined and assessed in a similar way to predictors in the development model? (choice=No information)"
+label(data$prob2_3___0)="Were predictor assessments made without knowledge of outcome data? (choice=Yes/Probably yes)"
+label(data$prob2_3___1)="Were predictor assessments made without knowledge of outcome data? (choice=No/Probably No)"
+label(data$prob2_3___2)="Were predictor assessments made without knowledge of outcome data? (choice=No information)"
+label(data$prob2_4___0)="Are all predictors available at the time the model is intended to be used? (choice=Yes/Probably yes)"
+label(data$prob2_4___1)="Are all predictors available at the time the model is intended to be used? (choice=No/Probably No)"
+label(data$prob2_4___2)="Are all predictors available at the time the model is intended to be used? (choice=No information)"
+label(data$prob3_1___0)="Was the outcome determined appropriately? (choice=Yes/Probably yes)"
+label(data$prob3_1___1)="Was the outcome determined appropriately? (choice=No/Probably No)"
+label(data$prob3_1___2)="Was the outcome determined appropriately? (choice=No information)"
+label(data$prob3_2___0)="Was a pre-specified or standard outcome definition used? (choice=Yes/Probably yes)"
+label(data$prob3_2___1)="Was a pre-specified or standard outcome definition used? (choice=No/Probably No)"
+label(data$prob3_2___2)="Was a pre-specified or standard outcome definition used? (choice=No information)"
+label(data$prob3_3___0)="Were predictors excluded from the outcome definition? (choice=Yes/Probably yes)"
+label(data$prob3_3___1)="Were predictors excluded from the outcome definition? (choice=No/Probably No)"
+label(data$prob3_3___2)="Were predictors excluded from the outcome definition? (choice=No information)"
+label(data$prob3_4___0)="Was the outcome defined and determined in a similar way for all participants? (choice=Yes/Probably yes)"
+label(data$prob3_4___1)="Was the outcome defined and determined in a similar way for all participants? (choice=No/Probably No)"
+label(data$prob3_4___2)="Was the outcome defined and determined in a similar way for all participants? (choice=No information)"
+label(data$prob3_5___0)="Was the outcome defined and determined in a similar way to the outcome in the model development study? (choice=Yes/Probably yes)"
+label(data$prob3_5___1)="Was the outcome defined and determined in a similar way to the outcome in the model development study? (choice=No/Probably No)"
+label(data$prob3_5___2)="Was the outcome defined and determined in a similar way to the outcome in the model development study? (choice=No information)"
+label(data$prob3_6___0)="Was the outcome determined without knowledge of predictor information? (choice=Yes/Probably yes)"
+label(data$prob3_6___1)="Was the outcome determined without knowledge of predictor information? (choice=No/Probably No)"
+label(data$prob3_6___2)="Was the outcome determined without knowledge of predictor information? (choice=No information)"
+label(data$prob3_7___0)="Was the time interval between predictor assessment and outcome determination appropriate? (choice=Yes/Probably yes)"
+label(data$prob3_7___1)="Was the time interval between predictor assessment and outcome determination appropriate? (choice=No/Probably No)"
+label(data$prob3_7___2)="Was the time interval between predictor assessment and outcome determination appropriate? (choice=No information)"
+label(data$prob4_1___0)="Were there a reasonable number of participants with the outcome? (choice=Yes/Probably yes)"
+label(data$prob4_1___1)="Were there a reasonable number of participants with the outcome? (choice=No/Probably No)"
+label(data$prob4_1___2)="Were there a reasonable number of participants with the outcome? (choice=No information)"
+label(data$prob4_2___0)="Were continuous and categorical predictors handled appropriately? (choice=Yes/Probably yes)"
+label(data$prob4_2___1)="Were continuous and categorical predictors handled appropriately? (choice=No/Probably No)"
+label(data$prob4_2___2)="Were continuous and categorical predictors handled appropriately? (choice=No information)"
+label(data$prob4_3___0)="Were all enrolled participants included in the analysis? (choice=Yes/Probably yes)"
+label(data$prob4_3___1)="Were all enrolled participants included in the analysis? (choice=No/Probably No)"
+label(data$prob4_3___2)="Were all enrolled participants included in the analysis? (choice=No information)"
+label(data$prob4_4___0)="Were participants with missing data handled appropriately? (choice=Yes/Probably yes)"
+label(data$prob4_4___1)="Were participants with missing data handled appropriately? (choice=No/Probably No)"
+label(data$prob4_4___2)="Were participants with missing data handled appropriately? (choice=No information)"
+label(data$prob4_5___0)="Was selection of predictors based on univariable analysis avoided? (choice=Yes/Probably yes)"
+label(data$prob4_5___1)="Was selection of predictors based on univariable analysis avoided? (choice=No/Probably No)"
+label(data$prob4_5___2)="Was selection of predictors based on univariable analysis avoided? (choice=No information)"
+label(data$prob4_6___0)="Were complexities in the data (e.g. censoring, competing risks, sampling of controls) accounted for appropriately? (choice=Yes/Probably yes)"
+label(data$prob4_6___1)="Were complexities in the data (e.g. censoring, competing risks, sampling of controls) accounted for appropriately? (choice=No/Probably No)"
+label(data$prob4_6___2)="Were complexities in the data (e.g. censoring, competing risks, sampling of controls) accounted for appropriately? (choice=No information)"
+label(data$prob4_7___0)="Were relevant model performance measures evaluated appropriately (e.g. calibration and discrimination)? (choice=Yes/Probably yes)"
+label(data$prob4_7___1)="Were relevant model performance measures evaluated appropriately (e.g. calibration and discrimination)? (choice=No/Probably No)"
+label(data$prob4_7___2)="Were relevant model performance measures evaluated appropriately (e.g. calibration and discrimination)? (choice=No information)"
+label(data$prob4_8___0)="Was model misfitting and optimism in model performance accounted for? (choice=Yes/Probably yes)"
+label(data$prob4_8___1)="Was model misfitting and optimism in model performance accounted for? (choice=No/Probably No)"
+label(data$prob4_8___2)="Was model misfitting and optimism in model performance accounted for? (choice=No information)"
+label(data$prob4_9___0)="Do predictors and their assigned weights in the final model correspond to the results from multivariable analysis?  (choice=Yes/Probably yes)"
+label(data$prob4_9___1)="Do predictors and their assigned weights in the final model correspond to the results from multivariable analysis?  (choice=No/Probably No)"
+label(data$prob4_9___2)="Do predictors and their assigned weights in the final model correspond to the results from multivariable analysis?  (choice=No information)"
+label(data$extraction_complete)="Complete?"
+#Setting Units
+
+
+#Setting Factors(will create new variable for factors)
+data$study_include.factor = factor(data$study_include,levels=c("1","0"))
+data$study_type.factor = factor(data$study_type,levels=c("0","1","2"))
+data$dev_how.factor = factor(data$dev_how,levels=c("0","1","2"))
+data$dev_design.factor = factor(data$dev_design,levels=c("0","1","2","3"))
+data$dev_mult.factor = factor(data$dev_mult,levels=c("0","1","2"))
+data$dev_mult_adj.factor = factor(data$dev_mult_adj,levels=c("0","1","2"))
+data$dev_single.factor = factor(data$dev_single,levels=c("0","1","2","3"))
+data$dev_missing.factor = factor(data$dev_missing,levels=c("1","0"))
+data$dev_missing_app.factor = factor(data$dev_missing_app,levels=c("0","1","2","3","4","5"))
+data$dev_reg.factor = factor(data$dev_reg,levels=c("1","0"))
+data$dev_reg_out_cat___0.factor = factor(data$dev_reg_out_cat___0,levels=c("0","1"))
+data$dev_reg_out_cat___1.factor = factor(data$dev_reg_out_cat___1,levels=c("0","1"))
+data$dev_reg_out_cat___2.factor = factor(data$dev_reg_out_cat___2,levels=c("0","1"))
+data$dev_reg_out_cat___3.factor = factor(data$dev_reg_out_cat___3,levels=c("0","1"))
+data$dev_reg_out_cat___4.factor = factor(data$dev_reg_out_cat___4,levels=c("0","1"))
+data$dev_reg_out_cat___5.factor = factor(data$dev_reg_out_cat___5,levels=c("0","1"))
+data$dev_reg_out_cat___6.factor = factor(data$dev_reg_out_cat___6,levels=c("0","1"))
+data$dev_reg_out_cat___7.factor = factor(data$dev_reg_out_cat___7,levels=c("0","1"))
+data$dev_reg_out_cat___8.factor = factor(data$dev_reg_out_cat___8,levels=c("0","1"))
+data$dev_reg_out_cat___9.factor = factor(data$dev_reg_out_cat___9,levels=c("0","1"))
+data$dev_reg_out_cat1.factor = factor(data$dev_reg_out_cat1,levels=c("0","1","2","3","4","5"))
+data$dev_reg_time_cat.factor = factor(data$dev_reg_time_cat,levels=c("0","1","2","3","4","5"))
+data$dev_reg_type.factor = factor(data$dev_reg_type,levels=c("0","1","2","3","4","5","6"))
+data$dev_reg_model.factor = factor(data$dev_reg_model,levels=c("0","1","2","3","4","5"))
+data$dev_reg_vars_list___0.factor = factor(data$dev_reg_vars_list___0,levels=c("0","1"))
+data$dev_reg_vars_list___1.factor = factor(data$dev_reg_vars_list___1,levels=c("0","1"))
+data$dev_reg_vars_list___2.factor = factor(data$dev_reg_vars_list___2,levels=c("0","1"))
+data$dev_reg_vars_list___3.factor = factor(data$dev_reg_vars_list___3,levels=c("0","1"))
+data$dev_reg_vars_list___4.factor = factor(data$dev_reg_vars_list___4,levels=c("0","1"))
+data$dev_reg_vars_list___5.factor = factor(data$dev_reg_vars_list___5,levels=c("0","1"))
+data$dev_reg_vars_list___6.factor = factor(data$dev_reg_vars_list___6,levels=c("0","1"))
+data$dev_reg_vars_list___7.factor = factor(data$dev_reg_vars_list___7,levels=c("0","1"))
+data$dev_reg_vars_list___8.factor = factor(data$dev_reg_vars_list___8,levels=c("0","1"))
+data$dev_reg_vars_list___9.factor = factor(data$dev_reg_vars_list___9,levels=c("0","1"))
+data$dev_reg_vars_list___10.factor = factor(data$dev_reg_vars_list___10,levels=c("0","1"))
+data$dev_reg_force.factor = factor(data$dev_reg_force,levels=c("1","0"))
+data$dev_reg_int.factor = factor(data$dev_reg_int,levels=c("1","0"))
+data$dev_reg_nl.factor = factor(data$dev_reg_nl,levels=c("1","0"))
+data$dev_reg_col.factor = factor(data$dev_reg_col,levels=c("1","0"))
+data$dev_reg_ass.factor = factor(data$dev_reg_ass,levels=c("1","0"))
+data$dev_reg_coef.factor = factor(data$dev_reg_coef,levels=c("1","0"))
+data$dev_reg_coef_int.factor = factor(data$dev_reg_coef_int,levels=c("1","0"))
+data$dev_reg_risk_pred.factor = factor(data$dev_reg_risk_pred,levels=c("1","0"))
+data$dev_reg_risk.factor = factor(data$dev_reg_risk,levels=c("1","0"))
+data$dev_reg_sim.factor = factor(data$dev_reg_sim,levels=c("1","0"))
+data$dev_reg_sim_rat.factor = factor(data$dev_reg_sim_rat,levels=c("1","0"))
+data$dev_reg_sim_how.factor = factor(data$dev_reg_sim_how,levels=c("1","0"))
+data$dev_app.factor = factor(data$dev_app,levels=c("1","0"))
+data$dev_app_dis___0.factor = factor(data$dev_app_dis___0,levels=c("0","1"))
+data$dev_app_dis___1.factor = factor(data$dev_app_dis___1,levels=c("0","1"))
+data$dev_app_dis___2.factor = factor(data$dev_app_dis___2,levels=c("0","1"))
+data$dev_app_dis___3.factor = factor(data$dev_app_dis___3,levels=c("0","1"))
+data$dev_app_cal___0.factor = factor(data$dev_app_cal___0,levels=c("0","1"))
+data$dev_app_cal___1.factor = factor(data$dev_app_cal___1,levels=c("0","1"))
+data$dev_app_cal___2.factor = factor(data$dev_app_cal___2,levels=c("0","1"))
+data$dev_app_cal___3.factor = factor(data$dev_app_cal___3,levels=c("0","1"))
+data$dev_app_cal___4.factor = factor(data$dev_app_cal___4,levels=c("0","1"))
+data$dev_app_cal___5.factor = factor(data$dev_app_cal___5,levels=c("0","1"))
+data$dev_app_cal___6.factor = factor(data$dev_app_cal___6,levels=c("0","1"))
+data$dev_app_cal___7.factor = factor(data$dev_app_cal___7,levels=c("0","1"))
+data$dev_app_oth___0.factor = factor(data$dev_app_oth___0,levels=c("0","1"))
+data$dev_app_oth___1.factor = factor(data$dev_app_oth___1,levels=c("0","1"))
+data$dev_app_oth___2.factor = factor(data$dev_app_oth___2,levels=c("0","1"))
+data$dev_app_oth___3.factor = factor(data$dev_app_oth___3,levels=c("0","1"))
+data$dev_app_oth___4.factor = factor(data$dev_app_oth___4,levels=c("0","1"))
+data$dev_app_oth___5.factor = factor(data$dev_app_oth___5,levels=c("0","1"))
+data$dev_app_oth___6.factor = factor(data$dev_app_oth___6,levels=c("0","1"))
+data$dev_app_oth___7.factor = factor(data$dev_app_oth___7,levels=c("0","1"))
+data$dev_app_oth___8.factor = factor(data$dev_app_oth___8,levels=c("0","1"))
+data$dev_app_roc.factor = factor(data$dev_app_roc,levels=c("1","0"))
+data$dev_int.factor = factor(data$dev_int,levels=c("1","0"))
+data$dev_int_how.factor = factor(data$dev_int_how,levels=c("0","1","2","3"))
+data$dev_int_dis___0.factor = factor(data$dev_int_dis___0,levels=c("0","1"))
+data$dev_int_dis___1.factor = factor(data$dev_int_dis___1,levels=c("0","1"))
+data$dev_int_dis___2.factor = factor(data$dev_int_dis___2,levels=c("0","1"))
+data$dev_int_dis___3.factor = factor(data$dev_int_dis___3,levels=c("0","1"))
+data$dev_int_cal___0.factor = factor(data$dev_int_cal___0,levels=c("0","1"))
+data$dev_int_cal___1.factor = factor(data$dev_int_cal___1,levels=c("0","1"))
+data$dev_int_cal___2.factor = factor(data$dev_int_cal___2,levels=c("0","1"))
+data$dev_int_cal___3.factor = factor(data$dev_int_cal___3,levels=c("0","1"))
+data$dev_int_cal___4.factor = factor(data$dev_int_cal___4,levels=c("0","1"))
+data$dev_int_cal___5.factor = factor(data$dev_int_cal___5,levels=c("0","1"))
+data$dev_int_cal___6.factor = factor(data$dev_int_cal___6,levels=c("0","1"))
+data$dev_int_cal___7.factor = factor(data$dev_int_cal___7,levels=c("0","1"))
+data$dev_int_oth___0.factor = factor(data$dev_int_oth___0,levels=c("0","1"))
+data$dev_int_oth___1.factor = factor(data$dev_int_oth___1,levels=c("0","1"))
+data$dev_int_oth___2.factor = factor(data$dev_int_oth___2,levels=c("0","1"))
+data$dev_int_oth___3.factor = factor(data$dev_int_oth___3,levels=c("0","1"))
+data$dev_int_oth___4.factor = factor(data$dev_int_oth___4,levels=c("0","1"))
+data$dev_int_oth___5.factor = factor(data$dev_int_oth___5,levels=c("0","1"))
+data$dev_int_oth___6.factor = factor(data$dev_int_oth___6,levels=c("0","1"))
+data$dev_int_oth___7.factor = factor(data$dev_int_oth___7,levels=c("0","1"))
+data$dev_int_oth___8.factor = factor(data$dev_int_oth___8,levels=c("0","1"))
+data$dev_int_roc.factor = factor(data$dev_int_roc,levels=c("1","0"))
+data$val_dev.factor = factor(data$val_dev,levels=c("1","0"))
+data$val_same.factor = factor(data$val_same,levels=c("1","0"))
+data$val_design.factor = factor(data$val_design,levels=c("0","1","2","3"))
+data$val_pri_outcome_cat___0.factor = factor(data$val_pri_outcome_cat___0,levels=c("0","1"))
+data$val_pri_outcome_cat___1.factor = factor(data$val_pri_outcome_cat___1,levels=c("0","1"))
+data$val_pri_outcome_cat___2.factor = factor(data$val_pri_outcome_cat___2,levels=c("0","1"))
+data$val_pri_outcome_cat___3.factor = factor(data$val_pri_outcome_cat___3,levels=c("0","1"))
+data$val_pri_outcome_cat___4.factor = factor(data$val_pri_outcome_cat___4,levels=c("0","1"))
+data$val_pri_outcome_cat___5.factor = factor(data$val_pri_outcome_cat___5,levels=c("0","1"))
+data$val_pri_outcome_cat___6.factor = factor(data$val_pri_outcome_cat___6,levels=c("0","1"))
+data$val_pri_outcome_cat___7.factor = factor(data$val_pri_outcome_cat___7,levels=c("0","1"))
+data$val_pri_outcome_cat___8.factor = factor(data$val_pri_outcome_cat___8,levels=c("0","1"))
+data$val_pri_outcome_cat___9.factor = factor(data$val_pri_outcome_cat___9,levels=c("0","1"))
+data$val_pri_outcome_cat1.factor = factor(data$val_pri_outcome_cat1,levels=c("0","1","2","3","4","5"))
+data$val_pri_time_cat.factor = factor(data$val_pri_time_cat,levels=c("0","1","2","3","4","5"))
+data$val_mult.factor = factor(data$val_mult,levels=c("0","1","2"))
+data$val_mult_adj.factor = factor(data$val_mult_adj,levels=c("0","1","2"))
+data$val_single.factor = factor(data$val_single,levels=c("0","1","2","3"))
+data$val_missing.factor = factor(data$val_missing,levels=c("1","0"))
+data$val_missing_app.factor = factor(data$val_missing_app,levels=c("0","1","2","3","4","5"))
+data$val_reest.factor = factor(data$val_reest,levels=c("1","0"))
+data$val_dis___0.factor = factor(data$val_dis___0,levels=c("0","1"))
+data$val_dis___1.factor = factor(data$val_dis___1,levels=c("0","1"))
+data$val_dis___2.factor = factor(data$val_dis___2,levels=c("0","1"))
+data$val_dis___3.factor = factor(data$val_dis___3,levels=c("0","1"))
+data$val_cal___0.factor = factor(data$val_cal___0,levels=c("0","1"))
+data$val_cal___1.factor = factor(data$val_cal___1,levels=c("0","1"))
+data$val_cal___2.factor = factor(data$val_cal___2,levels=c("0","1"))
+data$val_cal___3.factor = factor(data$val_cal___3,levels=c("0","1"))
+data$val_cal___4.factor = factor(data$val_cal___4,levels=c("0","1"))
+data$val_cal___5.factor = factor(data$val_cal___5,levels=c("0","1"))
+data$val_cal___6.factor = factor(data$val_cal___6,levels=c("0","1"))
+data$val_cal___7.factor = factor(data$val_cal___7,levels=c("0","1"))
+data$val_oth___0.factor = factor(data$val_oth___0,levels=c("0","1"))
+data$val_oth___1.factor = factor(data$val_oth___1,levels=c("0","1"))
+data$val_oth___2.factor = factor(data$val_oth___2,levels=c("0","1"))
+data$val_oth___3.factor = factor(data$val_oth___3,levels=c("0","1"))
+data$val_oth___4.factor = factor(data$val_oth___4,levels=c("0","1"))
+data$val_oth___5.factor = factor(data$val_oth___5,levels=c("0","1"))
+data$val_oth___6.factor = factor(data$val_oth___6,levels=c("0","1"))
+data$val_oth___7.factor = factor(data$val_oth___7,levels=c("0","1"))
+data$val_oth___8.factor = factor(data$val_oth___8,levels=c("0","1"))
+data$val_roc.factor = factor(data$val_roc,levels=c("1","0"))
+data$prob1_1___0.factor = factor(data$prob1_1___0,levels=c("0","1"))
+data$prob1_1___1.factor = factor(data$prob1_1___1,levels=c("0","1"))
+data$prob1_1___2.factor = factor(data$prob1_1___2,levels=c("0","1"))
+data$prob1_2___0.factor = factor(data$prob1_2___0,levels=c("0","1"))
+data$prob1_2___1.factor = factor(data$prob1_2___1,levels=c("0","1"))
+data$prob1_2___2.factor = factor(data$prob1_2___2,levels=c("0","1"))
+data$prob1_3___0.factor = factor(data$prob1_3___0,levels=c("0","1"))
+data$prob1_3___1.factor = factor(data$prob1_3___1,levels=c("0","1"))
+data$prob1_3___2.factor = factor(data$prob1_3___2,levels=c("0","1"))
+data$prob2_1___0.factor = factor(data$prob2_1___0,levels=c("0","1"))
+data$prob2_1___1.factor = factor(data$prob2_1___1,levels=c("0","1"))
+data$prob2_1___2.factor = factor(data$prob2_1___2,levels=c("0","1"))
+data$prob2_2___0.factor = factor(data$prob2_2___0,levels=c("0","1"))
+data$prob2_2___1.factor = factor(data$prob2_2___1,levels=c("0","1"))
+data$prob2_2___2.factor = factor(data$prob2_2___2,levels=c("0","1"))
+data$prob2_3___0.factor = factor(data$prob2_3___0,levels=c("0","1"))
+data$prob2_3___1.factor = factor(data$prob2_3___1,levels=c("0","1"))
+data$prob2_3___2.factor = factor(data$prob2_3___2,levels=c("0","1"))
+data$prob2_4___0.factor = factor(data$prob2_4___0,levels=c("0","1"))
+data$prob2_4___1.factor = factor(data$prob2_4___1,levels=c("0","1"))
+data$prob2_4___2.factor = factor(data$prob2_4___2,levels=c("0","1"))
+data$prob3_1___0.factor = factor(data$prob3_1___0,levels=c("0","1"))
+data$prob3_1___1.factor = factor(data$prob3_1___1,levels=c("0","1"))
+data$prob3_1___2.factor = factor(data$prob3_1___2,levels=c("0","1"))
+data$prob3_2___0.factor = factor(data$prob3_2___0,levels=c("0","1"))
+data$prob3_2___1.factor = factor(data$prob3_2___1,levels=c("0","1"))
+data$prob3_2___2.factor = factor(data$prob3_2___2,levels=c("0","1"))
+data$prob3_3___0.factor = factor(data$prob3_3___0,levels=c("0","1"))
+data$prob3_3___1.factor = factor(data$prob3_3___1,levels=c("0","1"))
+data$prob3_3___2.factor = factor(data$prob3_3___2,levels=c("0","1"))
+data$prob3_4___0.factor = factor(data$prob3_4___0,levels=c("0","1"))
+data$prob3_4___1.factor = factor(data$prob3_4___1,levels=c("0","1"))
+data$prob3_4___2.factor = factor(data$prob3_4___2,levels=c("0","1"))
+data$prob3_5___0.factor = factor(data$prob3_5___0,levels=c("0","1"))
+data$prob3_5___1.factor = factor(data$prob3_5___1,levels=c("0","1"))
+data$prob3_5___2.factor = factor(data$prob3_5___2,levels=c("0","1"))
+data$prob3_6___0.factor = factor(data$prob3_6___0,levels=c("0","1"))
+data$prob3_6___1.factor = factor(data$prob3_6___1,levels=c("0","1"))
+data$prob3_6___2.factor = factor(data$prob3_6___2,levels=c("0","1"))
+data$prob3_7___0.factor = factor(data$prob3_7___0,levels=c("0","1"))
+data$prob3_7___1.factor = factor(data$prob3_7___1,levels=c("0","1"))
+data$prob3_7___2.factor = factor(data$prob3_7___2,levels=c("0","1"))
+data$prob4_1___0.factor = factor(data$prob4_1___0,levels=c("0","1"))
+data$prob4_1___1.factor = factor(data$prob4_1___1,levels=c("0","1"))
+data$prob4_1___2.factor = factor(data$prob4_1___2,levels=c("0","1"))
+data$prob4_2___0.factor = factor(data$prob4_2___0,levels=c("0","1"))
+data$prob4_2___1.factor = factor(data$prob4_2___1,levels=c("0","1"))
+data$prob4_2___2.factor = factor(data$prob4_2___2,levels=c("0","1"))
+data$prob4_3___0.factor = factor(data$prob4_3___0,levels=c("0","1"))
+data$prob4_3___1.factor = factor(data$prob4_3___1,levels=c("0","1"))
+data$prob4_3___2.factor = factor(data$prob4_3___2,levels=c("0","1"))
+data$prob4_4___0.factor = factor(data$prob4_4___0,levels=c("0","1"))
+data$prob4_4___1.factor = factor(data$prob4_4___1,levels=c("0","1"))
+data$prob4_4___2.factor = factor(data$prob4_4___2,levels=c("0","1"))
+data$prob4_5___0.factor = factor(data$prob4_5___0,levels=c("0","1"))
+data$prob4_5___1.factor = factor(data$prob4_5___1,levels=c("0","1"))
+data$prob4_5___2.factor = factor(data$prob4_5___2,levels=c("0","1"))
+data$prob4_6___0.factor = factor(data$prob4_6___0,levels=c("0","1"))
+data$prob4_6___1.factor = factor(data$prob4_6___1,levels=c("0","1"))
+data$prob4_6___2.factor = factor(data$prob4_6___2,levels=c("0","1"))
+data$prob4_7___0.factor = factor(data$prob4_7___0,levels=c("0","1"))
+data$prob4_7___1.factor = factor(data$prob4_7___1,levels=c("0","1"))
+data$prob4_7___2.factor = factor(data$prob4_7___2,levels=c("0","1"))
+data$prob4_8___0.factor = factor(data$prob4_8___0,levels=c("0","1"))
+data$prob4_8___1.factor = factor(data$prob4_8___1,levels=c("0","1"))
+data$prob4_8___2.factor = factor(data$prob4_8___2,levels=c("0","1"))
+data$prob4_9___0.factor = factor(data$prob4_9___0,levels=c("0","1"))
+data$prob4_9___1.factor = factor(data$prob4_9___1,levels=c("0","1"))
+data$prob4_9___2.factor = factor(data$prob4_9___2,levels=c("0","1"))
+data$extraction_complete.factor = factor(data$extraction_complete,levels=c("0","1","2"))
+
+levels(data$study_include.factor)=c("Yes","No")
+levels(data$study_type.factor)=c("Development","Validation","Development & Validation")
+levels(data$dev_how.factor)=c("Using statistical methods (based on data)","Based on clinical consensus","Modification of existing score")
+levels(data$dev_design.factor)=c("RCT","Prospective cohort","Retrospective cohort/database","Other")
+levels(data$dev_mult.factor)=c("No","Yes","Unclear")
+levels(data$dev_mult_adj.factor)=c("No","Yes","Unclear")
+levels(data$dev_single.factor)=c("First","Last","Random","Other")
+levels(data$dev_missing.factor)=c("Yes","No")
+levels(data$dev_missing_app.factor)=c("No missing data","Use of complete cases","Single imputation","Multiple imputation","Other","Unclear")
+levels(data$dev_reg.factor)=c("Yes","No")
+levels(data$dev_reg_out_cat___0.factor)=c("Unchecked","Checked")
+levels(data$dev_reg_out_cat___1.factor)=c("Unchecked","Checked")
+levels(data$dev_reg_out_cat___2.factor)=c("Unchecked","Checked")
+levels(data$dev_reg_out_cat___3.factor)=c("Unchecked","Checked")
+levels(data$dev_reg_out_cat___4.factor)=c("Unchecked","Checked")
+levels(data$dev_reg_out_cat___5.factor)=c("Unchecked","Checked")
+levels(data$dev_reg_out_cat___6.factor)=c("Unchecked","Checked")
+levels(data$dev_reg_out_cat___7.factor)=c("Unchecked","Checked")
+levels(data$dev_reg_out_cat___8.factor)=c("Unchecked","Checked")
+levels(data$dev_reg_out_cat___9.factor)=c("Unchecked","Checked")
+levels(data$dev_reg_out_cat1.factor)=c("Death","ICU admission","Cardiac arrest","Death/ICU composite","Death/ICU/CA composite","Other")
+levels(data$dev_reg_time_cat.factor)=c("12 hours","24 hours","48 hours","30 days","In-hospital","Other")
+levels(data$dev_reg_type.factor)=c("Cox","Parametric survival","Logistic","ANN","Tree","Other","Unclear")
+levels(data$dev_reg_model.factor)=c("Stepwise","Forward","Backward","All significant in univariate","All","Other")
+levels(data$dev_reg_vars_list___0.factor)=c("Unchecked","Checked")
+levels(data$dev_reg_vars_list___1.factor)=c("Unchecked","Checked")
+levels(data$dev_reg_vars_list___2.factor)=c("Unchecked","Checked")
+levels(data$dev_reg_vars_list___3.factor)=c("Unchecked","Checked")
+levels(data$dev_reg_vars_list___4.factor)=c("Unchecked","Checked")
+levels(data$dev_reg_vars_list___5.factor)=c("Unchecked","Checked")
+levels(data$dev_reg_vars_list___6.factor)=c("Unchecked","Checked")
+levels(data$dev_reg_vars_list___7.factor)=c("Unchecked","Checked")
+levels(data$dev_reg_vars_list___8.factor)=c("Unchecked","Checked")
+levels(data$dev_reg_vars_list___9.factor)=c("Unchecked","Checked")
+levels(data$dev_reg_vars_list___10.factor)=c("Unchecked","Checked")
+levels(data$dev_reg_force.factor)=c("Yes","No")
+levels(data$dev_reg_int.factor)=c("Yes","No")
+levels(data$dev_reg_nl.factor)=c("Yes","No")
+levels(data$dev_reg_col.factor)=c("Yes","No")
+levels(data$dev_reg_ass.factor)=c("Yes","No")
+levels(data$dev_reg_coef.factor)=c("Yes","No")
+levels(data$dev_reg_coef_int.factor)=c("Yes","No")
+levels(data$dev_reg_risk_pred.factor)=c("Yes","No")
+levels(data$dev_reg_risk.factor)=c("Yes","No")
+levels(data$dev_reg_sim.factor)=c("Yes","No")
+levels(data$dev_reg_sim_rat.factor)=c("Yes","No")
+levels(data$dev_reg_sim_how.factor)=c("Yes","No")
+levels(data$dev_app.factor)=c("Yes","No")
+levels(data$dev_app_dis___0.factor)=c("Unchecked","Checked")
+levels(data$dev_app_dis___1.factor)=c("Unchecked","Checked")
+levels(data$dev_app_dis___2.factor)=c("Unchecked","Checked")
+levels(data$dev_app_dis___3.factor)=c("Unchecked","Checked")
+levels(data$dev_app_cal___0.factor)=c("Unchecked","Checked")
+levels(data$dev_app_cal___1.factor)=c("Unchecked","Checked")
+levels(data$dev_app_cal___2.factor)=c("Unchecked","Checked")
+levels(data$dev_app_cal___3.factor)=c("Unchecked","Checked")
+levels(data$dev_app_cal___4.factor)=c("Unchecked","Checked")
+levels(data$dev_app_cal___5.factor)=c("Unchecked","Checked")
+levels(data$dev_app_cal___6.factor)=c("Unchecked","Checked")
+levels(data$dev_app_cal___7.factor)=c("Unchecked","Checked")
+levels(data$dev_app_oth___0.factor)=c("Unchecked","Checked")
+levels(data$dev_app_oth___1.factor)=c("Unchecked","Checked")
+levels(data$dev_app_oth___2.factor)=c("Unchecked","Checked")
+levels(data$dev_app_oth___3.factor)=c("Unchecked","Checked")
+levels(data$dev_app_oth___4.factor)=c("Unchecked","Checked")
+levels(data$dev_app_oth___5.factor)=c("Unchecked","Checked")
+levels(data$dev_app_oth___6.factor)=c("Unchecked","Checked")
+levels(data$dev_app_oth___7.factor)=c("Unchecked","Checked")
+levels(data$dev_app_oth___8.factor)=c("Unchecked","Checked")
+levels(data$dev_app_roc.factor)=c("Yes","No")
+levels(data$dev_int.factor)=c("Yes","No")
+levels(data$dev_int_how.factor)=c("Bootstrap","Split sample","Cross-validation","Other")
+levels(data$dev_int_dis___0.factor)=c("Unchecked","Checked")
+levels(data$dev_int_dis___1.factor)=c("Unchecked","Checked")
+levels(data$dev_int_dis___2.factor)=c("Unchecked","Checked")
+levels(data$dev_int_dis___3.factor)=c("Unchecked","Checked")
+levels(data$dev_int_cal___0.factor)=c("Unchecked","Checked")
+levels(data$dev_int_cal___1.factor)=c("Unchecked","Checked")
+levels(data$dev_int_cal___2.factor)=c("Unchecked","Checked")
+levels(data$dev_int_cal___3.factor)=c("Unchecked","Checked")
+levels(data$dev_int_cal___4.factor)=c("Unchecked","Checked")
+levels(data$dev_int_cal___5.factor)=c("Unchecked","Checked")
+levels(data$dev_int_cal___6.factor)=c("Unchecked","Checked")
+levels(data$dev_int_cal___7.factor)=c("Unchecked","Checked")
+levels(data$dev_int_oth___0.factor)=c("Unchecked","Checked")
+levels(data$dev_int_oth___1.factor)=c("Unchecked","Checked")
+levels(data$dev_int_oth___2.factor)=c("Unchecked","Checked")
+levels(data$dev_int_oth___3.factor)=c("Unchecked","Checked")
+levels(data$dev_int_oth___4.factor)=c("Unchecked","Checked")
+levels(data$dev_int_oth___5.factor)=c("Unchecked","Checked")
+levels(data$dev_int_oth___6.factor)=c("Unchecked","Checked")
+levels(data$dev_int_oth___7.factor)=c("Unchecked","Checked")
+levels(data$dev_int_oth___8.factor)=c("Unchecked","Checked")
+levels(data$dev_int_roc.factor)=c("Yes","No")
+levels(data$val_dev.factor)=c("Yes","No")
+levels(data$val_same.factor)=c("Yes","No")
+levels(data$val_design.factor)=c("RCT","Prospective cohort","Retrospective cohort/database","Other")
+levels(data$val_pri_outcome_cat___0.factor)=c("Unchecked","Checked")
+levels(data$val_pri_outcome_cat___1.factor)=c("Unchecked","Checked")
+levels(data$val_pri_outcome_cat___2.factor)=c("Unchecked","Checked")
+levels(data$val_pri_outcome_cat___3.factor)=c("Unchecked","Checked")
+levels(data$val_pri_outcome_cat___4.factor)=c("Unchecked","Checked")
+levels(data$val_pri_outcome_cat___5.factor)=c("Unchecked","Checked")
+levels(data$val_pri_outcome_cat___6.factor)=c("Unchecked","Checked")
+levels(data$val_pri_outcome_cat___7.factor)=c("Unchecked","Checked")
+levels(data$val_pri_outcome_cat___8.factor)=c("Unchecked","Checked")
+levels(data$val_pri_outcome_cat___9.factor)=c("Unchecked","Checked")
+levels(data$val_pri_outcome_cat1.factor)=c("Death","ICU admission","Cardiac arrest","Death/ICU composite","Death/ICU/CA composite","Other")
+levels(data$val_pri_time_cat.factor)=c("12 hours","24 hours","48 hours","30 days","In-hospital","Other")
+levels(data$val_mult.factor)=c("No","Yes","Unclear")
+levels(data$val_mult_adj.factor)=c("No","Yes","Unclear")
+levels(data$val_single.factor)=c("First","Last","Random","Other")
+levels(data$val_missing.factor)=c("Yes","No")
+levels(data$val_missing_app.factor)=c("No missing data","Use of complete cases","Single imputation","Multiple imputation","Other","Unclear")
+levels(data$val_reest.factor)=c("Yes","No")
+levels(data$val_dis___0.factor)=c("Unchecked","Checked")
+levels(data$val_dis___1.factor)=c("Unchecked","Checked")
+levels(data$val_dis___2.factor)=c("Unchecked","Checked")
+levels(data$val_dis___3.factor)=c("Unchecked","Checked")
+levels(data$val_cal___0.factor)=c("Unchecked","Checked")
+levels(data$val_cal___1.factor)=c("Unchecked","Checked")
+levels(data$val_cal___2.factor)=c("Unchecked","Checked")
+levels(data$val_cal___3.factor)=c("Unchecked","Checked")
+levels(data$val_cal___4.factor)=c("Unchecked","Checked")
+levels(data$val_cal___5.factor)=c("Unchecked","Checked")
+levels(data$val_cal___6.factor)=c("Unchecked","Checked")
+levels(data$val_cal___7.factor)=c("Unchecked","Checked")
+levels(data$val_oth___0.factor)=c("Unchecked","Checked")
+levels(data$val_oth___1.factor)=c("Unchecked","Checked")
+levels(data$val_oth___2.factor)=c("Unchecked","Checked")
+levels(data$val_oth___3.factor)=c("Unchecked","Checked")
+levels(data$val_oth___4.factor)=c("Unchecked","Checked")
+levels(data$val_oth___5.factor)=c("Unchecked","Checked")
+levels(data$val_oth___6.factor)=c("Unchecked","Checked")
+levels(data$val_oth___7.factor)=c("Unchecked","Checked")
+levels(data$val_oth___8.factor)=c("Unchecked","Checked")
+levels(data$val_roc.factor)=c("Yes","No")
+levels(data$prob1_1___0.factor)=c("Unchecked","Checked")
+levels(data$prob1_1___1.factor)=c("Unchecked","Checked")
+levels(data$prob1_1___2.factor)=c("Unchecked","Checked")
+levels(data$prob1_2___0.factor)=c("Unchecked","Checked")
+levels(data$prob1_2___1.factor)=c("Unchecked","Checked")
+levels(data$prob1_2___2.factor)=c("Unchecked","Checked")
+levels(data$prob1_3___0.factor)=c("Unchecked","Checked")
+levels(data$prob1_3___1.factor)=c("Unchecked","Checked")
+levels(data$prob1_3___2.factor)=c("Unchecked","Checked")
+levels(data$prob2_1___0.factor)=c("Unchecked","Checked")
+levels(data$prob2_1___1.factor)=c("Unchecked","Checked")
+levels(data$prob2_1___2.factor)=c("Unchecked","Checked")
+levels(data$prob2_2___0.factor)=c("Unchecked","Checked")
+levels(data$prob2_2___1.factor)=c("Unchecked","Checked")
+levels(data$prob2_2___2.factor)=c("Unchecked","Checked")
+levels(data$prob2_3___0.factor)=c("Unchecked","Checked")
+levels(data$prob2_3___1.factor)=c("Unchecked","Checked")
+levels(data$prob2_3___2.factor)=c("Unchecked","Checked")
+levels(data$prob2_4___0.factor)=c("Unchecked","Checked")
+levels(data$prob2_4___1.factor)=c("Unchecked","Checked")
+levels(data$prob2_4___2.factor)=c("Unchecked","Checked")
+levels(data$prob3_1___0.factor)=c("Unchecked","Checked")
+levels(data$prob3_1___1.factor)=c("Unchecked","Checked")
+levels(data$prob3_1___2.factor)=c("Unchecked","Checked")
+levels(data$prob3_2___0.factor)=c("Unchecked","Checked")
+levels(data$prob3_2___1.factor)=c("Unchecked","Checked")
+levels(data$prob3_2___2.factor)=c("Unchecked","Checked")
+levels(data$prob3_3___0.factor)=c("Unchecked","Checked")
+levels(data$prob3_3___1.factor)=c("Unchecked","Checked")
+levels(data$prob3_3___2.factor)=c("Unchecked","Checked")
+levels(data$prob3_4___0.factor)=c("Unchecked","Checked")
+levels(data$prob3_4___1.factor)=c("Unchecked","Checked")
+levels(data$prob3_4___2.factor)=c("Unchecked","Checked")
+levels(data$prob3_5___0.factor)=c("Unchecked","Checked")
+levels(data$prob3_5___1.factor)=c("Unchecked","Checked")
+levels(data$prob3_5___2.factor)=c("Unchecked","Checked")
+levels(data$prob3_6___0.factor)=c("Unchecked","Checked")
+levels(data$prob3_6___1.factor)=c("Unchecked","Checked")
+levels(data$prob3_6___2.factor)=c("Unchecked","Checked")
+levels(data$prob3_7___0.factor)=c("Unchecked","Checked")
+levels(data$prob3_7___1.factor)=c("Unchecked","Checked")
+levels(data$prob3_7___2.factor)=c("Unchecked","Checked")
+levels(data$prob4_1___0.factor)=c("Unchecked","Checked")
+levels(data$prob4_1___1.factor)=c("Unchecked","Checked")
+levels(data$prob4_1___2.factor)=c("Unchecked","Checked")
+levels(data$prob4_2___0.factor)=c("Unchecked","Checked")
+levels(data$prob4_2___1.factor)=c("Unchecked","Checked")
+levels(data$prob4_2___2.factor)=c("Unchecked","Checked")
+levels(data$prob4_3___0.factor)=c("Unchecked","Checked")
+levels(data$prob4_3___1.factor)=c("Unchecked","Checked")
+levels(data$prob4_3___2.factor)=c("Unchecked","Checked")
+levels(data$prob4_4___0.factor)=c("Unchecked","Checked")
+levels(data$prob4_4___1.factor)=c("Unchecked","Checked")
+levels(data$prob4_4___2.factor)=c("Unchecked","Checked")
+levels(data$prob4_5___0.factor)=c("Unchecked","Checked")
+levels(data$prob4_5___1.factor)=c("Unchecked","Checked")
+levels(data$prob4_5___2.factor)=c("Unchecked","Checked")
+levels(data$prob4_6___0.factor)=c("Unchecked","Checked")
+levels(data$prob4_6___1.factor)=c("Unchecked","Checked")
+levels(data$prob4_6___2.factor)=c("Unchecked","Checked")
+levels(data$prob4_7___0.factor)=c("Unchecked","Checked")
+levels(data$prob4_7___1.factor)=c("Unchecked","Checked")
+levels(data$prob4_7___2.factor)=c("Unchecked","Checked")
+levels(data$prob4_8___0.factor)=c("Unchecked","Checked")
+levels(data$prob4_8___1.factor)=c("Unchecked","Checked")
+levels(data$prob4_8___2.factor)=c("Unchecked","Checked")
+levels(data$prob4_9___0.factor)=c("Unchecked","Checked")
+levels(data$prob4_9___1.factor)=c("Unchecked","Checked")
+levels(data$prob4_9___2.factor)=c("Unchecked","Checked")
+levels(data$extraction_complete.factor)=c("Incomplete","Unverified","Complete")
+
+
+data1 <- subset(data, study_include == 1)
+
+
+###########################################################################################################################
+
+data_dev <- subset(data1, study_type==0 | study_type==2)
+
+label(data_dev$dev_how.factor)="How was the model developed?"
+
+label(data_dev$dev_reg_vars)="How many variables were included in the final model?"
+
+label(data_dev$dev_reg_vars_list___0.factor)="-- Systolic Blood Pressure"
+label(data_dev$dev_reg_vars_list___1.factor)="-- Diastolic Blood Pressure"
+label(data_dev$dev_reg_vars_list___2.factor)="-- Respiratory Rate"
+label(data_dev$dev_reg_vars_list___3.factor)="-- Heart Rate"
+label(data_dev$dev_reg_vars_list___4.factor)="-- Oxygen Saturation"
+label(data_dev$dev_reg_vars_list___5.factor)="-- Temperature"
+label(data_dev$dev_reg_vars_list___6.factor)="-- Age"
+label(data_dev$dev_reg_vars_list___7.factor)="-- Sex"
+label(data_dev$dev_reg_vars_list___8.factor)="-- Oxygen Therapy"
+label(data_dev$dev_reg_vars_list___9.factor)="-- Level of Consciousness"
+label(data_dev$dev_reg_vars_list___10.factor)="-- Other(s)"
+
+tab_dev <- tableby(~ dev_how.factor + notest(dev_reg_vars, "N", "medianq1q3", "range") + notest(dev_reg_vars_list___0.factor, "countpct", cat.simplify=T) + notest(dev_reg_vars_list___1.factor, "countpct", cat.simplify=T) + notest(dev_reg_vars_list___2.factor, "countpct", cat.simplify=T) + notest(dev_reg_vars_list___3.factor, "countpct", cat.simplify=T) + notest(dev_reg_vars_list___4.factor, "countpct", cat.simplify=T) + notest(dev_reg_vars_list___5.factor, "countpct", cat.simplify=T) + notest(dev_reg_vars_list___6.factor, "countpct", cat.simplify=T) + notest(dev_reg_vars_list___7.factor, "countpct", cat.simplify=T) + notest(dev_reg_vars_list___8.factor, "countpct", cat.simplify=T) + notest(dev_reg_vars_list___9.factor, "countpct", cat.simplify=T) + notest(dev_reg_vars_list___10.factor, "countpct", cat.simplify=T), data=data_dev, digits=0)
+summary(tab_dev, title = "(\\#tab:dev) Model Development Study Type", longtable=T)
+
+
+#############################################################################################################################
+
+data1$reg_out_grouped <- ifelse(data1$dev_reg_out_cat___0==1, 1, ifelse(data1$dev_reg_out_cat___1==1, 2, ifelse(data1$dev_reg_out_cat___2==1, 3, ifelse(data1$dev_reg_out_cat___4==1, 5, ifelse(data1$dev_reg_out_cat___5==1, 6, ifelse(data1$dev_reg_out_cat___6==1, 7, ifelse(data1$dev_reg_out_cat___7==1, 8, ifelse(data1$dev_reg_out_cat___8==1, 9, ifelse(data1$dev_reg_out_cat___9==1, 10, NA)))))))))
+
+data1$val_out_grouped <- ifelse(data1$val_pri_outcome_cat___0==1, 1, ifelse(data1$val_pri_outcome_cat___1==1, 2, ifelse(data1$val_pri_outcome_cat___2==1, 3, ifelse(data1$val_pri_outcome_cat___4==1, 5, ifelse(data1$val_pri_outcome_cat___5==1, 6, ifelse(data1$val_pri_outcome_cat___6==1, 7, ifelse(data1$val_pri_outcome_cat___7==1, 8, ifelse(data1$val_pri_outcome_cat___8==1, 9, ifelse(data1$val_pri_outcome_cat___9==1, 10, NA)))))))))
+
+data_dev_stat <- subset(data_dev, dev_how==0)
+
+data_dev_stat$dev_obs <- ifelse(data_dev_stat$dev_mult==0 & is.na(data_dev_stat$dev_obs)==T, data_dev_stat$dev_patients, data_dev_stat$dev_obs)
+data_dev_stat$dev_events_ob <- ifelse(data_dev_stat$dev_mult==0 & is.na(data_dev_stat$dev_events_ob)==T, data_dev_stat$dev_events, data_dev_stat$dev_events_ob)
+
+label(data_dev_stat$dev_design.factor)="What was the study design?"
+label(data_dev_stat$dev_obs)="Number of observation sets"
+label(data_dev_stat$dev_events_ob)="Number of events (where appropriate) observation level"
+label(data_dev_stat$dev_mult.factor)="Were multiple sets of observations used per patient?"
+label(data_dev_stat$dev_mult_adj.factor)="-- If yes, was any adjustment made for the multiple observations per patient?"
+label(data_dev_stat$dev_single.factor)="-- If no, how was the single observation per patient chosen?"
+label(data_dev_stat$dev_missing.factor)="Was missing data referred to?"
+label(data_dev_stat$dev_missing_app.factor)="-- If yes, what approach was taken to handle missing data?"
+label(data_dev_stat$dev_reg.factor)="Was a regression modelling approach used?"
+
+
+tab_dev_stat <- tableby(~ dev_design.factor + notest(dev_date_start, "medianq1q3", "range") + notest(dev_date_fin, "medianq1q3", "range") + notest(dev_patients, "N", "medianq1q3", "range") + notest(dev_obs, "N", "medianq1q3", "range") + notest(dev_events, "N", "medianq1q3", "range") + notest(dev_events_ob, "N", "medianq1q3", "range") + notest(dev_age, "N", "medianq1q3", "range") + notest(dev_male, "N", "medianq1q3", "range") + dev_mult.factor + notest(dev_mult_adj.factor, "countpct") + notest(dev_single.factor, "countpct") + dev_missing.factor + notest(dev_missing_app.factor, "countpct") + dev_reg.factor
+                        , data=data_dev_stat, digits=0)
+summary(tab_dev_stat, title = "(\\#tab:stat) Model Development Study Design Characteristics")
+
+
+
+###########################################################################################################################
+
+data_dev_reg <- subset(data_dev_stat, dev_reg==1)
+
+
+label(data_dev_reg$dev_reg_out_cat1.factor)="What was the primary outcome measure?"
+label(data_dev_reg$dev_reg_time_cat.factor)="What was the primary outcome timeframe?"
+label(data_dev_reg$dev_reg_type.factor)="What type of regression approach was used?"
+label(data_dev_reg$dev_reg_model.factor)="What model building strategy was used?"
+label(data_dev_reg$dev_reg_force.factor)="Were any known risk factors forced into the final model?"
+label(data_dev_reg$dev_reg_int.factor)="Were any interaction terms examined?"
+label(data_dev_reg$dev_reg_nl.factor)="Were any non-linear terms examined?"
+label(data_dev_reg$dev_reg_col.factor)="Was collinearity mentioned?"
+label(data_dev_reg$dev_reg_ass.factor)="Were model assumptions assessed?"
+label(data_dev_reg$dev_reg_coef.factor)="For the final model, were regression coefficients/odds ratios/hazard ratios reported?"
+label(data_dev_reg$dev_reg_coef_int.factor)="-- If yes, was the intercept or baseline hazard reported?"
+label(data_dev_reg$dev_reg_risk_pred.factor)="Does the model allow absolute risks to be calculated?"
+label(data_dev_reg$dev_reg_risk.factor)="Were risk groups created?"
+label(data_dev_reg$dev_reg_sim.factor)="Was a simplified model created?"
+label(data_dev_reg$dev_reg_sim_rat.factor)="-- If yes, is a rationale given?"
+label(data_dev_reg$dev_reg_sim_how.factor)="-- If yes, do they describe how?"
+label(data_dev_reg$dev_app.factor)="Was apparent performance assessed?"
+label(data_dev_reg$dev_int.factor)="Was internal validation assessed?"
+
+
+tab_dev_reg <- tableby(~ dev_reg_out_cat1.factor + dev_reg_time_cat.factor + dev_reg_type.factor +  notest(dev_reg_vars, "N", "medianq1q3", "range") + dev_reg_model.factor +  notest(dev_reg_vars_final, "N", "medianq1q3", "range") + dev_reg_force.factor +  dev_reg_int.factor + dev_reg_nl.factor +  dev_reg_col.factor  +  dev_reg_ass.factor +  dev_reg_coef.factor + notest(dev_reg_coef_int.factor, "countpct") + dev_reg_risk_pred.factor + dev_reg_risk.factor + dev_reg_sim.factor + notest(dev_reg_sim_rat.factor, "countpct") + notest(dev_reg_sim_how.factor, "countpct") + dev_app.factor
+                        , data=data_dev_reg, digits=0)
+summary(tab_dev_reg, title = "(\\#tab:reg) Model Development Regression Modelling Characteristics")
+
+data_dev_reg %>%
+  ggplot(aes(x = factor(dev_reg_out_cat1.factor), fill = factor(dev_reg_time_cat.factor))) +
+  geom_bar() +
+  theme_bw() +
+  scale_fill_discrete(name="Primary Outcome Time") +
+  theme(axis.text.x = element_text(angle = 90, hjust = 1)) +
+  xlab("Primary Outcome Measure") +
+  ylab("Number of Studies")
+
+###########################################################################################################################
+
+data_dev_app <- subset(data_dev_reg, dev_app==1)
+
+label(data_dev_app$dev_app_dis___0.factor)="Was model discrimination assessed?"
+levels(data_dev_app$dev_app_dis___0.factor)=c("Yes","No")
+
+data_dev_app$dis1 <- ifelse(data_dev_app$dev_app_dis___1==1, "-- C-statistic", "-")
+data_dev_app$dis1.factor = factor(data_dev_app$dis1,levels=c("-","-- C-statistic"))
+
+data_dev_app$dis2 <- ifelse(data_dev_app$dev_app_dis___2==1, "-- Discrimination slope", "-")
+data_dev_app$dis2.factor = factor(data_dev_app$dis2,levels=c("-","-- Discrimination slope"))
+
+data_dev_app$dis3 <- ifelse(data_dev_app$dev_app_dis___3==1, "-- Other", "-")
+data_dev_app$dis3.factor = factor(data_dev_app$dis3,levels=c("-","-- Other"))
+
+label(data_dev_app$dev_app_cal___0.factor)="Was model calibration assessed?"
+levels(data_dev_app$dev_app_cal___0.factor)=c("Yes","No")
+
+data_dev_app$cal1 <- ifelse(data_dev_app$dev_app_cal___1==1, "-- Plot", "-")
+data_dev_app$cal1.factor = factor(data_dev_app$cal1,levels=c("-","-- Plot"))
+
+data_dev_app$cal2 <- ifelse(data_dev_app$dev_app_cal___2==1, "-- Table", "-")
+data_dev_app$cal2.factor = factor(data_dev_app$cal2,levels=c("-","-- Table"))
+
+data_dev_app$cal3 <- ifelse(data_dev_app$dev_app_cal___3==1, "-- Hosmer-Lemeshow Test", "-")
+data_dev_app$cal3.factor = factor(data_dev_app$cal3,levels=c("-","-- Hosmer-Lemeshow Test"))
+
+data_dev_app$cal4 <- ifelse(data_dev_app$dev_app_cal___4==1, "-- Slope", "-")
+data_dev_app$cal4.factor = factor(data_dev_app$cal4,levels=c("-","-- Slope"))
+
+data_dev_app$cal5 <- ifelse(data_dev_app$dev_app_cal___5==1, "-- Intercept", "-")
+data_dev_app$cal5.factor = factor(data_dev_app$cal5,levels=c("-","-- Intercept"))
+
+data_dev_app$cal6 <- ifelse(data_dev_app$dev_app_cal___6==1, "-- Kappa", "-")
+data_dev_app$cal6.factor = factor(data_dev_app$cal6,levels=c("-","-- Kappa"))
+
+data_dev_app$cal7 <- ifelse(data_dev_app$dev_app_cal___7==1, "-- Other", "-")
+data_dev_app$cal7.factor = factor(data_dev_app$cal7,levels=c("-","-- Other"))
+
+data_dev_app$oth <- ifelse(data_dev_app$dev_app_oth___0==1 | data_dev_app$dev_app_oth___1==1 | data_dev_app$dev_app_oth___2==1 | data_dev_app$dev_app_oth___3==1 | data_dev_app$dev_app_oth___4==1 | data_dev_app$dev_app_oth___5==1 | data_dev_app$dev_app_oth___6==1 | data_dev_app$dev_app_oth___7==1 | data_dev_app$dev_app_oth___8==1, "Yes", "No")
+data_dev_app$oth.factor = factor(data_dev_app$oth,levels=c("Yes","No"))
+
+label(data_dev_app$oth.factor)="Were any other methods used to assess model performance?"
+
+data_dev_app$oth0 <- ifelse(data_dev_app$dev_app_oth___0==1, "-- R-squared", "-")
+data_dev_app$oth0.factor = factor(data_dev_app$oth0,levels=c("-","-- R-squared"))
+
+data_dev_app$oth1 <- ifelse(data_dev_app$dev_app_oth___1==1, "-- Brier score", "-")
+data_dev_app$oth1.factor = factor(data_dev_app$oth1,levels=c("-","-- Brier score"))
+
+data_dev_app$oth2 <- ifelse(data_dev_app$dev_app_oth___2==1, "-- Predictive values", "-")
+data_dev_app$oth2.factor = factor(data_dev_app$oth2,levels=c("-","-- Predictive values"))
+
+data_dev_app$oth3 <- ifelse(data_dev_app$dev_app_oth___3==1, "-- Sensitivity", "-")
+data_dev_app$oth3.factor = factor(data_dev_app$oth3,levels=c("-","-- Sensitivity"))
+
+data_dev_app$oth4 <- ifelse(data_dev_app$dev_app_oth___4==1, "-- Specificity", "-")
+data_dev_app$oth4.factor = factor(data_dev_app$oth4,levels=c("-","-- Specificity"))
+
+data_dev_app$oth5 <- ifelse(data_dev_app$dev_app_oth___5==1, "-- Decision curve analysis", "-")
+data_dev_app$oth5.factor = factor(data_dev_app$oth5,levels=c("-","-- Decision curve analysis"))
+
+data_dev_app$oth6 <- ifelse(data_dev_app$dev_app_oth___6==1, "-- Odds ratios", "-")
+data_dev_app$oth6.factor = factor(data_dev_app$oth6,levels=c("-","-- Odds ratios"))
+
+data_dev_app$oth7 <- ifelse(data_dev_app$dev_app_oth___7==1, "-- Efficiency curves", "-")
+data_dev_app$oth7.factor = factor(data_dev_app$oth7,levels=c("-","-- Efficiency curves"))
+
+data_dev_app$oth8 <- ifelse(data_dev_app$dev_app_oth___8==1, "-- Other", "-")
+data_dev_app$oth8.factor = factor(data_dev_app$oth8,levels=c("-","-- Other"))
+
+label(data_dev_app$dev_app_roc.factor)="Was a ROC curve produced?"
+
+
+tab_dev_app <- tableby(~ dev_app_dis___0.factor + notest(dis1.factor, "countpct", cat.simplify=T) + notest(dis2.factor, "countpct", cat.simplify=T) + notest(dis3.factor, "countpct", cat.simplify=T) + notest(dev_app_c, "medianq1q3", "range", digits=2)
+                + dev_app_cal___0.factor + notest(cal1.factor, "countpct", cat.simplify=T) + notest(cal2.factor, "countpct", cat.simplify=T) + notest(cal3.factor, "countpct", cat.simplify=T) + notest(cal4.factor, "countpct", cat.simplify=T) + notest(cal5.factor, "countpct", cat.simplify=T) + notest(cal6.factor, "countpct", cat.simplify=T) + notest(cal7.factor, "countpct", cat.simplify=T) + oth.factor + notest(oth0.factor, "countpct", cat.simplify=T) + notest(oth1.factor, "countpct", cat.simplify=T) + notest(oth2.factor, "countpct", cat.simplify=T) + notest(oth3.factor, "countpct", cat.simplify=T) + notest(oth4.factor, "countpct", cat.simplify=T) + notest(oth5.factor, "countpct", cat.simplify=T) + notest(oth6.factor, "countpct", cat.simplify=T) + notest(oth7.factor, "countpct", cat.simplify=T) + notest(oth8.factor, "countpct", cat.simplify=T) + dev_app_roc.factor
+                         , data=data_dev_app, digits=0)
+summary(tab_dev_app, title = "(\\#tab:app) Model Development Apparent Performance Characteristics"
+        , labelTranslations=c(dis1.factor="-- C-statistic", dis2.factor="-- Discrimination slope", dis3.factor="-- Other", cal1.factor="-- Plot", cal2.factor="-- Table", cal3.factor="-- Hosmer-Lemeshow Test", cal4.factor="-- Slope", cal5.factor="-- Intercept", cal6.factor="-- Kappa", cal7.factor="-- Other", oth0.factor="-- R-squared", oth1.factor="-- Brier score", oth2.factor="-- Predictive values", oth3.factor="-- Sensitivity", oth4.factor="-- Specificity", oth5.factor="-- Decision curve analysis", oth6.factor="-- Odds ratios", oth7.factor="-- Efficiency curves", oth8.factor="-- Other"))
+
+###########################################################################################################################
+
+data_dev_int <- subset(data_dev_reg, dev_int==1)
+
+label(data_dev_int$dev_int_how.factor)="What method was used for internal validation?"
+
+label(data_dev_int$dev_int_dis___0.factor)="Was model discrimination assessed?"
+levels(data_dev_int$dev_int_dis___0.factor)=c("Yes","No")
+
+data_dev_int$dis1 <- ifelse(data_dev_int$dev_int_dis___1==1, "-- C-statistic", "-")
+data_dev_int$dis1.factor = factor(data_dev_int$dis1,levels=c("-","-- C-statistic"))
+
+data_dev_int$dis2 <- ifelse(data_dev_int$dev_int_dis___2==1, "-- Discrimination slope", "-")
+data_dev_int$dis2.factor = factor(data_dev_int$dis2,levels=c("-","-- Discrimination slope"))
+
+data_dev_int$dis3 <- ifelse(data_dev_int$dev_int_dis___3==1, "-- Other", "-")
+data_dev_int$dis3.factor = factor(data_dev_int$dis3,levels=c("-","-- Other"))
+
+label(data_dev_int$dev_int_cal___0.factor)="Was model calibration assessed?"
+levels(data_dev_int$dev_int_cal___0.factor)=c("Yes","No")
+
+data_dev_int$cal1 <- ifelse(data_dev_int$dev_int_cal___1==1, "-- Plot", "-")
+data_dev_int$cal1.factor = factor(data_dev_int$cal1,levels=c("-","-- Plot"))
+
+data_dev_int$cal2 <- ifelse(data_dev_int$dev_int_cal___2==1, "-- Table", "-")
+data_dev_int$cal2.factor = factor(data_dev_int$cal2,levels=c("-","-- Table"))
+
+data_dev_int$cal3 <- ifelse(data_dev_int$dev_int_cal___3==1, "-- Hosmer-Lemeshow Test", "-")
+data_dev_int$cal3.factor = factor(data_dev_int$cal3,levels=c("-","-- Hosmer-Lemeshow Test"))
+
+data_dev_int$cal4 <- ifelse(data_dev_int$dev_int_cal___4==1, "-- Slope", "-")
+data_dev_int$cal4.factor = factor(data_dev_int$cal4,levels=c("-","-- Slope"))
+
+data_dev_int$cal5 <- ifelse(data_dev_int$dev_int_cal___5==1, "-- Intercept", "-")
+data_dev_int$cal5.factor = factor(data_dev_int$cal5,levels=c("-","-- Intercept"))
+
+data_dev_int$cal6 <- ifelse(data_dev_int$dev_int_cal___6==1, "-- Kappa", "-")
+data_dev_int$cal6.factor = factor(data_dev_int$cal6,levels=c("-","-- Kappa"))
+
+data_dev_int$cal7 <- ifelse(data_dev_int$dev_int_cal___7==1, "-- Other", "-")
+data_dev_int$cal7.factor = factor(data_dev_int$cal7,levels=c("-","-- Other"))
+
+data_dev_int$oth <- ifelse(data_dev_int$dev_int_oth___0==1 | data_dev_int$dev_int_oth___1==1 | data_dev_int$dev_int_oth___2==1 | data_dev_int$dev_int_oth___3==1 | data_dev_int$dev_int_oth___4==1 | data_dev_int$dev_int_oth___5==1 | data_dev_int$dev_int_oth___6==1 | data_dev_int$dev_int_oth___7==1 | data_dev_int$dev_int_oth___8==1, "Yes", "No")
+data_dev_int$oth.factor = factor(data_dev_int$oth,levels=c("Yes","No"))
+
+label(data_dev_int$oth.factor)="Were any other methods used to assess model performance?"
+
+data_dev_int$oth0 <- ifelse(data_dev_int$dev_int_oth___0==1, "-- R-squared", "-")
+data_dev_int$oth0.factor = factor(data_dev_int$oth0,levels=c("-","-- R-squared"))
+
+data_dev_int$oth1 <- ifelse(data_dev_int$dev_int_oth___1==1, "-- Brier score", "-")
+data_dev_int$oth1.factor = factor(data_dev_int$oth1,levels=c("-","-- Brier score"))
+
+data_dev_int$oth2 <- ifelse(data_dev_int$dev_int_oth___2==1, "-- Predictive values", "-")
+data_dev_int$oth2.factor = factor(data_dev_int$oth2,levels=c("-","-- Predictive values"))
+
+data_dev_int$oth3 <- ifelse(data_dev_int$dev_int_oth___3==1, "-- Sensitivity", "-")
+data_dev_int$oth3.factor = factor(data_dev_int$oth3,levels=c("-","-- Sensitivity"))
+
+data_dev_int$oth4 <- ifelse(data_dev_int$dev_int_oth___4==1, "-- Specificity", "-")
+data_dev_int$oth4.factor = factor(data_dev_int$oth4,levels=c("-","-- Specificity"))
+
+data_dev_int$oth5 <- ifelse(data_dev_int$dev_int_oth___5==1, "-- Decision curve analysis", "-")
+data_dev_int$oth5.factor = factor(data_dev_int$oth5,levels=c("-","-- Decision curve analysis"))
+
+data_dev_int$oth6 <- ifelse(data_dev_int$dev_int_oth___6==1, "-- Odds ratios", "-")
+data_dev_int$oth6.factor = factor(data_dev_int$oth6,levels=c("-","-- Odds ratios"))
+
+data_dev_int$oth7 <- ifelse(data_dev_int$dev_int_oth___7==1, "-- Efficiency curves", "-")
+data_dev_int$oth7.factor = factor(data_dev_int$oth7,levels=c("-","-- Efficiency curves"))
+
+data_dev_int$oth8 <- ifelse(data_dev_int$dev_int_oth___8==1, "-- Other", "-")
+data_dev_int$oth8.factor = factor(data_dev_int$oth8,levels=c("-","-- Other"))
+
+label(data_dev_int$dev_int_roc.factor)="Was a ROC curve produced?"
+
+
+tab_dev_int <- tableby(~ dev_int_how.factor + dev_int_dis___0.factor + notest(dis1.factor, "countpct", cat.simplify=T) + notest(dis2.factor, "countpct", cat.simplify=T) + notest(dis3.factor, "countpct", cat.simplify=T) + notest(dev_int_c, "medianq1q3", "range", digits=2)
+                + dev_int_cal___0.factor + notest(cal1.factor, "countpct", cat.simplify=T) + notest(cal2.factor, "countpct", cat.simplify=T) + notest(cal3.factor, "countpct", cat.simplify=T) + notest(cal4.factor, "countpct", cat.simplify=T) + notest(cal5.factor, "countpct", cat.simplify=T) + notest(cal6.factor, "countpct", cat.simplify=T) + notest(cal7.factor, "countpct", cat.simplify=T) + oth.factor + notest(oth0.factor, "countpct", cat.simplify=T) + notest(oth1.factor, "countpct", cat.simplify=T) + notest(oth2.factor, "countpct", cat.simplify=T) + notest(oth3.factor, "countpct", cat.simplify=T) + notest(oth4.factor, "countpct", cat.simplify=T) + notest(oth5.factor, "countpct", cat.simplify=T) + notest(oth6.factor, "countpct", cat.simplify=T) + notest(oth7.factor, "countpct", cat.simplify=T) + notest(oth8.factor, "countpct", cat.simplify=T) + dev_int_roc.factor
+                         , data=data_dev_int, digits=0)
+summary(tab_dev_int, title = "(\\#tab:int) Model Development Internal Validation Characteristics"
+        , labelTranslations=c(dis1.factor="_-- C-statistic_", dis2.factor="_-- Discrimination slope_", dis3.factor="_-- Other_", cal1.factor="_-- Plot_", cal2.factor="_-- Table_", cal3.factor="_-- Hosmer-Lemeshow Test_", cal4.factor="_-- Slope_", cal5.factor="_-- Intercept_", cal6.factor="_-- Kappa_", cal7.factor="_-- Other_", oth0.factor="_-- R-squared_", oth1.factor="_-- Brier score_", oth2.factor="_-- Predictive values_", oth3.factor="_-- Sensitivity_", oth4.factor="_-- Specificity_", oth5.factor="_-- Decision curve analysis_", oth6.factor="_-- Odds ratios_", oth7.factor="_-- Efficiency curves_", oth8.factor="_-- Other_"))
+
+
+##########################################################################################################################
+
+data_val <- subset(data1, study_type==1 | study_type==2)
+
+label(data_val$study_type.factor)="Type of study"
+
+data_val$val_type <- ifelse(data_val$val_dev==1, "External validation of new (and potentially other) model(s) in external data set", "External validation of other models in development data set")
+
+data_val$val_type.factor <- factor(data_val$val_type)
+
+label(data_val$val_type.factor)="-- If development and validation, what type?"
+
+
+data_val$val_source  <- ifelse(data_val$val_same==1 & data_val$dev_how != 2 & is.na(data_val$val_same)==F, as.character(data_val$dev_source), as.character(data_val$val_source))
+
+data_val$val_mult  <- ifelse(data_val$val_same==1 & data_val$dev_how != 2 & is.na(data_val$val_same)==F, data_val$dev_mult, data_val$val_mult)
+
+data_val$val_design <- ifelse(data_val$val_same==1 & data_val$dev_how != 2 & is.na(data_val$val_same)==F, data_val$dev_design, data_val$val_design)
+data_val$val_design.factor = factor(data_val$val_design,levels=c("0","1","2","3"))
+levels(data_val$val_design.factor)=c("RCT","Prospective cohort","Retrospective cohort/database","Other")
+
+data_val$val_date_start  <- ifelse(data_val$val_same==1 & data_val$dev_how != 2 & is.na(data_val$val_same)==F, data_val$dev_date_start, data_val$val_date_start)
+
+data_val$val_date_fin  <- ifelse(data_val$val_same==1 & data_val$dev_how != 2 & is.na(data_val$val_same)==F, data_val$dev_date_fin, data_val$val_date_fin)
+
+data_val$val_patients  <- ifelse(data_val$val_same==1 & data_val$dev_how != 2 & is.na(data_val$val_same)==F, data_val$dev_patients, data_val$val_patients)
+
+data_val$val_obs  <- ifelse(data_val$val_same==1 & data_val$dev_how != 2 & is.na(data_val$val_same)==F, data_val$dev_obs, data_val$val_obs)
+data_val$val_obs <- ifelse(data_val$val_mult==0 & is.na(data_val$val_obs)==T, data_val$val_patients, data_val$val_obs)
+
+data_val$val_events  <- ifelse(data_val$val_same==1 & data_val$dev_how != 2 & is.na(data_val$val_same)==F, data_val$dev_events, data_val$val_events)
+
+data_val$val_age  <- ifelse(data_val$val_same==1 & data_val$dev_how != 2 & is.na(data_val$val_same)==F, data_val$dev_age, data_val$val_age)
+
+data_val$val_male  <- ifelse(data_val$val_same==1 & data_val$dev_how != 2 & is.na(data_val$val_same)==F, data_val$dev_male, data_val$val_male)
+
+data_val$val_mult_adj  <- ifelse(data_val$val_same==1 & data_val$dev_how != 2 & is.na(data_val$val_same)==F, data_val$dev_mult_adj, data_val$val_mult_adj)
+
+data_val$val_single  <- ifelse(data_val$val_same==1 & data_val$dev_how != 2 & is.na(data_val$val_same)==F, data_val$dev_single, data_val$val_single)
+
+data_val$val_missing  <- ifelse(data_val$val_same==1 & data_val$dev_how != 2 & is.na(data_val$val_same)==F, data_val$dev_missing, data_val$val_missing)
+
+data_val$val_missing_app  <- ifelse(data_val$val_same==1 & data_val$dev_how != 2 & is.na(data_val$val_same)==F, data_val$dev_missing_app, data_val$val_missing_app)
+
+data_val$val_mult.factor = factor(data_val$val_mult,levels=c("0","1","2"))
+data_val$val_mult_adj.factor = factor(data_val$val_mult_adj,levels=c("0","1","2"))
+data_val$val_single.factor = factor(data_val$val_single,levels=c("0","1","2","3"))
+data_val$val_missing.factor = factor(data_val$val_missing,levels=c("1","0"))
+data_val$val_missing_app.factor = factor(data_val$val_missing_app,levels=c("0","1","2","3","4","5"))
+data_val$val_reest.factor = factor(data_val$val_reest,levels=c("1","0"))
+
+levels(data_val$val_mult.factor)=c("No","Yes","Unclear")
+levels(data_val$val_mult_adj.factor)=c("No","Yes","Unclear")
+levels(data_val$val_single.factor)=c("First","Last","Random","Other")
+levels(data_val$val_missing.factor)=c("Yes","No")
+levels(data_val$val_missing_app.factor)=c("No missing data","Use of complete cases","Single imputation","Multiple imputation","Other","Unclear")
+levels(data_val$val_reest.factor)=c("Yes","No")
+
+
+label(data_val$val_date_start)="What year did data collection start?"
+label(data_val$val_date_fin)="What year did data collection finish?"
+label(data_val$val_pri_outcome_cat1.factor)="What was the primary outcome measure?"
+label(data_val$val_pri_time_cat.factor)="What was the primary outcome timeframe?"
+label(data_val$val_patients)="Number of patients"
+label(data_val$val_events)="Number of events (where appropriate)"
+label(data_val$val_age)="Mean (or median) age of patient population."
+label(data_val$val_male)="Proportion of patient population who are male"
+label(data_val$val_missing_app.factor)="What approach was taken to handle missing data?"
+label(data_val$val_reest.factor)="Were coefficients re-estimated or refitted on current dataset?"
+label(data_val$val_design.factor)="What was the study design?"
+label(data_val$val_obs)="Number of observation sets"
+label(data_val$val_mult.factor)="Were multiple sets of observations used per patient?"
+label(data_val$val_mult_adj.factor)="-- If yes, was any adjustment made for the multiple observations per patient?"
+label(data_val$val_single.factor)="-- If no, how was the single observation per patient chosen?"
+label(data_val$val_missing.factor)="Was missing data referred to?"
+label(data_val$val_missing_app.factor)="-- If yes, what approach was taken to handle missing data?"
+
+
+tab_val <- tableby(~ study_type.factor + notest(val_type.factor, "countpct") + notest(val_no, "medianq1q3", "range") + val_design.factor + notest(val_date_start, "medianq1q3", "range") + notest(val_date_fin, "medianq1q3", "range") + val_pri_outcome_cat1.factor + val_pri_time_cat.factor +  notest(val_patients, "N", "medianq1q3", "range") + notest(val_obs, "N", "medianq1q3", "range") + notest(val_events, "N", "medianq1q3", "range") + notest(val_age, "N", "medianq1q3", "range") + notest(val_male, "N", "medianq1q3", "range") + val_mult.factor + notest(val_mult_adj.factor, "countpct") + notest(val_single.factor, "countpct") + val_missing.factor + notest(val_missing_app.factor, "countpct") + notest(val_reest.factor, "countpct")
+                   , data=data_val, digits=0)
+summary(tab_val, title = "(\\#tab:val) External Validation Study Design Characteristics")
+
+
+data_val_plot <- na.omit(data_val[c("val_pri_outcome_cat1.factor","val_pri_time_cat.factor")])
+
+data_val_plot %>%
+  ggplot(aes(x = factor(val_pri_outcome_cat1.factor), fill = factor(val_pri_time_cat.factor))) +
+  geom_bar() +
+  theme_bw() +
+  scale_fill_discrete(name="Primary Outcome Time") +
+  theme(axis.text.x = element_text(angle = 90, hjust = 1)) +
+  xlab("Primary Outcome Measure") +
+  ylab("Number of Studies")
+
+###########################################################################################################################
+
+#data_val <- subset(data1, study_type==1 | study_type==2)
+
+label(data_val$val_dis___0.factor)="Was model discrimination assessed?"
+levels(data_val$val_dis___0.factor)=c("Yes","No")
+
+data_val$dis1 <- ifelse(data_val$val_dis___1==1, "-- C-statistic", "-")
+data_val$dis1.factor = factor(data_val$dis1,levels=c("-","-- C-statistic"))
+
+data_val$dis2 <- ifelse(data_val$val_dis___2==1, "-- Discrimination slope", "-")
+data_val$dis2.factor = factor(data_val$dis2,levels=c("-","-- Discrimination slope"))
+
+data_val$dis3 <- ifelse(data_val$val_dis___3==1, "-- Other", "-")
+data_val$dis3.factor = factor(data_val$dis3,levels=c("-","-- Other"))
+
+label(data_val$val_cal___0.factor)="Was model calibration assessed?"
+levels(data_val$val_cal___0.factor)=c("Yes","No")
+
+data_val$cal1 <- ifelse(data_val$val_cal___1==1, "-- Plot", "-")
+data_val$cal1.factor = factor(data_val$cal1,levels=c("-","-- Plot"))
+
+data_val$cal2 <- ifelse(data_val$val_cal___2==1, "-- Table", "-")
+data_val$cal2.factor = factor(data_val$cal2,levels=c("-","-- Table"))
+
+data_val$cal3 <- ifelse(data_val$val_cal___3==1, "-- Hosmer-Lemeshow Test", "-")
+data_val$cal3.factor = factor(data_val$cal3,levels=c("-","-- Hosmer-Lemeshow Test"))
+
+data_val$cal4 <- ifelse(data_val$val_cal___4==1, "-- Slope", "-")
+data_val$cal4.factor = factor(data_val$cal4,levels=c("-","-- Slope"))
+
+data_val$cal5 <- ifelse(data_val$val_cal___5==1, "-- Intercept", "-")
+data_val$cal5.factor = factor(data_val$cal5,levels=c("-","-- Intercept"))
+
+data_val$cal6 <- ifelse(data_val$val_cal___6==1, "-- Kappa", "-")
+data_val$cal6.factor = factor(data_val$cal6,levels=c("-","-- Kappa"))
+
+data_val$cal7 <- ifelse(data_val$val_cal___7==1, "-- Other", "-")
+data_val$cal7.factor = factor(data_val$cal7,levels=c("-","-- Other"))
+
+data_val$oth <- ifelse(data_val$val_oth___0==1 | data_val$val_oth___1==1 | data_val$val_oth___2==1 | data_val$val_oth___3==1 | data_val$val_oth___4==1 | data_val$val_oth___5==1 | data_val$val_oth___6==1 | data_val$val_oth___7==1 | data_val$val_oth___8==1, "Yes", "No")
+data_val$oth.factor = factor(data_val$oth,levels=c("Yes","No"))
+
+label(data_val$oth.factor)="Were any other methods used to assess model performance?"
+
+data_val$oth0 <- ifelse(data_val$val_oth___0==1, "-- R-squared", "-")
+data_val$oth0.factor = factor(data_val$oth0,levels=c("-","-- R-squared"))
+
+data_val$oth1 <- ifelse(data_val$val_oth___1==1, "-- Brier score", "-")
+data_val$oth1.factor = factor(data_val$oth1,levels=c("-","-- Brier score"))
+
+data_val$oth2 <- ifelse(data_val$val_oth___2==1, "-- Predictive values", "-")
+data_val$oth2.factor = factor(data_val$oth2,levels=c("-","-- Predictive values"))
+
+data_val$oth3 <- ifelse(data_val$val_oth___3==1, "-- Sensitivity", "-")
+data_val$oth3.factor = factor(data_val$oth3,levels=c("-","-- Sensitivity"))
+
+data_val$oth4 <- ifelse(data_val$val_oth___4==1, "-- Specificity", "-")
+data_val$oth4.factor = factor(data_val$oth4,levels=c("-","-- Specificity"))
+
+data_val$oth5 <- ifelse(data_val$val_oth___5==1, "-- Decision curve analysis", "-")
+data_val$oth5.factor = factor(data_val$oth5,levels=c("-","-- Decision curve analysis"))
+
+data_val$oth6 <- ifelse(data_val$val_oth___6==1, "-- Odds ratios", "-")
+data_val$oth6.factor = factor(data_val$oth6,levels=c("-","-- Odds ratios"))
+
+data_val$oth7 <- ifelse(data_val$val_oth___7==1, "-- Efficiency curves", "-")
+data_val$oth7.factor = factor(data_val$oth7,levels=c("-","-- Efficiency curves"))
+
+data_val$oth8 <- ifelse(data_val$val_oth___8==1, "-- Other", "-")
+data_val$oth8.factor = factor(data_val$oth8,levels=c("-","-- Other"))
+
+label(data_val$val_roc.factor)="Was a ROC curve produced?"
+
+
+tab_val_perf <- tableby(~ val_dis___0.factor + notest(dis1.factor, "countpct", cat.simplify=T) + notest(dis2.factor, "countpct", cat.simplify=T) + notest(dis3.factor, "countpct", cat.simplify=T) + notest(val_c1, "medianq1q3", "range", digits=2)
+                + val_cal___0.factor + notest(cal1.factor, "countpct", cat.simplify=T) + notest(cal2.factor, "countpct", cat.simplify=T) + notest(cal3.factor, "countpct", cat.simplify=T) + notest(cal4.factor, "countpct", cat.simplify=T) + notest(cal5.factor, "countpct", cat.simplify=T) + notest(cal6.factor, "countpct", cat.simplify=T) + notest(cal7.factor, "countpct", cat.simplify=T) + oth.factor + notest(oth0.factor, "countpct", cat.simplify=T) + notest(oth1.factor, "countpct", cat.simplify=T) + notest(oth2.factor, "countpct", cat.simplify=T) + notest(oth3.factor, "countpct", cat.simplify=T) + notest(oth4.factor, "countpct", cat.simplify=T) + notest(oth5.factor, "countpct", cat.simplify=T) + notest(oth6.factor, "countpct", cat.simplify=T) + notest(oth7.factor, "countpct", cat.simplify=T) + notest(oth8.factor, "countpct", cat.simplify=T) + val_roc.factor
+                         , data=data_val, digits=0)
+summary(tab_val_perf, title = "(\\#tab:valperf) External Validation Model Performance Characteristics"
+        , labelTranslations=c(dis1.factor="-- C-statistic", dis2.factor="-- Discrimination slope", dis3.factor="-- Other", cal1.factor="-- Plot", cal2.factor="-- Table", cal3.factor="-- Hosmer-Lemeshow Test", cal4.factor="-- Slope", cal5.factor="-- Intercept", cal6.factor="-- Kappa", cal7.factor="-- Other", oth0.factor="-- R-squared", oth1.factor="-- Brier score", oth2.factor="-- Predictive values", oth3.factor="-- Sensitivity", oth4.factor="-- Specificity", oth5.factor="-- Decision curve analysis", oth6.factor="-- Odds ratios", oth7.factor="-- Efficiency curves", oth8.factor="-- Other"))
+
+
+############################################################################################################################
+
+library(Hmisc)
+library(tidyr)
+library(plyr)
+
+data2=read.csv('C:/Users/stephen.gerry/Dropbox/Steve work/VM/SR/Validation_studies_211218_include.csv')
+
+data2_long <- gather(data2, num, model, val_score1:val_score34, factor_key=T)
+
+data3 <- subset(data2_long, model != "")
+
+df2 <- ddply(data3, .(model), summarize, y=length(model))
+
+
+
+knitr::kable(
+  df2, booktabs = TRUE,
+  caption = "(\\#tab:freq) Number of Validation Studies for Each Model",
+  col.names = c("Model", "Frequency"),
+  longtable = TRUE
+)
+
+
+
+library("wordcloud")
+library("RColorBrewer")
+
+
+set.seed(1234)
+wordcloud(words = df2$model, freq = df2$y, min.freq = 1,
+          max.words=200, random.order=FALSE, rot.per=0.35, 
+          colors=brewer.pal(8, "Dark2"))
+
+
+
+data1$P1 <- ifelse(data1$prob1_1___0==1 & data1$prob1_2___0==1 & (data1$prob1_3___0==1 | data1$study_type==0), 1, ifelse((data1$prob1_1___1==1 | data1$prob1_2___1==1 | data1$prob1_3___1==1), 3, ifelse((data1$prob1_1___2==1 | data1$prob1_2___2==1 | data1$prob1_3___2==1),2,NA)))
+
+data1$P2 <- ifelse(data1$prob2_1___0==1 & (data1$prob2_2___0==1 | data1$study_type==0) & data1$prob2_3___0==1 & data1$prob2_4___0==1, 1, ifelse((data1$prob2_1___1==1 | data1$prob2_2___1==1 | data1$prob2_3___1==1 | data1$prob2_4___1==1), 3, ifelse((data1$prob2_1___2==1 | data1$prob2_2___2==1 | data1$prob2_3___2==1 | data1$prob2_4___2==1),2,NA)))
+
+data1$P3 <- ifelse(data1$prob3_1___0==1 & data1$prob3_2___0==1 & data1$prob3_3___0==1 & data1$prob3_4___0==1 & (data1$prob3_5___0==1 | data1$study_type==0) & data1$prob3_6___0==1 & data1$prob3_7___0==1, 1, ifelse((data1$prob3_1___1==1 | data1$prob3_2___1==1 | data1$prob3_3___1==1 | data1$prob3_4___1==1 | data1$prob3_5___1==1 | data1$prob3_6___1==1 | data1$prob3_7___1==1), 3, ifelse((data1$prob3_1___2==1 | data1$prob3_2___2==1 | data1$prob3_3___2==1 | data1$prob3_4___2==1 | data1$prob3_5___2==1 | data1$prob3_6___2==1 | data1$prob3_7___2==1),2,NA)))
+
+data1$P4 <- ifelse(data1$prob4_1___0==1 & data1$prob4_2___0==1 & data1$prob4_3___0==1 & data1$prob4_4___0==1 & (data1$prob4_5___0==1 | data1$study_type!=0) & data1$prob4_6___0==1 & data1$prob4_7___0==1 & data1$prob4_8___0==1 & data1$prob4_9___0==1, 1, ifelse((data1$prob4_1___1==1 | data1$prob4_2___1==1 | data1$prob4_3___1==1 | data1$prob4_4___1==1 | data1$prob4_5___1==1 | data1$prob4_6___1==1 | data1$prob4_7___1==1 | data1$prob4_8___1==1 | data1$prob4_9___1==1), 3, ifelse((data1$prob4_1___2==1 | data1$prob4_2___2==1 | data1$prob4_3___2==1 | data1$prob4_4___2==1 | data1$prob4_5___2==1 | data1$prob4_6___2==1 | data1$prob4_7___2==1 | data1$prob4_8___2==1 | data1$prob4_9___2==1),2,NA)))
+
+df.summary1 <- as.data.frame(table(data1$P1))
+df.summary1$cat <- "Participant Selection"
+df.summary2 <- as.data.frame(table(data1$P2))
+df.summary2$cat <- "Predictors"
+df.summary3 <- as.data.frame(table(data1$P3))
+df.summary3$cat <- "Outcomes"
+df.summary4 <- as.data.frame(table(data1$P4))
+df.summary4$cat <- "Analysis"
+
+df.summary <- rbind(df.summary1,df.summary2,df.summary3,df.summary4)
+df.summary$res <- ifelse(df.summary$Var1==1,"Low",ifelse(df.summary$Var1==2,"Unclear", "High"))
+df.summary$pct <- df.summary$Freq/sum(df.summary1$Freq)
+
+df.summary$res <- factor(df.summary$res, levels=c("High","Unclear","Low"))
+
+library(scales)
+ggplot(df.summary, aes(x=factor(cat,levels = c("Analysis","Outcomes","Predictors","Participant Selection")), y=pct, fill=res)) +
+  geom_bar(stat="identity", width = .7, colour="black", lwd=0.1) +
+  geom_text(aes(label=ifelse(pct >= 0.07, paste0(sprintf("%.0f", pct*100),"%"),"")),
+                position=position_stack(vjust=0.5), colour="white") +
+  coord_flip() +
+  scale_y_continuous(labels = percent_format()) +
+  scale_fill_discrete(name="Risk of Bias") +
+  labs(y="", x="") +
+  theme_bw()
+
+```
+
+\newpage
+## Introduction {#sec:ch3s1}
+
+The results from this chapter have been published in the following two papers:
+
+\textcolor{brown}{Gerry S, Birks J, Bonnici T, et al. Early warning scores for detecting deterioration in adult hospital patients: a systematic review protocol \textit{BMJ Open} 2017;7:e019268.}
+
+\textcolor{brown}{Gerry S, Bonnici T, Birks J, et al. Early warning scores for detecting deterioration in adult hospital patients: systematic review and critical appraisal of methodology \textit{BMJ} 2020;369:m1501}
+
+Since the first Early warning score (EWS) was proposed by Morgan[@Morgan1997] in 1997 there has been a considerable amount of research into developing and validating new EWSs.
+There has also been an enormous clinical implementation of EWSs, which are now widely used every day in hospitals to identify clinically deteriorating patients.
+They are routinely used in several countries, including the Netherlands, USA, Australia, and the Republic of Ireland[@PrinceCharlesHospital; @Ireland; @Churpek2011; @Douw2016].
+Despite this widespread use there has been little attention paid to the methods used to develop and evaluate them.
+This chapter will present a systematic review of the literature to identify EWSs and summarise them, with a particular focus on evaluating the methodology used.
+
+Four existing systematic reviews evaluating studies which have developed or validated EWSs have been published [@Gao2007a; @Smith2008c; @Smith2014b; @KYRIACOS2011].
+Those by Gao et al[@Gao2007a] and GB Smith et al[@Smith2008c] were published almost a decade ago, while MEB Smith et al[@Smith2014b] used narrow inclusion criteria and did not include all available EWSs, and the review by Kyriacos et al[@KYRIACOS2011] was a more general overview of the literature.
+Several new EWSs have been published since.
+The main aims of these reviews were to describe the development of EWSs, assess their predictive performance and assess any impact studies that evaluate the effect of implementing EWSs in clinical practice.
+Other reviews, such as those by Alam et al[@Alam2014a] and McGaughey et al[@McGaughey2007b], looked at impact studies, but I do not plan to include these in my review, since the focus of this thesis is on development and validation of EWSs.
+Gao et al [@Gao2007a] and MEB Smith et al[@Smith2014b] subjectively reported that they found many of the primary studies to be of low quality, used suboptimal methods and were at high risk of bias.
+However, none of the reviews made a detailed and structured evaluation of the approaches used to develop EWSs, following recommended methodological considerations in the field of clinical prediction models[@Collins2015; @Moons2015; @Steyerberg2014].
+
+Papers describing the development of clinical prediction models abound in many areas of medicine[@Collins2015; @Christodoulou2019].
+Numerous systematic reviews have shown that the methodology used in these papers is often poor[@Damen2016; @Collins2011; @Bouwmeester2012; @Collins2013].
+Whilst many published prediction models are never used in practice, EWSs are used extensively, arguably more than any other type of clinical prediction model.
+Despite extensive development and increasing uptake, the EWS literature has not been comprehensively reviewed in the last decade.
+No systematic review has assessed the methodological and  reporting quality of papers that describe the development and validation of EWSs.
+Furthermore external validation studies, which are vital for assessing the generalisability of EWSs, have never been systematically assessed.
+Existing systematic reviews of EWS have largely concentrated on predictive performance, and have only hinted at methodological flaws[@Gao2007a; @Smith2014].
+
+As a hospital patient is likely to have their vital signs and other parameters measured multiple times during their hospital stay, the available analysis data sets may include multiple measurements per patient.
+The most appropriate way to analyse this type of data is not clear, increasing the complexity of EWS research in comparison to other areas of clinical prediction modelling.
+The best choice of outcome measure and time horizon is also debated, for example death or admission to intensive care, within a specific time period, e.g. 24 hours, or the whole hospital stay[@Churpek2013b].
+Different approaches to these problems may give different results when developing and validating EWSs and can lead to the implementation of models that do not work.
+
+The great potential for EWSs to assist in clinical decision-making may be thwarted by poor methods and inadequate reporting.
+The pervasive use of EWSs means poorly developed and reported EWSs could have a highly detrimental effect of patient care.
+I carried out a systematic review to assess the methodology and reporting of studies developing or externally validating general adult EWSs.
+
+## Methods {#sec:ch3s2}
+
+In summary, articles were identified that described the development or validation of EWSs.
+The Medline (OVID), CINAHL (EBSCOHost), PsycInfo (OVID), and Embase (OVID) databases were searched from database inception until 30 August 2017.
+An update search was conducted on 19 June 2019 to identify articles published since the date of the original search.
+Search strategies were developed by an information specialist for each database and are reported in Appendix sections \@ref(sec:appss1) to \@ref(sec:appss4).
+Search terms included relevant controlled vocabulary terms (e.g. MeSH, EMTREE) and free-text variations for early warning or track and trigger scores or systems (including common acronyms), physiologic monitoring or health status indicators combined with development and validation terms.
+No date or language limits were applied to the search.
+Additional articles were identified by searching the references in papers identified by the search strategy, personal reference lists, and a Google Scholar search.
+
+### Eligibility criteria {#sec:ch3s3}
+
+Primary research articles were included if they described the development or validation of one or more EWSs, defined as a score (with at least two predictors) used to identify general hospitalised patients at risk of clinical deterioration.
+External validation studies were only included if an article describing the development of that EWS was also available (with the exception of the original EWS).
+
+Articles were not eligible, if: (1)	the score was developed for use in a subset of patients with a specific disease or group of diseases, (2)	the score was developed for use with children (aged under 16 years) or pregnant women, (3) the score is intended for outpatient use, (4) the score is intended for use in the ICU, (5) no vital signs were included in the final model, (6) the article was a review, letter, personal correspondence, or abstract, or (7) the article was published in a non-English language.
+
+
+**Box 1**
+
+\begin{center}
+\fbox{\begin{varwidth}{\dimexpr\textwidth-2\fboxsep-2\fboxrule\relax}
+Definitions of technical terms: 
+
+\begin{enumerate}
+  \item \textbf{\textit{Apparent performance}}
+  Evaluating a models predictive performance in the same data used to develop it.
+  \item \textbf{\textit{Internal validation}}
+  An assessment of how well a model is likely to work in external data. The apparent performance is adjusted for the 'optimism' resulting from overfitting. Typical methods such as bootstrapping or cross-validation re-sample from the development data.
+  \item \textbf{\textit{External validation}}
+  Testing a models predictive performance in data other than that used to develop it.
+  \item \textbf{\textit{Discrimination}}
+  The ability of a model to distinguish between those who will and will not go on to develop the outcome of interest. Typically measured using the c-index.
+  \item \textbf{\textit{Calibration}}
+  The agreement between predicted and observed event rates. Best assessed using a calibration plot.
+  \item \textbf{\textit{Prediction horizon}}
+  The timeframe in which the model is intended to predict the outcome of interest.
+  \item \textbf{\textit{Individualised risk prediction}}
+  The ability of a model to estimate the probability of the outcome occurring, based on a patients' characteristics. This is typically made possible by the reporting of all model coefficients including the intercept (for a logistic regression model) or baseline hazard (for a survival model).
+\end{enumerate}
+\end{varwidth}}
+\end{center}
+
+
+### Study selection and data extraction {#sec:ch3s4}
+
+I screened the titles and abstracts of all articles identified by the search string.
+Data were independently extracted by two reviewers using a standardised and piloted data extraction form.
+The form was administered using the Research Electronic Data Capture (REDCap) electronic data capture tool [@Harris2009].
+The items for extraction were based on the CHARMS checklist [@Moons2014], supplemented by subject-specific questions and methodological guidance.
+It included study design characteristics, patient characteristics, sample size, outcomes, statistical analysis methods, and model performance methods.
+Items extracted from studies describing the development of EWSs included study design (retrospective, prospective), details of population (e.g. when and where data was collected, age, sex), method of development (e.g. clinical consensus, statistical approach), predicted outcome and time horizon, number and type of predictors, sample size, number of events, missing data approach, modelling approach (e.g. type of regression model, method used to select variables, handling of continuous variables, examination of interaction terms), model presentation (e.g. reporting of model coefficients, intercept or baseline hazard, simplified model, method of internal validation (e.g. split-sample, bootstrapping, cross-validation) ), and assessment of model performance (e.g. discrimination, calibration).
+Items extracted from studies describing the external validation of EWSs included study design (retrospective, prospective), details of population (e.g. when and where data was collected, age, sex), predicted outcome and time horizon, sample size, number of events, missing data approach, and assessment of model performance (e.g. discrimination, calibration).
+
+
+### Assessment of bias {#sec:ch3s5}
+
+The risk of bias of each article was assessed using the Prediction model Risk of Bias ASsessment Tool (PROBAST), developed by the Cochrane Prognosis Methods Group [@Wolff2019]. 
+PROBAST consists of 23 signalling questions within four domains (participant selection, predictors, outcome, and analysis).
+The articles were classified as low, high, or unclear risk of bias for each domain.
+
+#### Evidence synthesis {#sec:ch3s6}
+
+Results were summarised using descriptive statistics, graphical plots, and a narrative synthesis. 
+The review did not include a quantitative synthesis of the models, as this was not the main focus of the review, and the studies were too heterogeneous to combine.
+
+
+## Results {#sec:ch3s7}
+
+The search strategy identified 13171 unique articles, of which 12794 were excluded based on title and abstract screening. 
+I screened 377 full texts, of which 93 articles met the eligibility criteria and were included in the review (Figure \ref{prisma}).
+Two more articles were identified by searching the article references and were also included, giving 95 articles in total.
+
+Eleven articles described only development of EWSs, 23 described development and validation, and 61 articles described only external validation.
+
+The articles were published between 2001 and 2019 in 51 journals.
+One journal, Resuscitation, published 21 of the articles.
+No other journal included more than four of the articles.
+Ninety-three articles used a patient data set (the remaining two used clinical consensus).
+Most studies used data from the UK (n=28) or the US (n=25).
+The article represented data from 22 countries across four continents.
+
+
+```{r echo=FALSE, message=FALSE, warning=FALSE, fig.cap = "Flow diagram of article selection. \\label{prisma}", out.extra='', out.width="100%"}
+
+library(DiagrammeR)
+
+graph <- grViz("
+digraph prisma {
+  a -> nodups;
+  a [label='Medline\n6052 Citations'];
+  a [shape='box'];
+
+  b -> nodups;
+  b [label='Embase\n9373 Citations'];
+  b [shape='box'];
+
+  c -> nodups;
+  c [label='PsycInfo\n743 Citations'];
+  c [shape='box'];
+
+  d -> nodups;
+  d [label='CINAHL\n1956 Citations'];
+  d [shape='box'];
+
+  nodups -> incex;
+  nodups [label='13171 Non-duplicate\ncitations found'];
+  nodups [shape='box'];
+
+  incex -> {ex; ft}
+  incex [label='Title and abstracts screened'];
+
+  ex [label='12794 Articles excluded\nafter title/abstract screen'];
+  ex [shape='box'];
+  {rank=same; incex ex}
+
+  ft -> incex2;
+  ft [label='377 Articles retrieved'];
+  ft [shape='box'];
+
+  incex2 -> {ftex}
+  incex2 [label='Full texts screened'];
+
+  ftex [label='280 Articles excluded\nafter full text screen:\n\nConference abstract/editorial (n=122)\nPatient population not eligible (n=76)\nDuplicate (n=11)\nMethodological (n=13)\nNo development/validation (n=50)\nNot in English language (n=3)\nFull text not available (n=3)\nValidation of non-review EWSs (n=6)'];
+  ftex [shape='box'];
+  {rank=same; ftex incex2}
+  incex2 -> inc;
+
+  inc -> {ref}
+  inc [label='93 Articles eligible for review'];
+  inc [shape='box'];
+  
+  ref -> {final; refs}
+  ref [label='References searched'];
+  
+  refs [label='2 Articles included']
+  refs [shape='box'];
+  {rank=same; ref refs}
+  
+  final [label='95 Articles included in review'];
+  final [shape='box'];
+  final [peripheries=2];
+  
+  
+}
+
+")
+
+  capture.output({
+  graph
+  DiagrammeRsvg::export_svg(graph) %>% charToRaw %>% rsvg::rsvg_pdf("graph.pdf")
+  },  file='NUL')
+knitr::include_graphics("graph.pdf")
+
+```
+
+
+### Studies describing the development of an early warning score {#sec:ch3s7a}
+
+#### Study design (n=34) {#sec:ch3s8}
+
+Of the 34 articles describing the development of a new EWS, 29 were based on statistical methods, 3 were based on clinical consensus, and 2 were modifications of existing scores (Table \@ref(tab:dev1)).
+
+Most of the 29 studies that were developed using statistical methods used data from retrospective cohorts (n=21, 72%), whilst 7 (24%) used prospective data collection methods.
+Data used to develop the models were collected between 2000 and 2017.
+Twelve of the 29 studies (41%) did not adequately describe their data set, missing at least one of: average age, distribution of men and women, number of patients with/without the event, and number of observation sets with/without the event (as a patient may contribute more than one set of observations).
+
+Twenty-three of the 29 studies used a regression modelling approach.
+The remaining six studies used a variety of methods, which are listed in Table \@ref(tab:dev1).
+
+\newpage
+\blandscape
+
+```{r eval=FALSE, message=FALSE, warning=FALSE, include=FALSE, out.extra='', results='asis'}
+
+library(kableExtra)
+library(pander)
+
+info=read.csv('C:/Users/stephen.gerry/Dropbox/Steve work/VM/SR/Development_formatted_251019_thesis_special.csv')
+
+df <- info[c("Ref", "Name.of.EWS", "How.was.the.model.developed.", "Type.of.dataset","Country","Years.of.data.collection", "Mean..or.median..age", "Percentage.male")]
+
+colnames(df) <- c("Reference", "Name of EWS", "How developed", "Type of data", "Country", "Years of data", "Mean or median age", "Percentage male")
+
+panderOptions('table.split.cells', 10)
+
+pandoc.table(df, split.table = "Inf", split.cells=10, caption = "Study design characteristics of the 34 articles describing the development of an early warning score. (\\#tab:dev1)")
+
+```
+
+
+\blfootnote{AAM: Advanced alert monitor, APPROVE: Accurate prediction of prolonged ventilation, CARM: Computer aided risk of mortality, CART: Cardiac arrest risk triage, CEWS: Centile early warning score, DENWIS: Dutch early nurse worry indicator score, DTEWS: Decision-tree early warning score, eCART: Electronic cardiac arrest risk triage, EDI: Early deterioration indicator, EMR: Electronic medical record, GMEWS: Global modified early warning score, HOTEL: Hypotension, oxygen saturation, temperature, ECG abnormality, loss of independence, LDTEWS: Laboratory-decision tree early warning score, MARS: Medical admissions risk system, MEWS: Modified early warning score, mCEWS: Manual centile early warning score, NEWS: National early warning score, TOTAL: Tachypnoea, oxygen saturation, temperature, alert and loss of independence, PSS: Physiological scoring system, SCS: Simple clinical score, UVA: Universal vital assessment, ViEWS: Vitalpac early warning score}
+
+
+\elandscape
+\newpage
+
+#### Outcome measures and horizon times (n=23) {#sec:ch3s9}
+
+A variety of primary outcome measures were observed in the 23 development studies that used a regression approach (Table \@ref(tab:dev2)).
+Nearly all studies used death, ICU admission, cardiac arrest or a composite of these.
+The most common of were death (n=10, 44%) and cardiac arrest (n=4, 17%).
+There was also a wide variety of prediction time horizons used. 
+The most frequent was 24 hours (n=8, 35%). Other common horizons were 12 hours (n=3, 13%), 30 days (n=3, 13%), or in-hospital (n=6, 26%).
+Figure \ref{devout} shows a breakdown of outcomes and their time horizons.
+
+
+```{r echo=FALSE, message=FALSE, warning=FALSE, results='asis', fig.cap = "A summary of development outcomes and time horizons appearing in the 23 studies that used a regression modelling approach to develop an early warning score \\label{devout}", out.extra=''}
+
+
+data_dev_reg %>%
+  ggplot(aes(x = factor(dev_reg_out_cat1.factor), fill = factor(dev_reg_time_cat.factor))) +
+  geom_bar() +
+  theme_bw() +
+  scale_fill_discrete(name="Primary Outcome Time") +
+  scale_y_continuous(breaks = seq(0,10,2), limits = c(0,10)) +
+  theme(axis.text.x = element_text(angle = 90, hjust = 1)) +
+  xlab("Primary Outcome Measure") +
+  ylab("Number of Studies")
+
+```
+
+
+#### Predictors (n=34) {#sec:ch3s10}
+
+Twenty-one of the 34 development studies reported how many candidate predictors were considered for inclusion in the EWS, together reporting a median of 12 (range 4 to 45) predictors (Table \@ref(tab:dev3)).
+The median number of predictors included in the final model was 7 (range 3 to 35). 
+The most frequently included predictor was respiratory rate (n=30, 88%), followed by heart rate (n=28, 83%), oxygen saturation (n=24, 71%), temperature (n=24, 71%), systolic blood pressure (n=24, 71%), and level of consciousness (n=19, 56%).
+Thirteen models included age (38%) and three models included sex (9%).
+
+
+#### Sample size (for 29 studies developed using a regression method) {#sec:ch3s11}
+
+The sample size in EWS studies can be complicated, as there can be multiple observations per patient or hospital admission.
+It was not always clear whether the reported sample size referred to the number of patients, hospital admissions or observations (Table \@ref(tab:dev4)).
+The median patient or hospital-admission sample size was 10712 (range 242 to 649418).
+Eleven articles (38%) used multiple observation sets per patient, 15 (52%) used one observation set per patient, and 3 were unclear.
+Studies using only one observation set per patient, usually used the first recorded observation (n=9, 60%).
+
+The median number of events at the patient level was 396 (range 18 to 19153) and at the observation level was 284 (range 18 to 15452). 
+One article did not report the number of events at the patient level, and eight articles did not report the number of events at the observation level.
+
+The events-per-variable (EPV) is a key marker of sample size adequacy in prediction modelling studies, and is defined as the number of events divided by the number of candidate predictor variables used.
+Twenty articles used a regression modelling approach and provided sufficient information to calculate the patient-level EPV, with a median EPV of 52, and a range from 1 to 1288.
+Fifteen studies provided enough information to calculate the observation-level EPV, with a median of 17 and a range from 1 to 2693.
+
+#### Statistical methods (n=29) {#sec:ch3s12}
+
+*Missing data*
+
+Missing data were mentioned by most of the articles that used statistical methods to develop an EWS (n=25/29, 86%).
+Table \@ref(tab:dev5) lists the methods for dealing with missing data, of which complete-case analysis was the most common approach (n=10, 42%).
+None of the included studies used multiple imputation to handle missing data in the development of an EWS.
+Four articles mentioned missing data but did not clearly state which method was used to handle it.
+
+*Model building*
+
+Most of the 23 models developed using a regression modelling approach used logistic regression (n=15, 65%).
+Other methods included machine learning (n=4, 17%) and Cox proportional hazards regression (n=2, 9%).
+The most common approach for selecting variables for inclusion was backwards elimination (n=8, 35%).
+Six models included all candidate variables (26%).
+Four studies carried out univariable screening to reduce the initial number of candidate variables (17%).
+Although 11 articles used multiple observations per patient, only 2 (18%) used a statistical adjustment.
+
+*Handling of continuous predictors and use of interaction terms*
+
+All of the 23 regression models included at least one continuous variable.
+The most common approach for handling these variables was to categorise the variable before analysis (n=7, 30%).
+Other methods included splines (n=6, 26%), linear relationships (n=4, 17%), and fractional polynomials (n=2, 9%).
+Four studies used other methods.
+
+
+#### Model presentation (n=23) {#sec:ch3s13}
+
+Nine of the 23 (39%) models developed using a regression approach reported the complete regression formula, with all coefficients and either the intercept or baseline hazard (Table \@ref(tab:dev6)). 
+Of the remaining models, seven did not report any coefficients, and seven (30%) reported the predictor coefficients but not the intercept or baseline hazard.
+
+Thirteen of the studies (57%) reported enough information to allow for calculation of individualised risk predictions.
+Two articles reported the construction of risk groups (9%).
+Ten articles (44%) created a simplified model, although only five described how this was done.
+These simplified models typically reduce the model coefficients to a points-based scoring system, but these usually have no method of calculating predicted risks, i.e. converting the points back to a probability.
+
+#### Apparent predictive performance {#sec:ch3s14}
+
+Twenty-two studies assessed performance using the same data that were used in the development of the model, thus assessing apparent performance (Table \@ref(tab:dev7)). 
+Eighteen of these studies (82%) assessed discrimination with the c-index, with values ranging from 0.69 to 0.96.
+Calibration was assessed for eight models (36%), using the Hosmer-Lemeshow goodness-of-fit test in seven of those studies.
+Other performance metrics reported included sensitivity and specificity (n=8, 36%), and positive or negative predictive values (n=4, 18%).
+Receiver operating characteristic (ROC) curves were presented in eight studies.
+
+#### Internal validation {#sec:ch3s15}
+
+Table \@ref(tab:dev8) shows reporting of internal validation in the 34 development studies.
+Nineteen models were internally validated.
+Most split their data into development and validation data (n=13, 68%).
+Two articles used bootstrapping, and two used cross-validation (both 11%).
+All studies that assessed discrimination used the c-index.
+Calibration was assessed in four studies, one using a calibration plot and three using the Hosmer-Lemeshow test.
+Sensitivity and specificity were reported in six studies and ROC curves were produced in eight studies.
+
+### Studies describing the external validation of an early warning score {#sec:ch3s16}
+
+There were 84 articles that described an external validation of an EWS (Table \@ref(tab:val1)).
+Twenty-three of these also described the development of an EWS .
+Five developed an EWS and externally validated it on an external data set, and 18 developed an EWS and externally validated a different EWS using the development data set.
+
+#### Models validated {#sec:ch3s17}
+
+Twenty-six models were validated across the 84 studies (Figure \ref{words}).
+The Modified Early Warning Score (MEWS) [@Subbe2001b] was most frequently validated (n=43), followed by the National Early Warning Score [@Jones2012a] (n=40). 
+The VitalPac Early Warning Score (ViEWS) [@Prytherch2010a], on which the NEWS was based, was validated ten times, and the original EWS [@Morgan1997] was validated eight times.
+
+```{r echo=FALSE, message=FALSE, warning=FALSE, results='asis', fig.cap = "Frequency of external model validation by EWS in the 84 included validation studies \\label{words}", out.extra=''}
+
+# library(Hmisc)
+# library(tidyr)
+# library(plyr)
+library("wordcloud")
+library("RColorBrewer")
+
+# data2=read.csv('Validation_studies_211218_include.csv')
+# 
+# data2_long <- gather(data2, num, model, val_score1:val_score34, factor_key=T)
+# 
+# data3 <- subset(data2_long, model != "")
+# 
+# df2 <- ddply(data3, .(model), summarize, y=length(model))
+
+# ggplot(df2, aes(model, y=y, fill=model)) + geom_bar(stat="identity") +
+#   geom_text(aes(label=y), vjust=-0.5) +
+#   scale_y_continuous(name="Number of studies",breaks=c(0,10,20,35),limits=c(0,35)) +
+#   scale_x_discrete(name="") +
+#   theme_bw() + 
+#   theme(legend.position = "none")
+
+# set.seed(1234)
+# wordcloud(words = df2$model, freq = df2$y, min.freq = 1,
+#           max.words=200, random.order=FALSE, rot.per=0.35, 
+#           colors=brewer.pal(8, "Dark2"))
+df2 %>%
+  ggplot(aes(x=reorder(model, y), y=y) ) +
+    geom_bar(stat="identity", fill="#69b3a2") +
+    coord_flip() +
+    theme_bw() +
+    theme(
+      panel.grid.minor.y = element_blank(),
+      panel.grid.major.y = element_blank(),
+      legend.position="none"
+    ) +
+    xlab("") +
+    ylab("Number of Validation Studies") +
+    scale_y_continuous(breaks = seq(0,50,4))
+  
+
+
+```
+
+#### Study design {#sec:ch3s18}
+
+Most of the validation articles (n=58, 69%) used existing data to externally validate an EWS.
+Twenty-five (30%) collected prospective data for external validation.
+The data used to validate the EWSs were all collected between 2000 and 2017.
+Thirty-three of the 84 studies (39%) did not adequately describe their data set, missing at least one of: average age, distribution of men and women, number of patients with/without the event, and number of observation sets with/without the event.
+
+\newpage
+\blandscape
+
+```{r echo=FALSE, message=FALSE, warning=FALSE, out.extra='', results='asis'}
+
+library(kableExtra)
+library(pander)
+
+info=read.csv('C:/Users/stephen.gerry/Dropbox/Steve work/VM/SR/Validation_formatted_160919.csv')
+
+df <- info[c("Ref","Type.of.dataset","Country","Years.of.data.collection","EWS.s..validated","Mean..or.median..age","Percentage.male")]
+
+colnames(df) <- c("Reference","Type of dataset","Country","Year","EWSs validated","Mean age","Percentage male")
+
+pandoc.table(df, split.table = "Inf", split.cells = 10, type = "multiline", caption = "Design characteristics of the 84 studies  describing external validation of an early warning score. (\\#tab:val1)")
+
+```
+
+\blfootnote{APPROVE: Accurate prediction of prolonged ventilation, CARM: Computer aided risk of mortality, CART: Cardiac arrest risk triage, CEWS: Centile early warning score, DENWIS: Dutch early nurse worry indicator score, eCART: Electronic cardiac arrest risk triage, GMEWS: Global modified early warning score, HOTEL: Hypotension, oxygen saturation, temperature, ECG abnormality, loss of independence, LDTEWS: Laboratory-decision tree early warning score, MARS: Medical admissions risk system, MEWS: Modified early warning score,  NEWS: National early warning score, TOTAL: Tachypnoea, oxygen saturation, temperature, alert and loss of independence, PSS: Physiological scoring system, SCS: Simple clinical score,  ViEWS: Vitalpac early warning score}
+
+\elandscape
+\newpage
+
+#### Outcome measures and horizon times {#sec:ch3s19}
+
+The models were validated against a range of outcomes (Figure \ref{valout}, Table \@ref(tab:val2).
+The most frequent was death which was included in 66 articles (79%), followed by admission to intensive care (ICU) (n=22, 26%), and a composite of death and ICU (n=17, 20%).
+A variety of prediction horizons were used.
+'In-hospital', i.e. the remainder of the hospital stay, was the most frequently used time point (n=58, 69%), followed by 24 hours (n=56, 67%).
+Figure \ref{valout} shows all outcome and time horizon combinations, in-hospital death was the most commonly validated endpoint (n=26, 31%).
+
+```{r echo=FALSE, message=FALSE, warning=FALSE, results='asis', fig.cap = "Summary of the outcomes and time horizons used in the 84 studies externally validating an early warning score. \\label{valout}", out.extra=''}
+
+# data_val_plot <- na.omit(data_val[c("val_pri_outcome_cat1.factor","val_pri_time_cat.factor")])
+# 
+# data_val_plot %>%
+#   ggplot(aes(x = factor(val_pri_outcome_cat1.factor), fill = factor(val_pri_time_cat.factor))) +
+#   geom_bar() +
+#   theme_bw() +
+#   scale_fill_discrete(name="Primary Outcome Time") +
+#   theme(axis.text.x = element_text(angle = 90, hjust = 1)) +
+#   xlab("Primary Outcome Measure") +
+#   ylab("Number of Studies")
+
+data_val$val_pri_outcome_cat.f1 = factor(data_val$val_pri_outcome_cat1,levels=c("0","1","2","3","4","5"))
+levels(data_val$val_pri_outcome_cat.f1)=c("Death","ICU admission","Cardiac arrest","Death/ICU composite","Death/ICU/CA composite","Other")
+data_val$val_pri_outcome_cat.f2 = factor(data_val$val_pri_outcome_cat2,levels=c("0","1","2","3","4","5"))
+levels(data_val$val_pri_outcome_cat.f2)=c("Death","ICU admission","Cardiac arrest","Death/ICU composite","Death/ICU/CA composite","Other")
+data_val$val_pri_outcome_cat.f3 = factor(data_val$val_pri_outcome_cat3,levels=c("0","1","2","3","4","5"))
+levels(data_val$val_pri_outcome_cat.f3)=c("Death","ICU admission","Cardiac arrest","Death/ICU composite","Death/ICU/CA composite","Other")
+data_val$val_pri_outcome_cat.f4 = factor(data_val$val_pri_outcome_cat4,levels=c("0","1","2","3","4","5"))
+levels(data_val$val_pri_outcome_cat.f4)=c("Death","ICU admission","Cardiac arrest","Death/ICU composite","Death/ICU/CA composite","Other")
+data_val$val_pri_outcome_cat.f5 = factor(data_val$val_pri_outcome_cat5,levels=c("0","1","2","3","4","5"))
+levels(data_val$val_pri_outcome_cat.f5)=c("Death","ICU admission","Cardiac arrest","Death/ICU composite","Death/ICU/CA composite","Other")
+data_val$val_pri_outcome_cat.f6 = factor(data_val$val_pri_outcome_cat6,levels=c("0","1","2","3","4","5"))
+levels(data_val$val_pri_outcome_cat.f6)=c("Death","ICU admission","Cardiac arrest","Death/ICU composite","Death/ICU/CA composite","Other")
+data_val$val_pri_outcome_cat.f7 = factor(data_val$val_pri_outcome_cat7,levels=c("0","1","2","3","4","5"))
+levels(data_val$val_pri_outcome_cat.f7)=c("Death","ICU admission","Cardiac arrest","Death/ICU composite","Death/ICU/CA composite","Other")
+
+data_val$val_pri_time_cat.f1 = factor(data_val$val_pri_time_cat,levels=c("0","1","2","3","4","5"))
+levels(data_val$val_pri_time_cat.f1)=c("12 hours","24 hours","48 hours","30 days","In-hospital","Other")
+data_val$val_pri_time_cat.f2 = factor(data_val$val_pri_time_cat1,levels=c("0","1","2","3","4","5"))
+levels(data_val$val_pri_time_cat.f2)=c("12 hours","24 hours","48 hours","30 days","In-hospital","Other")
+data_val$val_pri_time_cat.f3 = factor(data_val$val_pri_time_cat2,levels=c("0","1","2","3","4","5"))
+levels(data_val$val_pri_time_cat.f3)=c("12 hours","24 hours","48 hours","30 days","In-hospital","Other")
+data_val$val_pri_time_cat.f4 = factor(data_val$val_pri_time_cat3,levels=c("0","1","2","3","4","5"))
+levels(data_val$val_pri_time_cat.f4)=c("12 hours","24 hours","48 hours","30 days","In-hospital","Other")
+data_val$val_pri_time_cat.f5 = factor(data_val$val_pri_time_cat4,levels=c("0","1","2","3","4","5"))
+levels(data_val$val_pri_time_cat.f5)=c("12 hours","24 hours","48 hours","30 days","In-hospital","Other")
+data_val$val_pri_time_cat.f6 = factor(data_val$val_pri_time_cat5,levels=c("0","1","2","3","4","5"))
+levels(data_val$val_pri_time_cat.f6)=c("12 hours","24 hours","48 hours","30 days","In-hospital","Other")
+data_val$val_pri_time_cat.f7 = factor(data_val$val_pri_time_cat6,levels=c("0","1","2","3","4","5"))
+levels(data_val$val_pri_time_cat.f7)=c("12 hours","24 hours","48 hours","30 days","In-hospital","Other")
+
+
+data_val_plot <- (data_val[c("val_pri_outcome_cat.f1","val_pri_outcome_cat.f2","val_pri_outcome_cat.f3","val_pri_outcome_cat.f4","val_pri_outcome_cat.f5","val_pri_outcome_cat.f6","val_pri_outcome_cat.f7","val_pri_time_cat.f1","val_pri_time_cat.f2","val_pri_time_cat.f3","val_pri_time_cat.f4","val_pri_time_cat.f5","val_pri_time_cat.f6","val_pri_time_cat.f7")])
+
+data_long1 <- gather(data_val_plot, outcome, outcome1, val_pri_outcome_cat.f1:val_pri_outcome_cat.f7, factor_key=TRUE)
+data_long2 <- gather(data_val_plot, time, time1, val_pri_time_cat.f1:val_pri_time_cat.f7, factor_key=TRUE)
+
+data_val_plot2 <- na.omit(as.data.frame(cbind(data_long1$outcome1,data_long2$time1)))
+
+data_val_plot2$V1 <- factor(data_val_plot2$V1, levels = c("Death","ICU admission","Cardiac arrest","Death/ICU composite","Death/ICU/CA composite","Other"))
+data_val_plot2$V2 <- factor(data_val_plot2$V2, levels = c("12 hours","24 hours","48 hours","30 days","In-hospital","Other"))
+
+data_val_plot2 %>%
+  ggplot(aes(x = V1, fill = V2)) +
+  geom_bar() +
+  theme_bw() +
+  scale_fill_discrete(name="Time Horizon") +
+  scale_y_continuous(breaks = seq(0,70,10), limits = c(0,70)) +
+  theme(axis.text.x = element_text(angle = 90, hjust = 1)) +
+  xlab("Outcome Measure") +
+  ylab("Number of Studies")
+
+```
+
+#### Sample size {#sec:ch3s20}
+
+Table \@ref(tab:val3) shows reported information on the sample size used in each external validation.
+It was not possible to identify the number of patients and observations in eight studies.
+It was not possible to identify the number of event patients and event observations in 25 studies.
+For those studies where it was reported the median number of patients included in the validation articles was 2806 (range 43 to 649418), and the median number of observation sets was 3160 (range 43 to 48723248).
+The median number of event patients was 126, ranging from 6 to 19153.
+
+Multiple observations were used per patient in 23 articles (27%), whilst one observation per patient was used in 55 articles (66%).
+In the remaining six studies it was unclear whether multiple observation sets had been used.
+Most of the studies using a single observation set per patient the majority of studies used the first observation (n=41, 73%).
+
+#### Statistical methods {#sec:ch3s21}
+
+Sixty-three of the 84 validation articles (75%) mentioned missing data (Table \@ref(tab:val4)).
+The most common approach for dealing with missing data was complete-case analysis (n=35, 56%).
+Two articles reported having no missing data (3%).
+One article used multiple imputation (2%).
+
+#### Predictive performance {#sec:ch3s22}
+
+Sixty-nine of the 84 validation studies (82%) assessed model discrimination. All but one using the c-index, with values ranging from 0.55 to 0.96.
+Model calibration was assessed in 15 studies, most commonly using the Hosmer-Lemeshow test (n=11, 16%).
+Calibration plots were presented in four studies (5%).
+Other commonly reported performance metrics included sensitivity and specificity (n=49, 58%), and positive or negative predictive values (n=31, 37%).
+Overall performance metrics, such as the Brier score and R^2^, were not reported in any of the studies.
+
+Due to the heterogeneity of outcomes and time horizons used in the validation studies, and the relative lack of head-to-head comparisons, I did not quantitatively synthesize performance metrics for specific EWSs. 
+
+
+### PROBAST risk of bias assessment {#sec:ch3s23}
+
+Risk of bias was assessed for each study focusing on participant selection, predictors, outcomes and analysis (figure \ref{rob}).
+Participant selection was at low risk of bias in 42% of studies, and at high risk of bias in 55%.
+The remainder were unclear.
+Predictors were at low risk of bias in 91% of the studies, and at high risk in 5%.
+Outcomes were at low risk of bias in 31% of studies, and at high risk in 66%.
+The analysis methods were at high risk of bias in all but two studies (98%).
+All studies were at high risk of bias in at least one domain.
+
+```{r echo=FALSE, message=FALSE, warning=FALSE, results='asis', fig.cap = "Summary of risk of bias in four domains of the 84 studies validating an early warning score, assessed using PROBAST \\label{rob}", out.extra=''}
+
+library(scales)
+ggplot(df.summary, aes(x=factor(cat,levels = c("Analysis","Outcomes","Predictors","Participant Selection")), y=pct, fill=res)) +
+  geom_bar(stat="identity", width = .7, colour="black", lwd=0.1) +
+  geom_text(aes(label=ifelse(pct >= 0.07, paste0(sprintf("%.0f", pct*100),"%"),"")),
+                position=position_stack(vjust=0.5), colour="white") +
+  coord_flip() +
+  scale_y_continuous(labels = percent_format()) +
+  scale_fill_discrete(name="Risk of Bias") +
+  labs(y="", x="") +
+  theme_bw()
+
+```
+
+## Discussion {#sec:ch3s24}
+
+This review of 95 published studies found poor methodology and inadequate reporting in the majority of studies developing or validating EWSs.
+Problems were observed across all aspects of study design and analysis.
+I found that statistical issues, such as missing data and regression modelling approaches were handled poorly.
+Very few studies assessed calibration, an essential aspect of model performance, and no study reported the overall metrics of model performance[@Collins2015], such as R^2^ or clinical utility using net benefit approaches[@VanCalster2018].
+Many studies also failed to report important details, such as sample size, number of events, population characteristics, and details of statistical methods.
+Several studies failed to report the full model, preventing (independent) external validation or implementation of the model in practice.
+
+Developing EWSs using inadequate methods is likely to lead to scoring systems that perform poorly and fail to predict deterioration sufficiently well[@McGaughey2007a].
+Poor methods in external validation studies could lead to inferior scoring systems being implemented, with false reassurances about their predictive ability and generalisability.
+Although no previous systematic reviews have formally assessed methodological and reporting quality in EWSs, some reviews have also found that studies describing the development or validation of an EWS were low quality, using poor statistical methods and at high risk of bias[@Gao2007a; @Smith2014].
+
+I assessed risk of bias using PROBAST [@Wolff2019] and found that most of the included studies were at risk of bias due to their participant selection, outcome definitions, and statistical analysis. 
+The only domain where most of the studies were at low risk of bias was predictor selection. 
+Overall, all studies were at high risk of bias.
+
+EWSs have historically been implemented as part of bedside paper observation charts. 
+As the scores were calculated manually, simple scoring systems were necessary.
+These systems have often relied on assigning points to each vital sign - typically three points - and summing them to get a total score.
+However these systems make the unlikely assumption that each vital sign has the same predictive value[@Churpek2012a].
+The total score has little meaning, and there is no obvious correspondence to an absolute risk of an event (e.g. the associated risk for someone who has a score of three is unclear).
+
+Electronic health records are increasingly being used to record vital signs and calculate EWSs[@Wong2015a].
+They offer the opportunity to implement more sophisticated EWSs that make full use of available data and can be fully integrated into the clinical workflow of healthcare providers. 
+As the adoption of digital vital signs charting inevitably leads to further research, it is important that that this research is of the highest quality, particularly where there is a surge in interest in using machine learning or artificial intelligence.
+The results of this review suggest recommendations for how this may be achieved.
+
+\newpage
+\FloatBarrier
+
+**Box 2**
+
+\begin{center}
+\fbox{\begin{varwidth}{\dimexpr\textwidth-2\fboxsep-2\fboxrule\relax}
+Summary of recommendations for future practice: 
+
+\begin{enumerate}
+  \item \textbf{\textit{Provide key details of your population.}}
+  Studies should report demographics (e.g. age and sex), source of data (country, hospital and ward), number of patients with and without the event of interest, and the number of observation sets with and without the event of interest.
+  \item \textbf{\textit{Use a large enough sample size.}}
+  The sample size should be sufficient to robustly answer the question. For model development studies a sample size calculation specific to the context should be used. For external validation studies should include at least 100 event patients.
+  \item \textbf{\textit{Describe the amount of missing data and use statistical methods to account for it.}}
+  Describe the frequency of missing data for each predictor and outcome. Consider multiple imputation as the best-practice approach for accounting for missing data in the analysis.
+  \item \textbf{\textit{Carefully consider outcome measures and time horizons.}}
+  Use an outcome measure that is clinically meaningful (i.e. one which can be prevented by appropriate treatment), and a time horizon in which deterioration can reasonably be expected to occur, and thus be predicted, which is probably a few days at most.
+  \item \textbf{\textit{Use best-practice statistical methods and report the full model.}}
+  If using a regression modelling approach to develop a new EWS studies should allow for non-linear predictor-outcome relationships (e.g. fractional polynomials), and avoid categorising predictors before analysis. Predictor interaction terms and competing risk approaches should be considered where appropriate. Newly developed models should always be fully described to allow independent evaluation and implementation.
+  \item \textbf{\textit{Always carry out internal validation of new models.}}
+  Internal validation is an important way of assessing how optimistic newly developed models may be. Split-sample validation should be avoided and bootstrapping should be used.
+  \item \textbf{\textit{Test all aspects of model performance.}}
+  Papers should assess both calibration and discrimination of EWSs. Researchers should consider reporting overall metrics such as $R^2$ and the Brier score, as well as decision curve analysis to evaluate clinical utility.
+\end{enumerate}
+\end{varwidth}}
+\end{center}
+
+
+### Recommendations for future research practice {#sec:ch3s25}
+
+*Describe the data*
+
+I found that data-sets were often not described in sufficient detail to understand in whom the model was intended for use or in whom the model was evaluated.
+These details are crucial when interpreting an article describing an EWS.
+The following critical factors should be reported for all studies:
+
+  * Number of patients with and without the event of interest.
+  * Whether multiple observation sets are used per patient. If so, the total number of observation sets with and without an associated event.
+  * Data source (e.g. country, hospital, and wards).
+  * Patient characteristics (e.g. age, sex, and admission method).
+
+*Use a sufficiently large sample size*
+
+Although many of the studies in the review used a large sample acquired from electronic health records, some used too small a sample.
+For example a quarter of model development studies had fewer than six events-per-variable at the patient level, and four at the observation level.
+A quarter of external validation studies included fewer than 460 patients, and a quarter of studies included fewer than 35 event patients.
+As the outcomes used in EWS studies are usually rare (~1-2%), and it is the number of events that is critical, large sample sizes are often necessary.
+Guidance suggests that external validation studies require a minimum of 100 event patients, and preferably more than 200[@Collins2016].
+With their low event rates, EWS studies therefore require data from many thousands of patients.
+Although defining the necessary sample size for model development studies is more complex, new guidance is available, which should be considered before embarking on new EWS studies[@Riley2019; @VanSmeden2019].
+
+*Account for missing data*
+
+Most of the included studies mentioned missing data (86% development studies and 75% validation studies).
+Although most of these studies used a complete-case analysis to deal with missing data.
+Data are usually not missing at random, but are using missing selectively, for example based on patient characteristics, or illness severity.
+Excluding records with incompletely observed predictor or outcome data can therefore cause serious bias[@Little1992; @Janssen2010], for example by inflating associations between predictors and outcomes.
+
+Every study should describe how missing data were handled (for example using complete-case analysis, single imputation, or multiple imputation).
+They should also describe the amount of missing data overall, and for each predictor variable, and outcome.
+Complete-case analyses should generally be avoided.
+Instead imputation approaches should be considered, where missing data are imputed based on other known information.
+These approaches are now easy to implement in all standard software packages.
+Multiple imputation is widely regarded as the preferred approach [@Ambler2007; @Little2002; @Vergouwe2010].
+This allows the uncertainty about missing data to be accounted for by creating multiple imputed data sets, then appropriately combining the results from each data-set.
+
+*Use appropriate outcome measures and time horizons*
+
+The included studies used a variety of outcome measures and time horizons to develop and validate EWSs.
+Both development and validation studies frequently used death and ICU admission, along with a variety of composite outcomes that included these outcomes.
+There is some debate about which outcome measure is most appropriate[@Churpek2013b].
+
+The review found that 39% of development studies and 52% of validation studies included a time horizon that was either in-hospital or 30 days.
+These long-term horizons will not lead to models that give early warning of deterioration[@Smith2014].
+Instead the resulting models will identify generally unwell patients who are more likely to die or be admitted to ICU.
+The time horizon should be limited to a few days at most, as any signs of deterioration linked to an observed outcome are not likely to be seen for longer than this.
+
+*Use best-practice statistical approaches and report the full model*
+
+Several of the articles reported regression modelling approaches that were methodologically weak.
+Non-linear relationships between predictors and outcomes were only included in 23% of development studies.
+However, this is an area of research where such relationships may readily exist.
+For example, both low and high respiratory rates can indicate increased risk.
+Similarly, interactions between predictors were only considered in 22% of studies.
+Models to predict the individual outcomes of ICU admission or cardiac arrest were relatively frequent, but few studies accounted for death as a competing risk (ICU admission or cardiac arrest not being possible if death has occurred).
+Failure to account for death as a competing risk may lead to a model which over-estimates risks[@Wolbers2009].
+Future work should consider accounting for competing risks in model development using Fine and Gray, cause-specific hazards, or absolute risk regression[@Gerds2012; @Wolbers2014a; @Austin2016; @Blanche2013], rather than logistic and Cox-proportional hazards regression models.
+External validation of such models should therefore also require accounting for the potential of competing risks[@Austin2016a; @Gerds2014].
+The review also found that the full models (all regression coefficients and either an intercept or baseline survival) were poorly reported, with only 39% of studies reporting sufficient information to allow independent validation or implementation.
+
+Future development studies should use best-practice statistical methods, including examining interactions, examining non-linear relationships, avoiding univariable selection methods, and reporting all regression modelling coefficients.
+The methods used should be fully described in the publication, following the recommendations laid out in the TRIPOD statement[@Collins2015].
+
+*Use internal validation for new models*
+
+The apparent performance of a newly developed model on its development data is likely to be optimistic, and better than it is when applied to external data.
+This optimism can be driven by a small sample size, many predictors, or categorization of continuous variables.
+Internal validation quantifies the optimism and adjusts the apparent performance, and can be used to shrink the regression coefficients[@Steyerberg2001; @Moons2015].
+Although many studies randomly split their data-set into two parts, one for model development and one for validation, this approach is weak and inefficient[@Steyerberg2001].
+The review found that 16 of the 34 included development studies internally validated their EWS.
+However, 11 used a split-sample approach.
+
+Cross-validation and bootstrapping are two preferred approaches for internal validation[@Harrell1996].
+They use the entire data set to both develop and validate the model.
+They also correct for overfitting in the model performance and provide a mechanism to shrink the regression coefficients to compensate for overfitting[@Steyerberg2004].
+
+New EWSs should be internally validated, using bootstrapping where possible.
+However it is clear that very large data-sets are becoming ever more present.
+In this context bootstrapping can be time consuming and arguably not required when large data sets are used, as overfitting in these instances is less likely.
+As an alternative a form of the split-sample approach can be carried out with large data-sets, where the data set is not split randomly, but according to time, location or centre[@Moons2014].
+Furthermore, if models are developed using large data-sets they also have the opportunity to examine performance in a variety of clinically relevant subgroups of the data, e.g. centre, hospital, or agegroup.
+If poor performance is identified in certain subgroups then the model may need to be updated to perform better in those subgroups.
+
+*Assess all aspects of model performance*
+
+As described in Section \@ref(sec:ch2s16) two key aspects characterise the performance of a prediction models, discrimination and calibration[@Collins2015; @VanCalster2016].
+Discrimination refers to a prediction model's ability to differentiate between those who develop an outcome and those who do not. 
+A model should predict higher risks for those who develop the outcome. 
+Calibration reflects the level of agreement between observed outcomes and the model predictions.
+In development studies the main emphasis will be on discrimination because the model will, by definition, be well-calibrated.
+However, in external validation studies, both discrimination and calibration are important.
+Most of the included studies assessed model performance using the c-index, as has been observed in other prediction model reviews[@Bouwmeester2012a; @Perel2006; @Meads2012].
+For example, although 82% of external validation articles reported a measure of discrimination, only 18% reported an assessment of calibration.
+those  that assessed calibration used weak methods that are not recommended.
+Only four articles (5%) presented the preferred approach to assess calibration, the calibration plot.
+
+Both discrimination and calibration should be assessed in external validation studies, in line with TRIPOD recommendations.
+Calibration should be assessed with a plot comparing predicted and observed risks, with a smoothed curve plotted using LOESS (locally estimated scatterplot smoothing) or similar methods such as fractional polynomials or restricted cubic splines[@Austin2014a].
+Other metrics of calibration such as the intercept and slope should also be reported[@Steyerberg2010].
+Many EWSs are currently based on an integer scoring system.
+For example, the National Early Warning Score ranges from 0 to 20 points.
+Calibration of an integer scoring system cannot be assessed as it relies on the model producing predicted probabilities.
+Overall performance measures, that combine discrimination and calibration, should also be considered, such as R^2^ and the Brier score[@Steyerberg2010].
+The more clinically meaningful decision curve analysis (or net benefit) approach is also recommended[@VanCalster2018].
+
+
+### Strengths and weaknesses of this study {#sec:ch3s26}
+
+#### Weaknesses {#sec:ch3s27}
+
+This review found 34 development studies, which is perhaps fewer than expected when compared to previous systematic reviews[@Smith2008c].
+Several existing EWSs were excluded because they have not been published in peer-reviewed academic journals.
+
+The eligibility criteria stated that external validation studies would only be included if the development study was also included.
+However I chose to make exceptions for studies describing external validations of Morgan's original EWS and Subbe's MEWS, due to their importance in the field.
+Otherwise this eligibility criterion excluded very few articles.
+
+#### Strengths {#sec:ch3s28}
+
+This is the first systematic review to formally assess the methodology and reporting standards in the EWS literature.
+It included a thorough assessment of all important aspects of development and validation, based on the CHARMS checklist[@Moons2014], and other important subject-specific items.
+Risk of bias was assessed using the PROBAST tool[@Wolff2019].
+
+
+## Conclusion {#sec:ch3s29}
+
+The review identified and included 95 articles developing or externally validating EWSs.
+There were many methodological and reporting shortcomings, which means that EWSs in common use may perform far more poorly than reported, with highly detrimental effects on patient care.
+The move towards electronic implementation of EWSs presents an opportunity to introduce better scoring systems, particularly with the increasing interest in modern model building approaches such as machine learning and artificial intelligence.
+However if methodological and reporting standards are not improved this potential may never be achieved.  
+
+There is much to be improved on and developed throughout the rest of this thesis.
+This review has shown that many 'standard' aspects of prediction modelling have been disregarded in much of the EWS literature, for example appropriately accounting for missing data, incorporating variable interactions and non-linearity, and carrying out internal validation.
+In the rest of this thesis I hope to show that it is possible to use 'best-practice' methods in EWS research, and the benefits this may offer.
+I also hope to dig much deeper into some of the complexities that have largely been ignored so far.
+For example, in the next chapter I will investigate how 'normal' vital sign measurements vary according to the age and sex of the patient.
+
+
+
+
+
+
+
+

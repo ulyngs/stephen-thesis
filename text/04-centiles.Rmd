@@ -1,0 +1,398 @@
+---
+output:
+  html_document: default
+  word_document: default
+  pdf_document: default
+bibliography: ../EWS papers.bib
+---
+
+```{block type='savequote', include=knitr::opts_knit$get('rmarkdown.pandoc.to') == 'latex', quote_author='(ref:bunuel-quote)'}
+
+Age is something that doesn't matter,\
+unless you are a cheese.
+
+<!-- ending a line with a lonely backslash inserts a linebreak -->
+```
+(ref:bunuel-quote) --- Luis Bunuel
+
+
+# Age-specific Vital Sign Centiles {#centiles}
+\minitoc <!-- this will include a mini table of contents-->
+
+\newpage
+## Introduction {#sec:ch4s1}
+
+The results from this chapter have been partially published in the following paper:
+
+\textcolor{brown}{Wong D, Gerry S, Shamout F, et al. Cross-sectional centiles of blood pressure by age and sex: a four-hospital database retrospective observational analysis \textit{BMJ Open} 2020;10:e033618.}
+
+The systematic review in Chapter \@ref(sr) showed that many Early warning scores have been derived over the last two decades.
+They are also very widely used, primarily in order to identify deteriorating patients on the hospital wards[@Subbe2001c; @Gerry2017].
+One of the purported benefits of scoring systems such as the National Early Warning Score (NEWS) is that it is a single scoring system that can be applied generally across all hospital patients, and indeed all hospitals[@McGinley2012a; @Inada-Kim2018].
+This simplicity could potentially lead to fewer errors in practice.
+However, one of the flaws in this argument is that there are likely to be sup-populations where the EWS does not work well.
+For a prediction model to work well for all patients it needs to be complex enough, and include enough predictors to account for the heterogeneity of different patient characteristics [@Riley2016; @Harrison2008].
+
+The usefulness of accounting for age in EWSs has been debated in the literature, and opinion is divided[@Smith2008d; @Churpek2015a].
+Few EWSs incorporate age, and when they do it tends to be as a single additional predictor[@Jarvis2015d].
+When only included as a single risk factor, this fails to allow for potential interaction effects, where the prognostic ability of vital signs may vary according to age.
+In their 2008 paper Smith and colleagues show that mortality is strongly related to age, based on a retrospective observational study[@Smith2008c].
+They also indicate that the predictive ability of both individual vital signs and the Modified Early Warning Score (MEWS), vary according to the age of the patient.
+They conclude by saying:
+
+> "Age has a significant impact on in-hospital mortality. Our data suggest that the inclusion of age as a component of these systems could be advantageous in improving their function."
+
+However, in their more recent work, Smith and colleagues do not include age in their models[@Prytherch2010a].
+One of the more recent papers the same group suggests that there is little use in accounting for age in EWSs[@Jarvis2015d].
+In their 2015 paper Churpek and colleagues find that MEWS is much better at discriminating risk of cardiac arrest in younger patients than in older patients[@Churpek2015a].
+They conclude that age-specific early warning scores may be beneficial.
+
+In addition to the effect that age may have on EWSs, there is also interest in simply understanding how vital signs change with age.
+Previous work, in non-hospital populations, has shown that the distribution of blood pressures vary considerably according to age and sex[@Franklin1997].
+However, little is known about the how the distributions of other vital signs may vary with age and sex.
+
+In this chapter I will describe the distribution of each vital sign according to patients' age and sex.
+This will be done by plotting and tabulating smoothed centiles over age, for each vital sign, separately for men and women.
+Results will potentially motivate further work into developing age-specific early warning scores.
+In addition it will be the first time that centiles for heart rate, respiratory rate, oxygen saturation and temperature according to age will be reported in any adult population.
+The data used to derive the centiles will represent the hospital patients in their most healthy state, which is assumed to be soon before discharge, for those who are not readmitted or those who die in hospital.
+
+## Methods {#sec:ch4s2}
+
+Data for this chapter was derived from the HAVEN database, as described in Section \@ref(sec:ch2s6).
+However this chapter only uses a subset of the data; first because the results were written up and published and therefore used an earlier cut of the data; and second because, as previously mentioned, the aim was to provide estimates for a 'healthy' population and therefore a variety of inclusion/exclusion criteria were applied.
+Data were collected from patients who attended the OUH between April 2015 and April 2017.
+All adult patients who were admitted to OUH and had at least one set of documented vital sign observations within 24 hours prior to discharge were eligible for inclusion. 
+Patients were excluded from the analysis if they (1): died in hospital, (2) had no recorded vital signs 24 hours prior to discharge, (3) were readmitted within a week of discharge, (4) had missing recordings for age or sex was unknown.
+The final recorded set of vital sign observations from a patient’s first attendance to the OUH Trust was collected during the study period.
+Vital signs were recorded as part of routine clinical care and electronically documented using the SEND e-Obs software[@Wong2015a].
+Hospital admission time, discharge time, discharge status, ethnicity, admission method and main specialty were also collected for each patient from the hospital electronic patient record.
+Admissions were classed as either elective, emergency or other (including maternity admissions), according to the admission method code.
+
+
+### Analysis {#sec:ch4s3}
+
+The characteristics of the study population were described using medians and quartiles for the continuous variables, and frequencies and percentages otherwise.
+The median and representative centiles (1st, 5th, 10th, 25th, 75th, 90th, 95th, 99th) were calculated for vital signs at all ages between 20 and 90 years, for males and females.
+The following vital signs were considered: systolic blood pressure (SBP), diastolic blood pressure (DBP), heart rate (HR), respiratory rate (RR), oxygen saturation (SpO2) and temperature.
+One further measure, the pulse pressure (PP) was derived as the arithmetic difference between SBP and DBP and was also analysed using the same methods. 
+
+Centiles were estimated using the Generalised Additive Models for Location, Scale and Shape framework (GAMLSS)[@Stasinopoulos2007].
+This semi-parametric method provides various options for fitting non-normal distributions to the data.
+To create smooth centiles across the age range, penalised splines and fractional polynomials were used as smoothing functions.
+For each vital sign, I assessed six different distributions within the GAMLSS framework: Box-Cox Cole and Green, Box-Cox Power Exponential, Box-Cox-t, Skew Power Exponential type 3, Skew t type 3, and Power Exponential.
+In addition, for SpO2, the Beta Inflated One Distribution was considered, since SpO2 is bounded between 0 and 100.
+The best fitting distribution was chosen based on a combination of model fit (Akaike information criterion and Bayesian information criterion)[@Akaike1974; @Schwarz1978] and a comparison of fitted versus empirical centiles.
+To ensure a fair comparison, the same distribution was chosen for all men and women within any given vital sign.
+The precision of the centiles were estimated via a bootstrapping procedure, whereby the data set was sampled with replacement to create a new data set and the analysis was repeated[@Bland2015].
+This was repeated 50 times.
+The standard deviation of those bootstrapped estimates was used to calculate the 95% confidence interval for each centile at two-yearly intervals.
+All analyses were undertaken using R and the GAMLSS package[@Stasinopoulos2007].
+
+## Results {#sec:ch4s4}
+
+In total, 83004 patients were admitted to the hospital trust between April 2015 and April 2017, and received at least one observation on the SEND e-Obs system.
+Patients were excluded due to death in hospital (1559), no recorded vital signs in the 24 hours prior to discharge (2567), re-admission within a week of discharge (2650), and unknown sex (1).
+In total, 76227 patients were included in the study cohort for whom at least one vital sign was observed.
+Data were missing for each vital sign as follows: SBP (719), DBP (885), PP (885), HR (1310), RR (3777), SpO2 (1585) and Temperature (7500).
+Missing data were not imputed for the analyses in this chapter since the focus was on a descriptive analysis, and the amount of missing data were relatively small.
+Patient and hospital admission characteristics are shown in Table \@ref(tab:baseline).
+
+
+```{r echo=FALSE, message=FALSE, warning=FALSE}
+base = read.csv("C:/Users/stephen.gerry/Dropbox/Steve work/VM/baseline1.csv", header = TRUE)
+
+base <- base[-c(24:25),]
+
+library(kableExtra)
+
+kable(base, "latex", caption = "(\\#tab:baseline) Baseline characteristics", booktabs = T, col.names = c("","Female","Male","Total")) %>%
+kableExtra::group_rows("Patient Characteristics", 2, 17, hline_before = T, latex_align = "c") %>%
+  kableExtra::group_rows(group_label = "Ethnicity", start_row = 2, end_row = 7, bold = F, hline_before = T) %>%
+  kableExtra::group_rows("Age", 8, 16, bold = F) %>%
+kableExtra::group_rows("Admission Characteristics", 18, 23, hline_before = T, latex_align = "c") %>%
+  kableExtra::group_rows("Main Specialty", 18, 20, bold = F, hline_before = T) %>%
+  kableExtra::group_rows("Admission Method", 21, 23, bold = F) %>%
+  row_spec(0, bold = T) %>%
+kable_styling(latex_options = c("hold_position","scale_down"))
+
+```
+
+
+For the majority of vital signs (SBP, HR, RR and SpO2) the best fitting distribution was the four-parameter Box-Cox T Distribution[@Stasinopoulos2007].
+In the case of SpO2 the Beta Inflated One Distribution gave the best fit[@Ospina2010], which is a three parameter distribution.
+For DBP and PP the Skew T Distribution Type 3 was used, which is a four parameter distribution.
+Penalised-splines were used as a smoother function for all vital signs, with the exception of DBP, where fractional polynomial smoothers were used due to a poor fit with penalised-splines.
+
+\FloatBarrier
+### Systolic Blood Pressure {#sec:ch4s5}
+
+Centiles of SBP over age and sex are shown in figure \ref{fig:sbp}, and tabulated in Tables \@ref(tab:SBPm) and \@ref(tab:SBPf).
+SBP increases steadily for both men and women.
+For men the average SBP rose from 122 (IQR: 114 - 130) mmHg at 20 years old to 132 (IQR: 118 - 147) mmHg at 90 years old.
+For women the average SBP was 114 (IQR: 106 - 122) mmHg at 20 years, rising to 135 (IQR: 121 - 151) mmHg at 90 years old.
+The variation in SBP increases as patients get older.
+
+
+```{r sbp, echo=FALSE, fig.cap='Age-specific centiles for systolic blood pressure', message=FALSE, warning=FALSE, fig.width=6, out.extra = ''}
+library(ggplot2)
+library(gridExtra)
+library(cowplot)
+
+load(file="C:/Users/stephen.gerry/Dropbox/Steve work/VM/Precursor/SBP_plots.RData")
+
+grid.arrange(sbp_m, sbp_f, ncol = 2)
+
+```
+
+\FloatBarrier
+### Diastolic Blood Pressure {#sec:ch4s6}
+
+Centiles of DBP over age and sex are shown in figure \ref{fig:dbp}, and tabulated in Tables \@ref(tab:DBPm) and \@ref(tab:DBPf).
+The distribution of DBP also varies according to age and sex, although in a different way to SBP.
+For both men and women there is a U-shape relationship, where average DBP is lowest at the extremes, and highest in the middle years.
+Men have their lowest DBP aged 20 (66 (IQR: 60 - 72) mmHg), and highest aged 50 (76 (IQR: 68 - 84) mmHg).
+Women also have their lowest DBP aged 20 (65 (IQR: 59 - 72) mmHg), and highest aged 52 (69 (IQR: 62 - 78) mmHg).
+Variability in centiles remains much the same over patient age and sex.
+
+
+```{r dbp, echo=FALSE, fig.cap='Age-specific centiles for diastolic blood pressure', message=FALSE, warning=FALSE, fig.width=6, out.extra = ''}
+library(ggplot2)
+library(gridExtra)
+library(cowplot)
+
+load(file="C:/Users/stephen.gerry/Dropbox/Steve work/VM/Precursor/DBP_plots.RData")
+
+grid.arrange(dbp_m, dbp_f, ncol = 2)
+
+```
+
+
+\FloatBarrier
+### Pulse Pressure {#sec:ch4s7}
+
+Centiles of PP over age and sex are shown in figure \ref{fig:pp}, and tabulated in Tables \@ref(tab:PPm) and \@ref(tab:PPf).
+A similar pattern is observed for both men and women.
+PP remains similar from ages 20 to 40 years, and then steadily rises until 70 years, before plateauing again.
+Men have their lowest PP aged 44 years (49 (IQR: 43 - 67) mmHg), and highest aged 90 years (63 (IQR: 51 - 76) mmHg).
+Women have their lowest PP aged 30 years (47 (IQR: 41 - 53) mmHg), and highest aged 90 years (66 (IQ: 54 - 80) mmHg).
+Variation in PP increases with age for both men and women.
+
+
+```{r pp, echo=FALSE, fig.cap='Age-specific centiles for pulse pressure', message=FALSE, warning=FALSE, fig.width=6, out.extra = ''}
+library(ggplot2)
+library(gridExtra)
+library(cowplot)
+
+load(file="C:/Users/stephen.gerry/Dropbox/Steve work/VM/Precursor/PP_plots.RData")
+
+grid.arrange(pp_m, pp_f, ncol = 2)
+
+```
+
+
+\FloatBarrier
+### Heart Rate {#sec:ch4s8}
+
+Centiles of HR over age and sex are shown in figure \ref{fig:hr}, and tabulated in Tables \@ref(tab:HRm) and \@ref(tab:HRf).
+There is little change in the average HR over age or sex.
+HR is slightly higher for women at all ages.
+For both men and women there is a slight decline from age 20 to 90 years: from 75 (IQR: 66 - 86) BPM to 73 (IQR: 64 - 82) BPM for men, and 80 (IQR: 71 - 90) BPM to 76 (IQR: 68 - 86) BPM for women.
+
+```{r hr, echo=FALSE, fig.cap='Age-specific centiles for heart rate', message=FALSE, warning=FALSE, fig.width=6, out.extra = ''}
+library(ggplot2)
+library(gridExtra)
+library(cowplot)
+
+load(file="C:/Users/stephen.gerry/Dropbox/Steve work/VM/Precursor/HR_plots.RData")
+
+grid.arrange(hr_m, hr_f, ncol = 2)
+
+```
+
+
+\FloatBarrier
+### Respiratory Rate {#sec:ch4s9}
+
+Centiles of RR over age and sex are shown in figure \ref{fig:rr}, and tabulated in Tables \@ref(tab:RRm) and \@ref(tab:RRf).
+Men and women follow a very similar pattern, which is a small increase in RR with age, but no change in variability.
+Men have an average RR of 16 (IQR: 16 - 17) BPM at 20 years, and 17 (IQR: 16 - 18) BPM at 90 years.
+Whilst women have an average RR of 17 (IQR: 16 - 17) BPM at 20 years, and 17 (IQR: 16 - 18) BPM at 90 years.
+
+
+```{r rr, echo=FALSE, fig.cap='Age-specific centiles for respiratory rate', message=FALSE, warning=FALSE, fig.width=6, out.extra = ''}
+library(ggplot2)
+library(gridExtra)
+library(cowplot)
+
+load(file="C:/Users/stephen.gerry/Dropbox/Steve work/VM/Precursor/RR_plots.RData")
+
+grid.arrange(rr_m, rr_f, ncol = 2)
+
+```
+
+
+\FloatBarrier
+### Oxygen Saturation {#sec:ch4s10}
+
+Centiles of SpO2 over age and sex are shown in figure \ref{fig:spo2}, and tabulated in Tables \@ref(tab:SPO2m) and \@ref(tab:SPO2f).
+There is a similar pattern for men and women, which is a decline and increase in variability with age.
+For men and women the average SpO2 at 20 years is 98 (IQR: 97 - 99) %, whereas by 90 years this has dropped to 96 (IQR: 95 - 98) %.
+
+
+```{r spo2, echo=FALSE, fig.cap='Age-specific centiles for oxygen saturation (SpO2)', message=FALSE, warning=FALSE, fig.width=6, out.extra = ''}
+library(ggplot2)
+library(gridExtra)
+library(cowplot)
+
+load(file="C:/Users/stephen.gerry/Dropbox/Steve work/VM/Precursor/SpO2_plots.RData")
+
+grid.arrange(spo2_m, spo2_f, ncol = 2)
+
+```
+
+\FloatBarrier
+### Temperature {#sec:ch4s11}
+
+Centiles of temperature over age and sex are shown in figure \ref{fig:temp}, and tabulated in Tables \@ref(tab:Tempm) and \@ref(tab:Tempf).
+There is very little change in temperature with age, and variability remains constant as well.
+Women have a higher temperature than men at all ages, but the magnitude is small (< 0.2$^\circ$).
+
+
+```{r temp, echo=FALSE, fig.cap='Age-specific centiles for temperature', message=FALSE, warning=FALSE, fig.width=6, out.extra = ''}
+library(ggplot2)
+library(gridExtra)
+library(cowplot)
+
+load(file="C:/Users/stephen.gerry/Dropbox/Steve work/VM/Precursor/Temp_plots.RData")
+
+grid.arrange(temp_m, temp_f, ncol = 2)
+
+```
+
+\FloatBarrier
+## Discussion
+
+### Summary of results {#sec:ch4s12}
+
+These results show clear changes in "normal" vital sign distributions according to age, and to a lesser extent, according to sex.
+The most striking relationships are seen in SBP, DBP, PP and SpO2.
+
+There was a clear trend of increasing SBP with age, for men and women.
+The average blood pressure increased by 10 mmHg for men and 22 mmHg for women, from 20 to 90 years.
+Variability in SBP also increased considerably with age.
+There was a U-shaped relationship between age and DBP, with a peak at around 50 years of age for both men and women.
+The magnitude of change was greater for men.
+Some suggest that pulse pressure is a good marker of heart health, where higher values indicate poorer health [@Wilkinson2000].
+This is put down to a stiffening of the large arteries due to cholesterol deposits.
+If this is to be believed, then we see a worsening with age from around 50 years onwards, for men and women.
+Average SpO2 became lower and had greater variability with age.
+The average reduction from 20 to 90 years was 2% for both men and women.
+
+There was weaker evidence for differences in "normal" vital signs between men and women.
+The main differences occurred in SBP and DBP, where different patterns with age were observed.
+However pulse pressure, which is the difference of the two, has a very similar age-related pattern.
+It seems that the differences in SBP and DBP patterns for men and women seem to "balance" each other out, i.e. there were greater changes in SBP for women, but greater changes in DBP for men.
+Differences were also observed between men and women for HR and temperature, but these were of a small magnitude.
+In both cases, the age-related patterns were similar, however women had higher values on average.
+
+  
+### Implications for Early Warning Scores {#sec:ch4s14}
+  
+Based on these results there are some implications for the use and development of early warning scores.
+For instance, see figure \ref{fig:sbpews} where the thresholds of the National Early Warning Score (NEWS) have been overlaid on the SBP centiles.
+Using NEWS, over 25% of (healthy) women aged 30 would score at least one point for hypotension.
+However, in comparison, only 10% of women aged 70 would score any points.
+It seems unlikely that younger women are at greater risk of deterioration.
+Therefore this is likely to have arisen because NEWS and many other EWSs are developed using data sets that disproportionately consist of elderly patients.
+Note that NEWS also scores three points for hypertension (> 220 mmHg).
+Based on the results presented here it is much more likely that elderly men and women will trigger this threshold compared to the younger patients.
+
+```{r sbpews, echo=FALSE, fig.cap='Age-specific centiles for systolic blood pressure with NEWS thresholds overlaid', message=FALSE, warning=FALSE, fig.width=6, out.extra = ''}
+library(ggplot2)
+library(gridExtra)
+library(cowplot)
+
+load(file="C:/Users/stephen.gerry/Dropbox/Steve work/VM/Precursor/SBP_plots.RData")
+
+grid.arrange(sbp_m + geom_hline(yintercept=90, linetype="dashed", color = "blue", size = 1)
+              + geom_hline(yintercept=100, linetype="dashed", color = "blue", size = 1)
+              + geom_hline(yintercept=110, linetype="dashed", color = "blue", size = 1)
+              + geom_hline(yintercept=220, linetype="dashed", color = "blue", size = 1), 
+             sbp_f + geom_hline(yintercept=90, linetype="dashed", color = "blue", size = 1)
+              + geom_hline(yintercept=100, linetype="dashed", color = "blue", size = 1)
+              + geom_hline(yintercept=110, linetype="dashed", color = "blue", size = 1)
+              + geom_hline(yintercept=220, linetype="dashed", color = "blue", size = 1), ncol = 2)
+
+```
+
+There was also a fairly strong age effect observed with SpO2.
+In this case, as shown in figure \ref{fig:spo2ews}, the opposite effect to SBP it true - that the elderly are much more likely to cross a NEWS scoring threshold than the younger.
+This time less than 5% of "healthy" 30 year olds would score at least one point, whilst around 25% of 70 year olds would score.
+Perhaps this could be reconciled by the fact that older patients are more likely to deteriorate in hospital.
+However the other vital signs, aside from blood pressures and SpO2, show fairly little age effect.
+Therefore it is more likely that scoring systems like NEWS are failing to fully account for age-relationships with certain vital signs.
+It seems quite likely that false alerts for low blood pressure are going to be common in younger patients who are actually healthy.
+Whilst false alerts may be common in healthy older patients with a moderately low SpO2.
+These results also suggest that that young patients with potentially dangerous hypertension or hypoxemia may fail to trigger based on NEWS.
+
+```{r spo2ews, echo=FALSE, fig.cap='Age-specific centiles for oxygen saturation (SpO2) with NEWS thresholds overlaid', message=FALSE, warning=FALSE, fig.width=6, out.extra = ''}
+library(ggplot2)
+library(gridExtra)
+library(cowplot)
+
+load(file="C:/Users/stephen.gerry/Dropbox/Steve work/VM/Precursor/SpO2_plots.RData")
+
+grid.arrange(spo2_m + geom_hline(yintercept=95, linetype="dashed", color = "blue", size = 1)
+              + geom_hline(yintercept=93, linetype="dashed", color = "blue", size = 1)
+              + geom_hline(yintercept=91, linetype="dashed", color = "blue", size = 1),
+             spo2_f + geom_hline(yintercept=95, linetype="dashed", color = "blue", size = 1)
+              + geom_hline(yintercept=93, linetype="dashed", color = "blue", size = 1)
+              + geom_hline(yintercept=91, linetype="dashed", color = "blue", size = 1), ncol = 2)
+
+```
+
+It is clear that the majority of vital signs vary depending on age and sex, to varying degrees of magnitude.
+However, this should not be taken as proof that age-specific, or age-varying, EWSs would necessarily improve predictive performance.
+Since it is not known, based on this data, whether the prognostic usefulness of vital signs vary by age.
+Nonetheless it is compelling evidence that there may be benefits in pursuing an age-related EWS.
+  
+### Strengths and Limitations {#sec:ch4s15}
+
+This is the first time that vital sign centiles according to age and sex have been developed for patients attending hospital.
+Furthermore, it is the first ever time that centiles have ever been presented for HR, RR, SpO2 and temperature in any adult population.
+Only the final vital sign set before discharge from each patient’s initial encounter was used to generate the centiles.
+This ensured that the centiles were not biased towards repeat attenders or patients with longer hospital stays. 
+The use of the final set of vital signs ensured that the resulting centiles represented the stable hospital population.
+
+Vital signs were recorded as part of standard clinical practice, so that conditions for data recording were not controlled.
+This may have a direct impact on the measured values.
+For instance, the state of wakefulness of the patient, which is known to be associated with blood pressure and pulse rate, was unknown[@Mancia1983].
+However, there is no reason to suspect that these effects would vary by age or sex.
+
+The data set was collected from all four hospitals within the OUH Trust.
+Whilst this is a good representation of the local area, there were perhaps a slightly higher proportions of white Caucasian patients than the national population.
+Previous studies have shown a correlation between ethnicity and differences in blood pressure trajectory[@Agyemang2012].
+
+In addition to age I could have also chosen to investigate the impact of other patient characteristics on vital signs, such as their ethnicity, comorbidities, and reason for hospital admission.
+Whilst these would have been interesting, the size of the dataset meant that many of these analyses would have given imprecise estimates.
+Furthermore, whilst the age and sex of a patient may be used in clinical practice to calculate more sophisticated EWSs, this would be difficult for the majority of other patient characteristics, as they are not reliably recorded, or are recorded after a patient is discharged. 
+
+This study uses a cross-sectional cohort and therefore the derived centiles may be affected by survival bias and birth cohort effects[@DelgadoRodriguez2004; @Keyes2010].
+Furthermore there are likely to be different causes for admission to hospital at different ages, which may affect vital signs.
+While the influence of these effects cannot be determined, note that the results presented here for blood pressure are very similar to those previously seen for longitudinal data in healthy populations[@Wills2011].
+  
+## Conclusion {#sec:ch4s16}
+
+There is evidence that "normal" vital signs vary according to age and sex.
+The largest differences were in SBP, DBP, PP and SpO2.
+This motivates further work to assess the potential for accounting for age and sex in EWSs.
+I will explore this idea further in Chapter \@ref(validation) where I will examine the predictive accuracy of NEWS according to the age of the patient, and chapter \@ref(ageews) where I will examine whether including age in a new EWS improves predictive accuracy.
+
+
+
+
+
+
+
+

@@ -1,0 +1,18 @@
+I would firstly like to thank each of my supervisors, Gary, Jackie, Tim, and Pete.
+It has been a privilege and a pleasure to work with each of you.
+You have all been generous with your time, and have given great insight and support throughout the last four years.
+And thank you for your patience as I struggle to arrange meetings in a timely fashion!
+
+I would also like to thank the National Institute for Health Research (NIHR), who gave me the opportunity to carry out this DPhil research.
+I simply wouldn't have had the opportunity without their generous funding.
+
+Thank you to Marco Pimentel, Ollie Redfern and Rob Hatch for their help in giving access to and understanding of the HAVEN data set.
+You have all been very helpful.
+
+Thank you to Ulrik Lyngs who developed the 'Oxforddown' R package (https://github.com/ulyngs/oxforddown) which has been really helpful in allowing me to put this thesis together.
+
+Thanks to Lindy Castell, at Green Templeton College, who has been a great advisor and friend.
+
+Finally, thank you to my family and friends who have supported me throughout this thesis.
+You have all been a real encouragement, and even pretended to understand as I badly explained what I was working on.
+Special thanks to Helen, Lydia, and Naomi, who have put up with me 'checking the simulations' at all hours, and writing strange calculations on the back of any spare piece of paper, and have been a very loving and supportive family.

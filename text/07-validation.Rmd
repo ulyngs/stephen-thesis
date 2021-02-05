@@ -1,0 +1,806 @@
+---
+output:
+  pdf_document: default
+  word_document: default
+  html_document: default
+bibliography: ../EWS papers.bib
+---
+
+```{block type='savequote', include=knitr::opts_knit$get('rmarkdown.pandoc.to') == 'latex', quote_author='(ref:rowling-quote)'}
+
+Time to test our talents in the real world, d'you reckon?
+
+<!-- ending a line with a lonely backslash inserts a linebreak -->
+```
+(ref:rowling-quote) --- J.K. Rowling
+
+# External Validation of the National Early Warning Score in Subgroups {#validation}
+\minitoc <!-- this will include a mini table of contents-->
+
+\newpage
+## Introduction {#sec:ch7s1}
+
+External validation of prediction models is an important step to show that the models are generalisable and will work well in real world settings[@Collins2015].
+There are many published external validation studies of early warning scores in the literature, as seen in the systematic review in Chapter \@ref(sr).
+However there are many flaws in how these studies were conducted, as has been shown in many other clinical settings[@Damen2016; @Bouwmeester2012].
+Often the studies were too small, and in particular included too few patients with events (such as death or ICU admission)[@Fang2020a].
+Validation studies based on small sample sizes can lead to inaccurate and unreliable assessments of model performance, including important metrics such as discrimination and calibration[@Collins2016].
+On the other hand, large data sets are increasingly becoming available through electronic health records, and this offers a great opportunity for research[@Riley2016].
+These type of data sets are increasingly being using for EWS research, however in these cases the performance metrics are often reported only for the overall population.
+Yet, it is likely that there is significant heterogeneity in performance across different hospital populations.
+Failing to assess whether heterogeneity exists may lead to false assurances of the usefulness of a model when it is subsequently implemented.
+
+The National Early Warning Score is currently seen as the 'gold standard' EWS[@McGinley2012a].
+External validation studies have shown that NEWS performs better than most other EWSs in terms of discrimination, and this  has led to the NEWS being implemented on a wide scale in the UK[@Smith2013e].
+This implementation of NEWS has been strongly encouraged by NHS England[@NHS2017].
+Whilst NEWS may work well on a population level, i.e. an analysis which includes all hospital inpatients, or a broad range of different patients populations, little thought has been given to whether it works well in all patient populations.
+There are some examples of external validation studies that only include patients of a particular type, for example surgical[@Bartkowiak2019; @GardnerThorpe2006a], pneumonia[@Brabrand2018], elderly[@Cei2009a], oncology[@Cooksley2012a], chronic hypoxaemia[@Eccles2014a], respiratory disease[@Forster2018], pancreatitis[@Garcea2006], COPD[@Hodgson2017], and liver disease[@Hydes2018].
+These studies are useful, however due to the heterogeneity of methods used to assess model performance, and the fact that these studies do not normally provide a comparison to other hospital populations, means that it is unclear whether the performance is good or not.
+Several recent papers in the prediction modelling literature have called for a much more detailed assessment of model performance, which in particular investigates predictive performance in sub-populations as well as the whole population[@Riley2016; @Debray2018; @Wynants2018].
+Once populations with poor predictive performance have been identified, there are a variety of possible options to improve the performance such as: re-calibration, refitting the model coefficients, or even developing a totally new model.
+With big data sets it is also possible to use meta-regression approaches.
+This will potentially identify variables that are not sufficiently well accounted for in the prediction model.
+Once such variables have been identified they could be included in future models, used to update the existing model, or lead to the development of models tailored for a particular population.
+
+In this chapter I aim to provide a detailed examination of the performance of NEWS, by looking at the predictive performance in a variety of populations.
+I will look at populations defined according to the age and sex of the patient, the consultant treatment code to which they were admitted, and the ward on which their observations were taken.
+Performance will be primarily described using the c-index which assesses model discrimination, but also by using more descriptive methods such as plotting the distributions of the NEWS, and plotting the risks associated with NEWS scores.
+The goal is to identify the populations where better or different models are needed, and potentially identify factors that may help do this.
+These findings will be used when I develop my own models in Chapter \@ref(ageews).
+
+
+## Methods {#sec:ch7s2}
+
+This analyses in this chapter are carried out on the HAVEN data mentioned in Section \@ref(sec:ch2s6).
+All hospital admissions with at least one observation set were included.
+Multiple observation sets were included per patient according to the results of the previous chapter, i.e. approach 1 (see Section \@ref(sec:ch6s4)).
+
+The outcome measures were death, ICU admission, and a composite of the two (see Section \@ref(sec:ch2s4b)).
+These were all assessed using a time horizon of 48 hours from the observation set.
+Death may be considered as a competing risk for ICU admission, i.e. a patient cannot be admitted to ICU if they have already died.
+Therefore two analyses were carried out for the ICU outcome, one accounting for the competing risk and the other ignoring the competing event, i.e. censoring at death.
+The competing risk c-indices were calculated using the methods of Blanche et al[@Blanche2013].
+
+The prediction model of interest was the National Early Warning Score (NEWS) which was calculated for each observation set.
+The predictive performance of NEWS was assessed by three different grouping methods, according to the patient’s age at admission, the ward on which the observation set was recorded, and the treatment function code of the treating consultant.
+Age groups were defined by decades, with the exception of those less than or equal to 30 being condensed into one category, and similarly those greater than 90 condensed into another.
+Hospital ward was defined as the ward where each set of vital sign observations was recorded.
+Therefore some of the hospital admissions will include observation sets that are assigned to different wards.
+The treatment function groups were defined according to the NHS definitions which are aligned with the royal college definitions of different specialties (https://datadictionary.nhs.uk/attributes/treatment_function_code.html).
+Note that these codes were updated in April 2020, and I have used the older version of the codes.
+Each patient is assigned to one treatment code at the point of admission. 
+
+Multiple imputation was used to impute missing vital signs values within an observation set, as described in Section \@ref(sec:ch2s15).
+Performance metrics and summary statistics were calculated for each data set, and pooled using Rubin’s Rule[@Rubin1987].
+The c-index was pooled on a logit scale in order to maintain the zero to one bounds.
+
+The c-index was used to assess the discrimination of NEWS overall, and within each subgroup of interest.
+These results were graphically presented using forest plots.
+In order to examine whether any variables may explain potential heterogeneity between groups meta-regression methods were used.
+For each group the average of the variable of interest was calculated, and these values were entered into a random-effects model, where each group was weighted according to the number of events[@Pennells2014], and the logit c-index was the outcome.
+Additionally, for each group, the distribution of the NEWS was plotted separately according to whether or not the event of interest occurred within 48 hours.
+For this purpose a single imputed data set was used, instead of multiple imputation.
+Again within groups, the risk of each event was plotted against the NEWS.
+This is similar to a calibration plot, except that NEWS does not give a predicted risk, but instead an integer between 0 and 21. Finally, to check its consistency, the c-index was plotted for each subgroup over the entire 48 hour time frame. 
+
+
+## Results {#sec:ch7s3}
+
+The population has already been described in Section \@ref(sec:ch2s6).
+In total 1065 admissions included an ICU admission, 3392 ended in death, and either death or ICU admission occurred in 4332. 
+
+### Overall Discrimination Performance of NEWS {#sec:ch7s4}
+
+When including the whole population the c-index for NEWS was 0.84 when predicting 48 hour ICU admission, 0.89 for 48 hour death, and 0.87 for 48 death of ICU admission.
+In the analyses that follow the stated overall performance may vary, since some groups were excluded due to too few events (less than 100 composite events, i.e. death or ICU admission).
+The observations from these groups were also excluded from the overall assessment, in order to make a more fair comparison.
+
+In all of the analyses the competing risk version of the ICU admission c-index was identical to the version that did not account for the competing risk (of death).
+This is to be expected, since the benefit of a competing risk approach is usually related to accuracy of risk predictions rather than discrimination[@Wolbers2009].
+Therefore I will not present both sets of results here, as they are identical.
+
+### Grouped According to treatment code {#sec:ch7s5}
+
+There are 25 treatment groups in which the sample size is sufficient to assess the performance of NEWS (i.e. there were at least 100 observations within 48 hours of a composite outcome).
+The largest group is general medicine, which includes 1231235 observations.
+Trauma and orthopaedics (n=624967), and general surgery (n=276874) were other large groups.
+Most ICU admissions (n=4261) and deaths (n=20853) were from the general medicine group.
+
+Figure \ref{fig:p1} shows the c-index of NEWS for predicting 48 hour ICU admission according to treatment code.
+Treatment code groups are ordered worst to best.
+The model shows worst performance in the ENT group, albeit with a wide confidence interval (0.62 (0.50, 0.72)).
+The performance in the vascular surgery group is notably poor (0.69 (0.66, 0.72)) compared to other treatment groups.
+Performance in best in the cardiology (0.90 (0.89, 0.92)) and cardiac surgery groups (0.96 (0.94, 0.97)).
+The groups where a large number of events occur, such as general medicine and general surgery, have performance very similar to the overall average.
+
+
+```{r p1, echo=FALSE, fig.cap="Forest Plot for 48hr ICU admission c-index by treatment code", fig.width=6, message=FALSE, warning=FALSE, out.extra=''}
+
+library(RMySQL)
+library(chron)
+library(rmarkdown)
+library(ggplot2)
+library(plyr)
+library(chron)
+library(gamlss)
+library(gridExtra)
+library(cowplot)
+library(Amelia)
+library(data.table)
+library(pROC)
+library(timeROC)
+library(survival)
+library(ggjoy)
+library(ggplot2)
+library(dplyr)
+library(pROC)
+library(cowplot)
+library(metafor)
+library(timeROC)
+library(survival)
+library(data.table)
+library(boot)
+library(tidyr)
+
+
+load(file="C:/Users/stephen.gerry/Dropbox/Steve work/VM/treat_plots.RData")
+
+load(file="C:/Users/stephen.gerry/Dropbox/Steve work/VM/ward_plots.RData")
+
+load(file="C:/Users/stephen.gerry/Dropbox/Steve work/VM/age_plots.RData")
+
+load(file="C:/Users/stephen.gerry/Dropbox/Steve work/VM/sex_plots.RData")
+
+forest1
+
+```
+
+The c-indices for 48 hour death are shown in figure \ref{fig:p2}, again ordered worst to best.
+Strikingly, the two treatment groups that had the best performance in identifying ICU admissions (cardiology and cardiac surgery) have the worst performance in identifying deaths.
+Performance is also poor in the urology and hepatology groups.
+The best performance was in the blood and marrow transplantation, and infectious disease groups.
+Again, the groups with large numbers of events have performance close to  the overall performance.
+
+```{r p2, echo=FALSE, fig.cap="Forest Plot for 48hr death c-index by treatment code", fig.width=6, message=FALSE, warning=FALSE, out.extra=''}
+
+forest4
+
+```
+
+As may be expected the performance of NEWS to predict the composite outcome in the different treatment groups (figure \ref{fig:p3}) is roughly an average of the performance in predicting the two separate components.
+There is notably a clustering of three surgical treatment groups with the worst performance: vascular surgery (0.81 (0.79, 0.82)); transplantation surgery (0.81 (0.79, 0.83)); and hepatobiliary & pancreatic surgery (0.82 (0.80, 0.83)).
+There is also poor performance in a number of other treatment groups: cardiology, urology, cardiac surgery, ENT, and hepatology.
+Other treatment groups have performance relatively close to the overall performance, with the exception of good performance for infectious diseases (0.91 (0.88, 0.93)), and blood and marrow transplantation (0.91 (0.90, 0.93)).
+
+
+```{r p3, echo=FALSE, fig.cap="Forest Plot for 48hr ICU admission and death composite c-index by treatment code", fig.width=6, message=FALSE, warning=FALSE, out.extra=''}
+
+forest3
+
+```
+
+Figure \ref{fig:p4} shows the distribution of NEWS scores by treatment group, separately according to whether or not the patient was admitted to ICU within 48 hours.
+The red curve represents the non-event observations, and the blue curve represents the event observations.
+The treatment groups are ordered according to the c-index (worst to best), the same as in figure \ref{fig:p1}.
+The degree of separation of the two curves shows how well the NEWS score discriminates between events and non-events.
+For example it is clear that the performance in the ENT group is poor since the two curves are almost completely overlapping.
+Notice that the distribution of NEWS scores in the non-event observations is very similar across all treatment groups, with a few exceptions - hepatobiliary & pancreatic surgery, upper gastrointestinal surgery, and respiratory medicine.
+In each of these groups the curve is shifted towards higher NEWS scores.
+This may represent a sicker population, or may simply be an increase in false alerts.
+From top to bottom there is a noticeable shift in distribution of the NEWS scores in the event population.
+
+
+```{r p4, echo=FALSE, fig.cap="Distribution of NEWS according to 48hr ICU admission outcome by treatment code", fig.width=6, fig.height=9, message=FALSE, warning=FALSE, out.extra=''}
+
+joy1
+
+```
+
+Figure \ref{fig:p5} shows the same type of plot as before, this time for the 48 hour death outcome.
+Again, the non-event distributions are very similar in shame, with the exception of the same three groups as before (hepatobiliary & pancreatic surgery, upper gastrointestinal surgery, and respiratory medicine).
+
+
+```{r p5, echo=FALSE, fig.cap="Distribution of NEWS according to 48hr death outcome by treatment code", fig.width=6, fig.height=9, message=FALSE, warning=FALSE, out.extra=''}
+
+joy3
+
+```
+
+A similar pattern emerges in figure \ref{fig:p6} when considering the composite outcome.
+
+
+```{r p6, echo=FALSE, fig.cap="Distribution of NEWS according to 48hr ICU admission and death composite outcome by treatment code", fig.width=6, fig.height=9, message=FALSE, warning=FALSE, out.extra=''}
+
+joy4
+
+
+```
+
+\newpage
+
+Figure \ref{fig:p7} includes a panel for each of the three outcomes (ICU admission, then death, and then the composite).
+In each plot the NEWS score is on the x-axis, and the percentage risk of the event is on the y-axis.
+Each treatment group has a separate line, and the overall population is represented by the thick black line.
+The distribution of risks clearly varies considerably by treatment group.
+For example, considering the composite outcome, for a NEWS score of five the associated risk ranges from 1% to 7%.
+Similarly for a NEWS score of 10, the associated risk can range from 6% to more than 20%, depending on the treatment group.
+Although not exactly a calibration plot, since NEWS scores do not refer to predicted risks, this is similar to saying that the NEWS score is poorly calibrated to the different treatment groups.
+
+Figure \ref{fig:p8} also has a panel for each of the outcomes (ICU admission, then death, and then the composite).
+It shows time-to-event on the x-axis (the event occurs at zero), and the c-index on the y-axis.
+Again there are separate lines for each treatment group, and the thick black line represents the overall population.
+As would be expected the predictive performance deteriorates as time-to-event increases.
+The curves of each of the treatment groups lie relatively parallel to each other, indicating that the time-frame chosen (48 hours) to assess performance does not have a big impact on the conclusions, since the ranking of treatment groups at other time points is similar.
+
+The following plots in figures \ref{fig:p9} to \ref{fig:p17} show the results of univariable meta-regression analyses attempting to explain some of the heterogeneity between treatment groups.
+For each treatment group the average of the variable of interest is plotted against the c-index.
+The size of the circle represents the number of events.
+The meta regression line is shown in red, where a deflection from horizontal may reflect some explained heterogeneity.
+
+There is some indication in figure \ref{fig:p9} that differences in systolic blood pressure may explain some of the heterogeneity, although not significantly for any of the outcomes.
+It appears that treatment groups with higher SBP have worse performance than those with lower SBP.
+
+There also appears to be a possible relationship with heart rate and performance (\ref{fig:p11}).
+Lower HRs are associated with worse performance, but again not significantly so.
+
+The other variables studied show little relationship to the c-index.
+
+\blandscape
+\FloatBarrier
+
+```{r p7, echo=FALSE, fig.cap="Percentage risk of outcome according to NEWS by treatment code", fig.width=9, fig.height=6, message=FALSE, warning=FALSE, out.extra=''}
+
+risk.short1 <- risk.short1 + scale_linetype_manual(values = c(rep("solid",10),rep("dashed",10),rep("dotted",10))) +
+  scale_color_manual(values=c(brewer.pal(10,"Set1"), brewer.pal(10,"Set1"), brewer.pal(10,"Set1")))
+
+risk.short3 <- risk.short3 + scale_linetype_manual(values = c(rep("solid",10),rep("dashed",10),rep("dotted",10))) +
+  scale_color_manual(values=c(brewer.pal(10,"Set1"), brewer.pal(10,"Set1"), brewer.pal(10,"Set1")))
+
+risk.short4 <- risk.short4 + scale_linetype_manual(values = c(rep("solid",10),rep("dashed",10),rep("dotted",10))) +
+  scale_color_manual(values=c(brewer.pal(10,"Set1"), brewer.pal(10,"Set1"), brewer.pal(10,"Set1")))
+
+legend <- get_legend(
+  risk.short1 +
+    guides(color = guide_legend(nrow = 1)) +
+    theme(legend.position = "bottom",
+          legend.title = element_blank(),
+          legend.text = element_text(size=6),
+          legend.spacing.x = unit(0,'cm'),
+          legend.spacing.y = unit(0,'cm'),
+          legend.key.size = unit(0.5,'cm'))
+  )
+
+
+prow <- plot_grid(risk.short1, risk.short3, risk.short4, ncol=3, align="h")
+
+plot_grid(prow, legend, ncol=1, rel_heights = c(1,.2))
+
+# risk.short9 + scale_linetype_manual(values = c(rep("solid",10),rep("dashed",10))) +
+#   scale_color_manual(values=c(brewer.pal(10,"Set3"), brewer.pal(10,"Set3")))
+
+
+#plot_grid(risk.short1, risk.short3, risk.short4, ncol=3, align="h")
+
+
+```
+
+
+```{r p8, echo=FALSE, fig.cap="C-index for outcome according to time from the event by treatment code", fig.width=9, message=FALSE, warning=FALSE, out.extra=''}
+
+plot_grid(q1+scale_y_continuous(limits = c(0.5,1), breaks = seq(0.5,1,0.05))+scale_x_continuous(limits = c(0,48), breaks = seq(0,48,4)), q3+scale_y_continuous(limits = c(0.5,1), breaks = seq(0.5,1,0.05))+scale_x_continuous(limits = c(0,48), breaks = seq(0,48,4)), q4+scale_y_continuous(limits = c(0.5,1), breaks = seq(0.5,1,0.05))+scale_x_continuous(limits = c(0,48), breaks = seq(0,48,4)), ncol=3, align="h")
+
+```
+
+
+```{r p9, echo=FALSE, fig.cap="Meta-regression of mean systolic blood pressure with treatment code", fig.width=9, message=FALSE, warning=FALSE, out.extra=''}
+
+plot_grid(bub_sbp1+ggtitle("ICU"), bub_sbp3+ggtitle("Death"), bub_sbp4+ggtitle("Composite"), ncol=3, align="h")
+
+```
+
+```{r p10, echo=FALSE, fig.cap="Meta regression of mean diastolic blood pressure with treatment code", fig.width=9, message=FALSE, warning=FALSE, out.extra=''}
+
+plot_grid(bub_dbp1+ggtitle("ICU"), bub_dbp3+ggtitle("Death"), bub_dbp4+ggtitle("Composite"), ncol=3, align="h")
+
+```
+
+```{r p11, echo=FALSE, fig.cap="Meta regression of mean heart rate with treatment code", fig.width=9, message=FALSE, warning=FALSE, out.extra=''}
+
+plot_grid(bub_hr1+ggtitle("ICU"), bub_hr3+ggtitle("Death"), bub_hr4+ggtitle("Composite"), ncol=3, align="h")
+
+```
+
+```{r p12, echo=FALSE, fig.cap="Meta regression of mean respiratory rate with treatment code", fig.width=9, message=FALSE, warning=FALSE, out.extra=''}
+
+plot_grid(bub_rr1+ggtitle("ICU"), bub_rr3+ggtitle("Death"), bub_rr4+ggtitle("Composite"), ncol=3, align="h")
+
+```
+
+```{r p13, echo=FALSE, fig.cap="Meta regression of mean oxygen saturation with treatment code", fig.width=9, message=FALSE, warning=FALSE, out.extra=''}
+
+plot_grid(bub_spo21+ggtitle("ICU"), bub_spo23+ggtitle("Death"), bub_spo24+ggtitle("Composite"), ncol=3, align="h")
+
+```
+
+```{r p14, echo=FALSE, fig.cap="Meta regression of mean temperature with treatment code", fig.width=9, message=FALSE, warning=FALSE, out.extra=''}
+
+plot_grid(bub_temp1+ggtitle("ICU")+xlab("Mean Temperature"), bub_temp3+ggtitle("Death")+xlab("Mean Temperature"), bub_temp4+ggtitle("Composite")+xlab("Mean Temperature"), ncol=3, align="h")
+
+```
+
+```{r p15, echo=FALSE, fig.cap="Meta regression of mean National Early Warning Score with treatment code", fig.width=9, message=FALSE, warning=FALSE, out.extra=''}
+
+plot_grid(bub_news1+ggtitle("ICU"), bub_news3+ggtitle("Death"), bub_news4+ggtitle("Composite"), ncol=3, align="h")
+
+```
+
+```{r p16, echo=FALSE, fig.cap="Meta regression of mean Charlson Comorbidity Index with treatment code", fig.width=9, message=FALSE, warning=FALSE, out.extra=''}
+
+plot_grid(bub_cci1+ggtitle("ICU"), bub_cci3+ggtitle("Death"), bub_cci4+ggtitle("Composite"), ncol=3, align="h")
+
+```
+
+```{r p17, echo=FALSE, fig.cap="Meta regression of mean age with treatment code", fig.width=9, message=FALSE, warning=FALSE, out.extra=''}
+
+plot_grid(bub_age1+ggtitle("ICU")+xlab("Mean Age"), bub_age3+ggtitle("Death")+xlab("Mean Age"), bub_age4+ggtitle("Composite")+xlab("Mean Age"), ncol=3, align="h")
+
+```
+
+\elandscape
+\FloatBarrier
+
+\newpage
+
+### Grouped According to Hospital Ward {#sec:ch7s6}
+
+There are 39 hospital wards in which the sample size is sufficient to assess the performance of NEWS (i.e. there were at least 100 observations within 48 hours of a composite outcome).
+
+The majority of these results do not add much information in addition to the treatment groups, which have already been shown, so I have put them in Appendix section \@ref(sec:appval1).
+Considerable heterogeneity of performance seems to exist between wards, but with no clear pattern.
+The ward with most observations is the Churchill oncology ward (C-WD Oncology), which includes 160345 observations.
+Most ICU admissions were from the Churchill haematology ward (n=1188), and the John Radcliffe EAU (n=827).
+The wards where most deaths occurred were the John Radcliffe EAU (n=2804), and the Churchill oncology ward (n=2181).
+
+The heterogeneity of performance between the different wards is summarised in Figures \ref{fig:p23} and \ref{fig:p24}.
+
+\newpage
+\blandscape
+
+```{r p23, echo=FALSE, fig.cap="Percentage risk of outcome according to NEWS by ward", fig.width=9, message=FALSE, warning=FALSE, out.extra=''}
+
+plot_grid(risk.short5, risk.short7, risk.short8, ncol=3, align="h")
+
+```
+
+```{r p24, echo=FALSE, fig.cap="C-index for outcome according to time from the event by ward", fig.width=9, message=FALSE, warning=FALSE, out.extra=''}
+
+plot_grid(q5+scale_y_continuous(limits = c(0.5,1), breaks = seq(0.5,1,0.05))+scale_x_continuous(limits = c(0,48), breaks = seq(0,48,4)), q7+scale_y_continuous(limits = c(0.5,1), breaks = seq(0.5,1,0.05))+scale_x_continuous(limits = c(0,48), breaks = seq(0,48,4)), q8+scale_y_continuous(limits = c(0.5,1), breaks = seq(0.5,1,0.05))+scale_x_continuous(limits = c(0,48), breaks = seq(0,48,4)), ncol=3, align="h")
+
+```
+
+\elandscape
+
+\newpage
+
+### Grouped According to Age {#sec:ch7s7}
+
+When grouped according to age at admission the majority of observations were recorded in the 71-80 (n=903996) and 81-90 year old (n=933436) groups.
+The only group with fewer than 200000 observations were those aged 91 years and older (135223).
+
+Figure \ref{fig:p33} shows the c-index to predict 48 hour ICU admission according to age group.
+There were very few events in those >91 years which led to an ICU admission, hence the wide confidence interval.
+Otherwise, the performance is broadly similar across all age group, with the exception of the 41-50 and the 61-70 age groups, 0.87 (0.86, 0.88) and 0.86 (0.85, 0.87) respectively.
+
+
+```{r p33, echo=FALSE, fig.cap="Forest plot for 48hr ICU admission c-index by age", fig.width=6, message=FALSE, warning=FALSE, out.extra=''}
+
+forest9
+
+```
+
+As expected the risk of death increases with age, with the majority of observations linked to deaths in the last three age groups (greater than 71).
+Figure \ref{fig:p34} shows the 48hr death c-index according to age group.
+There seems to be a clear curved relationship, where performance is best in the middle ages.
+However the 51-60 age group it a notable outlier with poor performance relative to the age groups either side.
+
+
+```{r p34, echo=FALSE, fig.cap="Forest plot for 48hr death c-index by age", fig.width=6, message=FALSE, warning=FALSE, out.extra=''}
+
+forest12
+
+```
+
+Figure \ref{fig:p35} shows the c-index for predicting the 48 hour composite outcome.
+There is a similar shape to the curve seen for the death outcome in figure \ref{fig:p34}, where again the 51-60 age group is a clear outlier.
+
+
+```{r p35, echo=FALSE, fig.cap="Forest plot for 48hr ICU admission and death composite c-index by age", fig.width=6, message=FALSE, warning=FALSE, out.extra=''}
+
+forest11
+
+```
+
+Figure \ref{fig:p36} shows the distribution of NEWS scores according to age group and whether or not the observation was linked to an ICU admission.
+The curves are relatively similar across age groups, with the exception of the >91 group.
+This is expected since the c-indices were all broadly similar, apart from in the >91 group.
+
+```{r p36, echo=FALSE, fig.cap="Distribution of NEWS according to 48hr ICU admission outcome by age", fig.width=6, message=FALSE, warning=FALSE, out.extra=''}
+
+joy9
+
+```
+
+Figure \ref{fig:p37} shows the same plot, but for the death outcome.
+Here, as for the treatment group analyses, the distribution in the non-event populations are all very similar.
+There are differences in the distribution of the event populations.
+The age groups in which NEWS performs better (41-50, 61-70) have a greater shift to the right compared to age groups where it does not perform very well (51-60, >91).
+
+```{r p37, echo=FALSE, fig.cap="Distribution of NEWS according to 48hr death outcome by age", fig.width=6, message=FALSE, warning=FALSE, out.extra=''}
+
+joy11
+
+```
+
+Figure \ref{fig:p38} for the composite outcome is very similar to the previous figure. 
+
+```{r p38, echo=FALSE, fig.cap="Distribution of NEWS according to 48hr ICU admission and death composite outcome by age", fig.width=6, message=FALSE, warning=FALSE, out.extra=''}
+
+joy12
+
+
+```
+
+\newpage
+\FloatBarrier
+
+Figure \ref{fig:p39} shows the percentage risk associated with the NEWS scores for each of the three outcomes of interest.
+The overall relationship is represented by the thick black line, and the different age groups are plotted individually.
+There is a stark contrast between the first and second panels.
+It shows that the younger age groups are more likely than the older groups to be admitted to ICU, for any given NEWS score, but less likely to die.
+The third panel which shows the risk of the composite outcome appears similar to the death outcome.
+This is expected since deaths are more common than the ICU admissions, so the composite outcome is mainly composed of deaths.
+
+Figure \ref{fig:p40} shows how the c-indices change over time, for each group and overall.
+As seen previously, the ranking of the different groups is fairly constant over time, since the curves are fairly parallel.
+
+The meta-regression results are shown in figures \ref{fig:p41} to \ref{fig:p48}.
+There is little evidence of any of the variables studies explaining the between age group heterogeneity.
+
+
+\newpage
+\blandscape
+\FloatBarrier
+
+```{r p39, echo=FALSE, fig.cap="Percentage risk of outcome according to NEWS by age", fig.width=9, message=FALSE, warning=FALSE, out.extra=''}
+
+risk.short9 <- risk.short9 + scale_linetype_manual(values = c(rep("solid",10),rep("dashed",10))) +
+  scale_color_manual(values=c(brewer.pal(10,"YlOrRd"), brewer.pal(10,"YlOrRd")))
+
+risk.short11 <- risk.short11 + scale_linetype_manual(values = c(rep("solid",10),rep("dashed",10))) +
+  scale_color_manual(values=c(brewer.pal(10,"YlOrRd"), brewer.pal(10,"YlOrRd")))
+
+risk.short12 <- risk.short12 + scale_linetype_manual(values = c(rep("solid",10),rep("dashed",10))) +
+  scale_color_manual(values=c(brewer.pal(10,"YlOrRd"), brewer.pal(10,"YlOrRd")))
+
+legend <- get_legend(
+  risk.short9 +
+    guides(color = guide_legend(nrow = 1)) +
+    theme(legend.position = "bottom",
+          legend.title = element_blank())
+  )
+
+
+prow <- plot_grid(risk.short9, risk.short11, risk.short12, ncol=3, align="h")
+
+plot_grid(prow, legend, ncol=1, rel_heights = c(1,.1))
+
+# risk.short9 + scale_linetype_manual(values = c(rep("solid",10),rep("dashed",10))) +
+#   scale_color_manual(values=c(brewer.pal(10,"Set3"), brewer.pal(10,"Set3")))
+
+```
+
+
+```{r p40, echo=FALSE, fig.cap="C-index for outcome according to time from the event by age", fig.width=9, message=FALSE, warning=FALSE, out.extra=''}
+
+plot_grid(q9+scale_y_continuous(limits = c(0.5,1), breaks = seq(0.5,1,0.05))+scale_x_continuous(limits = c(0,48), breaks = seq(0,48,4)), q11+scale_y_continuous(limits = c(0.5,1), breaks = seq(0.5,1,0.05))+scale_x_continuous(limits = c(0,48), breaks = seq(0,48,4)), q12+scale_y_continuous(limits = c(0.5,1), breaks = seq(0.5,1,0.05))+scale_x_continuous(limits = c(0,48), breaks = seq(0,48,4)), ncol=3, align="h")
+
+```
+
+\elandscape
+\FloatBarrier
+
+\newpage
+
+### Grouped According to Sex {#sec:ch7s7a}
+
+C-indices according to the sex of the patient are shown in Figures \ref{fig:p1z} to \ref{fig:p3z}.
+In each case the performance is almost identical for males and females.
+
+
+```{r p1z, echo=FALSE, fig.cap="Forest Plot for 48hr ICU admission c-index by sex", fig.width=6, fig.height=2, message=FALSE, warning=FALSE, out.extra=''}
+
+forest13
+
+```
+
+
+```{r p2z, echo=FALSE, fig.cap="Forest Plot for 48hr death c-index by sex", fig.width=6, fig.height=2, message=FALSE, warning=FALSE, out.extra=''}
+
+forest15
+
+```
+
+
+```{r p3z, echo=FALSE, fig.cap="Forest Plot for 48hr ICU admission and death composite c-index by sex", fig.width=6, fig.height=2, message=FALSE, warning=FALSE, out.extra=''}
+
+forest16
+
+```
+
+Figures \ref{fig:p4z} to \ref{fig:p6z}show the distributions of NEWS scores by sex, separately according to whether or not the patient had the event of interest.
+As would be expected, given the forest plots, the distributions appear almost identical between males and females.
+
+
+```{r p4z, echo=FALSE, fig.cap="Distribution of NEWS according to 48hr ICU admission outcome by sex", fig.width=6, fig.height=4, message=FALSE, warning=FALSE, out.extra=''}
+
+joy13
+
+```
+
+```{r p5z, echo=FALSE, fig.cap="Distribution of NEWS according to 48hr death outcome by sex", fig.width=6, fig.height=4, message=FALSE, warning=FALSE, out.extra=''}
+
+joy15
+
+```
+
+
+```{r p6z, echo=FALSE, fig.cap="Distribution of NEWS according to 48hr ICU admission and death composite outcome by sex", fig.width=6, fig.height=4, message=FALSE, warning=FALSE, out.extra=''}
+
+joy16
+
+
+```
+
+\newpage
+
+Figure \ref{fig:p7z} includes a panel for each of the three outcomes (ICU admission, then death, and then the composite).
+In each plot the NEWS score is on the x-axis, and the percentage risk of the event is on the y-axis.
+Males and females are plotted separately, and the overall population is represented by the thick black line.
+The distribution of risks is clearly very similar for males and females.
+There is possibly some divergence for ICU admission at the higher scores.
+
+Figure \ref{fig:p8z} also has a panel for each of the outcomes (ICU admission, then death, and then the composite).
+It shows time-to-event on the x-axis (the event occurs at zero), and the c-index on the y-axis.
+Again the lines for males and females appear very similar. 
+
+\FloatBarrier
+\blandscape
+
+```{r p7z, echo=FALSE, fig.cap="Percentage risk of outcome according to NEWS by sex", fig.width=9, fig.height=6, message=FALSE, warning=FALSE, out.extra=''}
+
+library(RColorBrewer)
+
+risk.short13 <- risk.short13 + scale_linetype_manual(values = c(rep("solid",10),rep("dashed",10),rep("dotted",10))) +
+  scale_color_manual(values=c(brewer.pal(10,"Set1"), brewer.pal(10,"Set1"), brewer.pal(10,"Set1")))
+
+risk.short14 <- risk.short14 + scale_linetype_manual(values = c(rep("solid",10),rep("dashed",10),rep("dotted",10))) +
+  scale_color_manual(values=c(brewer.pal(10,"Set1"), brewer.pal(10,"Set1"), brewer.pal(10,"Set1")))
+
+risk.short15 <- risk.short15 + scale_linetype_manual(values = c(rep("solid",10),rep("dashed",10),rep("dotted",10))) +
+  scale_color_manual(values=c(brewer.pal(10,"Set1"), brewer.pal(10,"Set1"), brewer.pal(10,"Set1")))
+
+legend <- get_legend(
+  risk.short13 +
+    guides(color = guide_legend(nrow = 1)) +
+    theme(legend.position = "bottom",
+          legend.title = element_blank(),
+          legend.text = element_text(size=6),
+          legend.spacing.x = unit(0,'cm'),
+          legend.spacing.y = unit(0,'cm'),
+          legend.key.size = unit(0.5,'cm'))
+  )
+
+
+prow <- plot_grid(risk.short13, risk.short14, risk.short15, ncol=3, align="h")
+
+plot_grid(prow, legend, ncol=1, rel_heights = c(1,.2))
+
+# risk.short9 + scale_linetype_manual(values = c(rep("solid",10),rep("dashed",10))) +
+#   scale_color_manual(values=c(brewer.pal(10,"Set3"), brewer.pal(10,"Set3")))
+
+
+#plot_grid(risk.short1, risk.short3, risk.short4, ncol=3, align="h")
+
+
+```
+
+
+```{r p8z, echo=FALSE, fig.cap="C-index for outcome according to time from the event by treatment code", fig.width=9, message=FALSE, warning=FALSE, out.extra=''}
+
+plot_grid(q13+scale_y_continuous(limits = c(0.5,1), breaks = seq(0.5,1,0.05))+scale_x_continuous(limits = c(0,48), breaks = seq(0,48,4)), q15+scale_y_continuous(limits = c(0.5,1), breaks = seq(0.5,1,0.05))+scale_x_continuous(limits = c(0,48), breaks = seq(0,48,4)), q16+scale_y_continuous(limits = c(0.5,1), breaks = seq(0.5,1,0.05))+scale_x_continuous(limits = c(0,48), breaks = seq(0,48,4)), ncol=3, align="h")
+
+```
+
+\elandscape
+\FloatBarrier
+
+
+
+\newpage
+
+## Discussion {#sec:ch7s8a}
+
+The results in this chapter have shown that considerable heterogeneity exists in the predictive performance of the NEWS across treatment groups, wards and age groups.
+This was true for all outcome measures - ICU admission, death, and a composite of the two.
+However, it was not necessarily true that poor performance in predicting ICU admission also meant poor performance in predicting death, or vice-versa (See figures \ref{fig:p50} to \ref{fig:p52} below).
+The results also showed that the risk of the different outcomes associated with the levels of the NEWS varies considerably according to the different groups.
+
+
+```{r p50, echo=FALSE, fig.cap="C-index comparison for ICU and death outcomes by treatment group", fig.width=6, message=FALSE, warning=FALSE, out.extra=''}
+
+library(ggrepel)
+
+ggplot(cis_rubin, aes(x=inv.logit(auc_death_r), y=inv.logit(auc_ICU_r), shape="circle", color="red", size=n0_death)) +
+  geom_point() +
+  scale_y_continuous(limits=c(0.75,1),breaks=seq(0.75,1,0.05)) +
+  scale_x_continuous(limits=c(0.75,1),breaks=seq(0.75,1,0.05)) +
+  theme_bw(base_size=12) +
+  theme(legend.position = "none") +
+  ylab("ICU c-index") +
+  xlab("Death c-index") +
+  ggtitle("Treatment Groups") +
+  geom_label_repel(aes(label=cis_rubin$treatment_function_text), size=1.5)
+
+```
+
+```{r p51, echo=FALSE, fig.cap="C-index comparison for ICU and death outcomes by ward", fig.width=6, message=FALSE, warning=FALSE, out.extra=''}
+
+ggplot(cis_rubin_ward, aes(x=inv.logit(auc_death_r), y=inv.logit(auc_ICU_r), shape="circle", color="red", size=n0_death)) +
+  geom_point() +
+  scale_y_continuous(limits=c(0.75,1),breaks=seq(0.75,1,0.05)) +
+  scale_x_continuous(limits=c(0.75,1),breaks=seq(0.75,1,0.05)) +
+  theme_bw(base_size=12) +
+  theme(legend.position = "none") +
+  ylab("ICU c-index") +
+  xlab("Death c-index") +
+  ggtitle("Ward Groups") +
+  geom_label_repel(aes(label=cis_rubin_ward$ward_code), size=1.75)
+
+```
+
+```{r p52, echo=FALSE, fig.cap="C-index comparison for ICU and death outcomes by age group", fig.width=6, message=FALSE, warning=FALSE, out.extra=''}
+
+ggplot(cis_rubin_age, aes(x=inv.logit(auc_death_r), y=inv.logit(auc_ICU_r), shape="circle", color="red", size=n0_death)) +
+  geom_point() +
+  scale_y_continuous(limits=c(0.75,1),breaks=seq(0.75,1,0.05)) +
+  scale_x_continuous(limits=c(0.75,1),breaks=seq(0.75,1,0.05)) +
+  theme_bw(base_size=12) +
+  theme(legend.position = "none") +
+  ylab("ICU c-index") +
+  xlab("Death c-index") +
+  ggtitle("Age Groups") +
+  geom_label_repel(aes(label=cis_rubin_age$age_cat), size=5)
+
+```
+
+### Significant Heterogeneity in c-index across Groups {#sec:ch7s8}
+
+Whilst the National Early Warning Score seems to have good predictive performance overall (at least in its ability to rank patients), which has been reported frequently in the literature[@Smith2013e], its performance in different settings and populations has not been well tested.
+This study again has shown that when evaluated in all observations the NEWS seems to predict outcomes well, with relatively high c-indices by most standards (0.84 for ICU admission, 0.89 for death, and 0.87 for the composite of death and ICU admission).
+
+However, this study has found that when NEWS is tested in different populations there are many where performance is poor.
+In some major treatment groups, where a large number of observations were recorded, the NEWS had a low c-index, such as vascular surgery (0.69 for ICU admission), cardiology (0.82 for death), and urology (0.83 for death).
+Again in young patients (<40 years), in those aged 51-60 and the older patients (>80 years) NEWS does not predict well, particularly for death.
+
+There may be many varied reasons for why the heterogeneity of performance is so large.
+One argument may be that the different characteristics or comorbidities of the patients in the different groups effects the predictive performance.
+For example sudden post surgical deaths may be difficult or even impossible to predict.
+Similarly sudden cardiac arrests may be more frequent in certain treatment groups/wards, and again these events may be difficult to predict.
+
+There was an exception to the pattern of heterogeneity, where the performance was shown to be identical for men and women.
+
+
+### Outcome Measures are Different {#sec:ch7s9}
+
+As shown in figures \ref{fig:p50} to \ref{fig:p52}, the relative ability to predict ICU admission and death by group are not very well correlated.
+There are some examples of agreement, such as poor performance for both outcomes in urology, hepatology, and transplantation surgery; and good performance for both outcomes in 41-50 year olds.
+However, there are also many examples where the performance with respect to the two outcomes disagree, such as cardiac surgery and cardiology.
+
+The composite outcome measure is often seen as a good summary measure which encompasses the two main 'bad outcomes', and is frequently used in the literature - in the systematic review in Chapter \@ref(sr) 17 external validation studies used the composite outcome.
+However, as discussed in Chapter \@ref(trajectories), there are many flaws associated with the use of composite outcomes in prediction modelling, not least a difficulty in interpretation.
+The results from this chapter highlight some of these flaws.
+Roughly three quarters of the observation sets linked to a composite outcome are linked to death.
+A consequence of this is that the performance of predicting these two outcomes are generally well correlated (figure \ref{fig:p53}).
+There are exceptions in cases where the agreement between ICU and death predictive performance is not good, or where the ratio of deaths to ICU admissions is lower than average.
+
+```{r p53, echo=FALSE, fig.cap="C-index comparison for composite and death outcomes", fig.width=6, message=FALSE, warning=FALSE, out.extra=''}
+
+library(gridExtra)
+library(cowplot)
+
+grid.arrange(
+ggplot(cis_rubin, aes(x=inv.logit(auc_death_r), y=inv.logit(auc_composite_r), shape="circle", color="red", size=n0_death)) +
+  geom_point() +
+  scale_y_continuous(limits=c(0.75,1),breaks=seq(0.8,1,0.1)) +
+  scale_x_continuous(limits=c(0.75,1),breaks=seq(0.8,1,0.1)) +
+  theme_bw(base_size=12) +
+  theme(legend.position = "none") +
+  ylab("Composite c-index") +
+  xlab("") +
+  ggtitle("Treatment"),
+
+ggplot(cis_rubin_ward, aes(x=inv.logit(auc_death_r), y=inv.logit(auc_composite_r), shape="circle", color="red", size=n0_death)) +
+  geom_point() +
+  scale_y_continuous(limits=c(0.75,1),breaks=seq(0.8,1,0.1)) +
+  scale_x_continuous(limits=c(0.75,1),breaks=seq(0.8,1,0.1)) +
+  theme_bw(base_size=12) +
+  theme(legend.position = "none") +
+  ylab("") +
+  xlab("Death c-index") +
+  ggtitle("Ward") +
+  theme(axis.text.y = element_blank()),
+
+ggplot(cis_rubin_age, aes(x=inv.logit(auc_death_r), y=inv.logit(auc_composite_r), shape="circle", color="red", size=n0_death)) +
+  geom_point() +
+  scale_y_continuous(limits=c(0.75,1),breaks=seq(0.8,1,0.1)) +
+  scale_x_continuous(limits=c(0.75,1),breaks=seq(0.8,1,0.1)) +
+  theme_bw(base_size=12) +
+  theme(legend.position = "none") +
+  ylab("") +
+  xlab("") +
+  ggtitle("Age") +
+  theme(axis.text.y = element_blank()), ncol=3, widths = c(1.12, 1, 1))
+
+```
+
+
+
+### Risk of events different according to grouping factors {#sec:ch7s10} 
+
+One of the main drawbacks of the traditional points scoring EWS approaches such as NEWS it that they do not (and cannot) provide a predicted probability of the event of interest occurring.
+This is one of the main cornerstones of prediction  modelling approaches [@Spiegelhalter1986; @Steyerberg2014].
+Without a predicted probability the output of the model is difficult to interpret, and choosing a threshold at which intervention should be delivered becomes challenging.
+For models which do provide predicted risks, it is important that these are well calibrated, which means that the predicted risks should match the observed risks[@Steyerberg2010; @Collins2015].
+Calibration of NEWS cannot be assessed since it gives no risks, however the plots in figures \ref{fig:p7}, \ref{fig:p23}, and \ref{fig:p39} go some way to describing this by looking at the observed risk versus each point on the NEWS scale.
+The fact that the observed risks vary widely between the different groups identifies two important points.
+The first is that currently, as NEWS is used in practice, the level of risk that patients are exposed to before intervention, varies enormously depending on the characteristics of the patient.
+For example a patient aged 81-90 is at a 3% risk of death (within 48 hours) at a NEWS of 5, whereas a patient aged 18-30 would have practically zero risk.
+The second implication is that when future EWSs are developed which do  provide predicted risks, they need to either directly account for the factors that give this heterogeneous risk relationship (such as age), or the models should be re-calibrated for clinically relevant patient groups.
+
+### Strengths and limitations
+
+As described in the systematic review in Chapter \@ref(sr), there have been many external validation studies of the NEWS, and these have looked at predictive performance in a variety of different medical areas[@Bartkowiak2019; @GardnerThorpe2006a; @Brabrand2018; @Cei2009a; @Cooksley2012a; @Eccles2014a; @Forster2018; @Garcea2006; @Hodgson2017; @Hydes2018].
+However it is difficult to interpret the results of these studies, since they often use different methods, and are based on different data sets.
+Therefore a real benefit of the research in this chapter is that the performance in different subgroups is directly comparable, thus it was possible to identify groups where the NEWS works well or works poorly.
+This sort of study is recommended when using large electronic health record data sets[@Riley2016].
+
+A further strength of this study is that it was based on a large data set.
+Whereas a number of the studies included in the systematic review in Chapter \@ref(sr) were based on small datasets, limiting their scope.
+However, in some of the subgroups which I investigated the sample sizes (specifically the number of events) were still quite small.
+In the systematic review I recommended to include at least 100 events.
+Therefore I chose to include subgroups if they had at least 100 composite events.
+However this meant that when looking at ICU admission or death separately the number of events in a subgroup was sometimes fewer than 100.
+Therefore some of the results need to be treated with caution.
+
+A further limitation of the study is that I only investigated the NEWS, when many other EWSs exist, as seen in Chapter \@ref(sr).
+However this was chosen since NEWS is overwhelmingly the gold standard EWS, particularly in the UK where it is recommended for clinical use[@NHS2017].
+
+I could also have investigated the NEWS performance by different grouping variables, such as ethnicity and Charlson Comorbidity Index (CCI).
+However, those variables are poorly recorded, or recorded after discharge.
+The choice of what variables to examine was determined by what may be useful for the purpose of including in a news EWS (i.e. age and sex), or where it may be appropriate to develop disease specific EWSs (treatment code and ward).
+
+
+## Conclusion {#sec:ch7s11}
+
+There are two clear implications from this chapter for EWSs and for the last chapter of this thesis.
+First, it is apparent that there is heterogeneity in the performance of NEWS between different subgroups, and therefore future EWSs should account for this.
+This may either be through using more complex models (i.e. by including more variables such as age, comorbidities, reason for admission, and interaction terms), or by using different models in different populations.
+Second, it is clear that there is a large difference between the two outcomes - ICU admission and death.
+There was no apparent correlation between the c-indices for the two outcomes.
+The composite outcome was dominated by death events (because these are more common).
+Therefore composite outcomes should be avoided, and instead death and ICU admission should be treated as separate outcomes.
+This agrees with the findings from Chapter \@ref(trajectories).
+Modeling ICU admission separately from death may require a competing risk approach.
+
+
+

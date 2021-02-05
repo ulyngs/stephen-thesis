@@ -1,0 +1,178 @@
+---
+output:
+  pdf_document: default
+  word_document: default
+  html_document: default
+bibliography: ../EWS papers.bib
+---
+
+```{block type='savequote', include=knitr::opts_knit$get('rmarkdown.pandoc.to') == 'latex', quote_author='(ref:tolkein-quote)'}
+
+It's the job that's never started as takes longest to finish.
+
+<!-- ending a line with a lonely backslash inserts a linebreak -->
+```
+(ref:tolkein-quote) --- J.R.R. Tolkein
+
+# Introduction {#intro}
+\minitoc <!-- this will include a mini table of contents-->
+
+\newpage
+
+## What is the clinical problem {#sec:ch1s1}
+
+Severe clinical deterioration of hospital patients is often preceded by changes in their physiological parameters, such as blood pressure, respiratory rate, pulse and level of consciousness[@Findlay2012; @Hillman2002; @Hogan2012; @Kause2004]. 
+Chart reviews and a recent report from the National Confidential Enquiry into Patient Outcome and Death (NCEPOD) show that before serious events such as death, cardiac arrest and intensive care unit admission occur, there is often several hours of evidence of clinical deterioration.
+Many of these serious events could thus be prevented with appropriate action[@Hogan2012; @Cei2009a; @DeMeester2013; @Moon2011a; @Paterson2006a].
+Factors associated with failure to prevent deaths in hospital include poor patient monitoring, failure to recognise signs of deterioration, inadequate interpretation of physiological changes, and failure to take appropriate action[@Cuthbertson2007; @GardnerThorpe2006a; @Subbe2003b; @Subbe2001b].
+A recent review estimated that 12,000 deaths could have been prevented in English hospitals in 2009, whilst other sources estimate this number could reach 40,000 per year[@Hogan2012].
+
+## Early Warning Scores are the existing solution {#sec:ch1s2}
+
+Hospitals need tools to help staff identify patients at increased risk of deterioration, enabling them to provide appropriate, timely care and help prevent unnecessary serious events.
+Morgan proposed the Early Warning Score (EWS) as a solution in 1997[@Morgan1997].
+Many adaptations of the idea have since been proposed.
+These simple approaches usually allocate points for each physiological vital sign, weighted according to the degree of departure from a range perceived as normal, then sum the weighted points to give a total score.
+The vital signs typically assessed are respiratory rate, systolic blood pressure, temperature, heart rate and level of consciousness.
+It is the total score that informs care.
+Particular scores trigger particular actions, such as increasing the frequency of vital sign monitoring, calling more experienced staff or calling a rapid response team.
+These simple tools can easily be implemented as part of traditional bedside observation charts.
+
+A systematic review published in 2007 found 33 EWSs in use, with a high degree of overlap in the vital signs included, but with considerable variability in the weighting systems used to obtain the score[@Smith2008c].
+However, due to numerous deficiencies in the methods used to develop many of these EWSs, the authors concluded that none of the EWSs could be said to ‘perform well’ at identifying patients at increased risk of in-hospital death from those who were not.
+In the same year, NICE released guideline CG50 on recognising and responding to deterioration using EWSs [@cg50].
+Recommendations from the guideline concluded that all adult patients in acute hospital settings should be monitored using an EWS, that there are six key physiological factors that should be included in an EWS, and that they should be used on admission, at least every twelve hours, and more frequently if an abnormal physiology is detected.
+As a result, NHS hospitals in England could potentially collect around 350 million sets of vital signs observations each year[@Gerry2017].
+In 2012 a group formed by the Royal College of Physicians published recommendations proposing a standardised EWS to be used across the NHS[@Jones2012a].
+This led to the development of the National Early Warning Score (NEWS).
+The NEWS incorporates the six physiological parameters recommended in NICE CG50: respiratory rate, oxygen saturations, temperature, systolic blood pressure, pulse rate and level of consciousness.
+The weighting for each vital sign was based on a previously developed EWS, called ViEWS, and on the clinical consensus of the group[@Prytherch2010a].
+The NEWS is now seen as the gold standard EWS (Figure \ref{fig:newschart}).
+NEWS has recently been modified to incorporate changes to the points scoring thresholds related to oxygen saturation, which is called NEWS2[@InadaKim2018].
+Although some evidence suggests that this change was ill-judged, since the new score does not perform any better, but increases the complexity of the chart[@Pimentel2019; @Mohammed2019].
+
+```{r newschart, echo=FALSE, fig.cap="The National Early Warning Score chart", out.width='90%', message=FALSE, warning=FALSE, out.extra=''}
+
+knitr::include_graphics("./NEWS_chart.pdf")
+
+```
+
+EWSs are now routinely used in several countries, including the Netherlands, USA, Australia and the Republic of Ireland[@PrinceCharlesHospital; @Ireland; @Churpek2011; @Douw2016].
+In the UK there have been calls to further increase their use across ambulance services, primary care and community care homes[@rcp2017; @Silcock2015a; @Corfield2014; @Brangan2018; @InadaKim2018].
+
+\begin{wrapfigure}{r}{3in}
+\fcolorbox{red}{lightgray}{\begin{minipage}{\dimexpr\linewidth-2\fboxrule-2\fboxsep}
+
+\fontsize{8pt}{8pt}\selectfont
+
+\begin{center}
+\bfseries
+Summary of Early Warning Scores - what are they and how are they implemented?
+\end{center}
+
+\begin{itemize}[leftmargin=*]
+
+  \item Early warning scores are scoring systems used in hospitals to identify deteriorating patients. Historically they were implemented as part of paper based observation charts, but now are increasingly implemented using EHR systems.
+  \item Conventionally a score ranging from zero (healthy) to three (sick) will be assigned to each vital sign/variable according to how abnormal it is.
+  \item Most EWSs will include respiratory rate, oxygen saturation, temperature, systolic blood pressure, heart rate, and level of consciousness.Other variables such as urine output, use of supplementary oxygen therapy, and age are also sometimes included.
+  \item The EWS itself is simply the sum of the individual components, and will thus typically range from 0 (healthy) to around 20 (sick).
+  \item Action is required when the EWS reaches given thresholds, such as an increase in the frequency of monitoring at a low threshold, or calling in expert clinicians at higher thresholds.
+  \item Current standards recommend that EWSs should be calculated on admission and at least every 12 hours thereafter.
+  
+\caption{A summary of EWSs}\label{fig:ewssum}
+
+\end{itemize}
+
+\end{minipage}}
+
+\end{wrapfigure}
+
+
+
+## Early Warning Scores have been developed and validated using suboptimal methods {#sec:ch1s3}
+
+### Model development {#sec:ch1s4}
+
+Several approaches have been used to develop EWSs[@Fu2020].
+Many have been based wholly or partly on the clinical expertise of a committee or on a review of the literature, notably NEWS[@Jones2012a].
+Others have used a ‘trial and error’ approach, in which parameters are manipulated and weights assigned based on those that give the optimal results from a single data set, i.e. the best model performance[@Prytherch2010a].
+This approach leads to ‘overfitting’ problems: the model fits idiosyncrasies in that particular data set rather than any underlying generalisable patterns, meaning that the model fails to work in other data.
+Very few EWS models have been developed using robust statistical regression modelling, which is the most widely recommended approach for developing clinical risk prediction models.
+
+There are a number of ways in which the use of poor methodology may have led to poorly performing EWSs.
+One clear limitation of current EWSs is that they often give the same weighting to each vital sign, implying equal predictive power.
+If a statistical model were used certain variables would be shown to have greater predictive power, the apparent predictive effects of one vital sign could be explained by other predictive variables, and a more robust and unbiased choice of which predictors to include in the model could be made.
+Whilst there have been several examples of EWSs developed using statistical methods, they have tended to use simple methods and have largely ignored the recommended best practice approaches, which consequently make assumptions that are unlikely to hold.
+These areas of deficiency include the handling of missing covariate and outcome data, the investigation of non-linear relationships between predictor and outcome, the investigation of interactions between predictors, the categorisation of continuous predictors, and the incorporation of competing risk approaches.
+
+A further weakness of the current EWSs is that in many cases the same scoring system is intended for use across all hospital patients, regardless of their illness (and severity), age or sex.
+There are a few exceptions, such as the development of paediatric- or antenatal-specific versions[@Chapman2019; @Umar2019].
+However, EWSs are generally applied to highly variable populations.
+As one would expect using different physiological factors to predict poor outcome in different illnesses, a generic scoring system is unlikely to perform well in all patient groups.
+There are perhaps some benefits to having a single standardised score to use across all populations, however very few EWSs contain any patient-specific or disease-specific variables that could ‘individualise’ the prediction, such as age, sex and medical indication (and severity).
+
+### Model validation {#sec:ch1s5}
+
+After a prediction model has been developed its predictive performance should be evaluated in the same data set used to derive it, called internal validation[@Moons2015].
+However, the performance in the development data set is likely to be optimistic, i.e. better than it will be when applied to new patients.
+Therefore statistical techniques are required to adjust for this optimism, such as bootstrapping or cross-validation[@Steyerberg2001].
+However these methods are rarely used in the EWS studies, which typically ignore the need for internal validation, or use a weak alternative such as splitting the data set into a separate training and testing sets.
+
+The performance of a prediction model should also be evaluated in independent data sets, not used in the development of the score, which is known as external validation.
+As there is little evidence that EWSs generally undergo independent external validation, their performance is largely unknown, which raises questions about whether they should be used.
+The validation studies that do exist tend to have been poorly designed, conducted and reported, show only limited usefulness, look at a very specific population, or have been carried out on a very similar population to the original derivation data set.
+
+## The consequences on the clinical application of EWSs {#sec:ch1s6}
+
+As with all risk prediction models, the aim is to have a system that flags the majority of those actually at risk (sensitivity) and correctly does not flag those not at risk (specificity).
+Once a model has been chosen, a threshold score at which action will be taken is defined.
+The threshold creates a trade-off between sensitivity and specificity – improving one is to the detriment of the other.
+The NEWS has a recommended threshold for calling the critical care team of five points.
+This threshold results in a specificity of around 80%[@Jones2012a].
+Since the outcome is rare, this means that around 20% of observations on healthy patients will alert.
+This creates a tremendous workload for clinical staff, resulting in protocols often not being followed.
+This may be part of the reason why randomised trials of EWSs have generally shown them to be ineffective in improving health outcomes[@Hillman2005; @Kyriacos2015].
+Other studies have concluded that there is a benefit of using EWSs, however these have generally not been randomised studies, but retrospective studies or before-and-after studies [@Ludikhuize2015a; @Bellomo2004; @Subbe2017].
+Trials in this area are complex, as in addition to the new EWS, they often include a protocolised clinical response, such as a so-called 'rapid response team'.
+A recent study has shown a benefit of the 'Advance Alert Monitor' a relatively sophisticated EWS, in a randomised (stepped-wedge) study[@Escobar2020].
+However this study included a very intensive clinical response to the EWS alerting.
+
+## Electronic systems give the opportunity for next-generation Early Warning Scores {#sec:ch1s7}
+
+EWSs have thus far remained simple, with few exceptions.
+The scores have traditionally been calculated by hand on paper charts and therefore must be quick and easy to use.
+Although including an excessive number of variables (e.g. patient characteristics or laboratory values) may improve predictive accuracy, it could also make the system unwieldy and time consuming.
+However, unsurprisingly the paper based approach is error-prone; incorrect scores are assigned to vital signs and individual scores are incorrectly summed[@Clifton2015].
+Electronic EWS systems have been developed, partly to mitigate the human-error flaws[@Wong2015a].
+An electronic system assigns scores to vital signs and computes the EWS automatically.
+These systems can send alerts, prompt appropriate action and give ward- or hospital-level oversight of the EWS status of all patients. 
+
+The Health Secretary delivered a mandate in 2013 that the NHS should be paperless by 2018[@hunt].
+The vast majority of hospitals are likely to be using electronic EWS systems soon.
+As electronic systems become more widely available, they should be the subject of focused research.
+More sophisticated models can be devised now that scores are calculated automatically.
+Further, using the electronic observation systems, very large numbers of vital sign observations will now be recorded.
+These data sets can be used to develop improved EWSs. 
+
+Next-generation scores risk being developed using the same poor statistical methods.
+Despite their enormous potential, there has been no obvious improvement in the methods used to develop EWSs in the several years since electronic systems became available.
+There is a real risk that the basic EWS scoring systems developed to take into account the restrictions of paper observation charts will continue to be used if no concerted effort is made.
+In light of the lack of progress in this area, it seems likely that any new EWSs will continue to be developed using the same poor quality methods and will continue to be of little benefit to patients. 
+
+
+## Outline of thesis: providing a better solution to EWSs {#sec:ch1s8}
+
+The broad aim of my thesis is to take a much more statistically rigorous approach to the development and validation of EWSs. 
+Chapter \@ref(methods) will introduce the data set that will be used in the analyses that follow in the rest of the thesis.
+It will also summarise some of the key statistical concepts that will be relied on throughout the thesis.
+In Chapter \@ref(sr) I present the results of my systematic review of published studies which develop or validate EWSs.
+The main emphasis of the study will be to describe and critically appraise the methodology used in these papers.
+Chapter \@ref(centiles) presents the descriptive study which examines how the distribution of vital signs change according to the age of the patients.
+This will be used to motivate further work which looks to develop an age-specific EWS.
+In Chapter \@ref(trajectories) I present a descriptive analysis investigating the changes in distribution of vital signs leading up to key events, ICU admission, death, or hospital discharge.
+Chapter \@ref(simulation) examines the best approaches to evaluating the performance of EWSs through a simulation study.
+In chapter \@ref(validation) the performance of the NEWS is evaluated in subgroups of the whole population, according to the patients age, the ward they were on, and the medical specialty they were assigned to.
+Finally in Chapter \@ref(ageews) I describe the development of a new age-specific EWS which will separately predict death and ICU admission.
+
+
+

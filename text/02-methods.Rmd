@@ -1,0 +1,537 @@
+---
+output:
+  pdf_document: default
+  word_document: default
+  html_document: default
+bibliography: ../EWS papers.bib
+---
+
+```{block type='savequote', include=knitr::opts_knit$get('rmarkdown.pandoc.to') == 'latex', quote_author='(ref:lewis-quote)'}
+
+All shall be done, but it may be harder than you think.
+
+<!-- ending a line with a lonely backslash inserts a linebreak -->
+```
+(ref:lewis-quote) --- C.S. Lewis
+
+# Data and Methods {#methods}
+\minitoc <!-- this will include a mini table of contents-->
+
+\newpage
+
+The aim of this chapter is to provide details on the data set used in the majority of the analyses in the thesis, as well as a description of some of the important statistical concepts that will be used.
+
+## Data {#sec:ch2s1}
+
+### Source of data {#sec:ch2s2}
+All data used in this thesis was collected and collated from adult (aged 16 years and older) acute admissions to the Oxford University Hospitals (OUH) trust as part of the Hospital Alerting Via Electronic Noticeboard (HAVEN) data set[@HAVEN].
+Clinical staff recorded patients’ vital signs at the bedside using the System for Electronic Notification and Documentation (SEND, Sensyne Health, https://www.sensynehealth.com/send)[@Wong2015a].
+The following data were recorded: date and time of observation (automatically by SEND); heart rate, systolic blood pressure, respiratory rate, body temperature, neurological status using the Alert-Voice-Pain-Unresponsive (AVPU) scale, SpO2; and the patient’s inspired gas (air or supplemental oxygen) at the time of SpO2 measurement.
+All outcomes were obtained retrospectively from different clinical information systems, including the hospitals’ patient administration systems, the ICU clinical information systems, and the hospitals’ National Cardiac Arrest Audit (https://ncaa.icnarc.org) databases.
+The HAVEN database also contains administrative and patient demographic information.
+Prescription data from the electronic patient record is also available within the database for OUH admissions.
+
+### Access to data {#sec:ch2s2a}
+The Heath Research Authority (HRA) and the Confidentiality Advisory Group (CAG) gave approval for the HAVEN data set to be put together[@HAVEN].
+I was given access to a pseudo-anonymised version of the HAVEN data set under the terms of this ethics approval, and by permission of the principle investigator.
+Therefore I did not need to seek my own ethics approval to access the data.
+Data were stored and analysed on a secure University of Oxford server, which was accessed through a virtual machine on a virtual private network (VPN).
+It took approximately six months for all of these approvals to be put into place such that I could access the data.
+Anyone interested in accessing the same data set for research purposed should contact Critical Care Research Group at the Kadoorie Centre, University of Oxford: ccrg\@ndcn.ox.ac.uk. 
+
+### Study sites and times {#sec:ch2s3}
+The study took place at four hospitals in the Oxford University Hospitals NHS Foundation Trust: The John Radcliffe Hospital (a large university hospital), The Horton General Hospital (a small district general hospital), The Churchill Hospital (a large university cancer centre), and The Nuffield Orthopaedic Centre.
+All completed adult admissions to the four hospitals between April 2014 and March 2018 were considered.
+
+### Early warning scores {#sec:ch2s4}
+Vital sign sets, also known as observations sets, were recorded using SEND.
+Where the patient’s consciousness level had been assessed only using the Glasgow Coma Scale (GCS), we converted GCS to an AVPU equivalent[@Prytherch2010].
+In all four of the hospital included in the HAVEN data set a centile-based early warning score (CEWS) is used in clinical practice[@Tarassenko2011a].
+This is a variation of the standard EWS, but with different scoring thresholds.
+Using the HAVEN data set it is possible to calculate the NEWS value for each observation set.
+Clinical staff entering vital signs data were therefore unaware of NEWS scores, but were aware of the CEWS scores.
+
+### Variables of interest {#sec:ch2s4a}
+
+The research in this thesis will largely be based upon manually recorded vital signs.
+I will briefly describe the variables which will be included:
+
+* Systolic blood pressure (SBP). The force at which blood pumps around the body. Generally recorded using an automated pressure cuff. Measured in millimetres of mercury (mmHg).
+* Diastolic blood pressure (DBP). The resistance to blood flow in the blood vessels. Generally recorded using an automated pressure cuff. Measured in millimetres of mercury (mmHg).
+* Heart rate (HR). The number of times the heart beats per minute. Often referred to as 'pulse'. Generally recorded using a pulse oximeter placed upon a patient's finger. Measured in beats per minute (bpm). 
+* Respiratory rate (RR). The number of breaths per minute. Generally this is measured by the nurse observing the number of breaths a patient takes over a short time period (e.g. 15 or 30 seconds) and then multiplied out to find the number of breaths per minute.
+* Temperature. Generally a patient's core body temperature is measured by an in ear thermometer. Measured in degrees Celsius.
+* Oxygen saturation (SpO2). A measure of how much oxygen a patient's red blood cells are carrying. Generally recorded using a pulse oximeter placed upon a patient's finger. Measured as a percentage value.
+* Oxygen therapy. Whether or not a patient is using supplemental oxygen, e.g. through a mask.
+* Fraction of inspired oxygen (FiO2). This is the fraction (or percentage) of oxygen in the air that is inspired by a patient. Room air is 21% oxygen. This is not directly measured, but instead derived from the flow rate of particular masks, the use of which is recorded[@Malycha2019]. Measured as a fraction (and therefore is a value between zero and one) or a percentage.
+* Level of consciousness. A neurological status assessment using either the Alert-Verbal-Painful-Unresponsive (AVPU) scale or the Glasgow Coma Scale (GCS).
+* I will also use patient characteristics such as their age and sex
+
+
+### Outcome measures {#sec:ch2s4b}
+
+I will use two main outcome measures in the thesis.
+
+* In-hospital death. The death of a patient in hospital.
+* Unanticipated intensive care unit (ICU) admission. The admission of a patient to an intensive care unit, but excluding those admissions that were planned. Planned ICU admissions are standard practice after certain procedures, e.g. organ transplantation. The planned admissions will not be included because they are not the result of the acute deterioration of a patient. Henceforth in the thesis I will simply use the term ICU admission to represent unanticipated ICU admissions.
+
+
+### Structure of the data {#sec:ch2s5}
+The data set comprises a series of hospital admissions.
+Many patients will have had more than one admission during the timeframe of the study.
+Furthermore, vital signs (and other information such as blood tests) are typically recorded more than once per hospital admission.
+Thus, there are vital signs clustered with admissions, and admissions clustered within patients.
+These issues will be discussed and expanded on throughout the thesis.
+
+## Data description {#sec:ch2s6}
+
+In total, there were 218521 admissions to the hospital trust between April 2014 and March 2018, which included at least one observation on the SEND e-Obs system.
+These admissions included 4089038 sets of vital sign observations.
+All of these admissions and vital signs were included in the majority analyses in the thesis.
+
+
+```{r misspct, echo=FALSE, message=FALSE, warning=FALSE, fig.width=4, out.extra='', fig.cap="Percentage of observation sets with missing data for each vital sign"}
+
+load("C:/Users/stephen.gerry/Dropbox/Steve work/VM/methods_plots.RData")
+
+missing
+
+```
+
+In total 16% of observation sets were missing at least one vital sign measurement.
+Figure \@ref(fig:misspct) shows the percentage missing for each of the vital signs separately.
+Temperature was the most commonly missing vital sign (10%).
+For all the other vital signs data were missing in 5% or less of the observation sets. 
+
+
+```{r echo=FALSE, message=FALSE, warning=FALSE}
+base = read.csv("C:/Users/stephen.gerry/Dropbox/Steve work/VM/baseline_validation_new010221.csv", header = TRUE)
+
+#base <- base[-c(24:25),]
+
+base <- base[-c(3:5)]
+
+library(kableExtra)
+library(magrittr)
+
+kable(base, "latex", caption = "(\\#tab:baselinemeth) Baseline Characteristics", booktabs = T, col.names = c("","")) %>%
+kableExtra::group_rows("Patient Characteristics", 1, 21, hline_before = T, latex_align = "c") %>%
+  kableExtra::group_rows("Sex", 3, 4, bold = F, hline_before = T) %>%
+  kableExtra::group_rows("Age", 5, 14, bold = F) %>%
+  kableExtra::group_rows("Ethnicity", 15, 20, bold = F) %>%
+kableExtra::group_rows("Admission Characteristics", 22, 29, hline_before = T, latex_align = "c") %>%
+  kableExtra::group_rows("Main Specialty", 22, 23, bold = F, hline_before = T) %>%
+  kableExtra::group_rows("Admission Method", 24, 25, bold = F) %>%
+  kableExtra::row_spec(0, bold = T)
+
+```
+
+
+In total 1065 admissions included an ICU admission, 3392 ended in death, and either death or ICU admission occurred in 4332.
+The characteristics of the population are shown in Table \@ref(tab:baselinemeth).
+
+Important variables are graphically presented in figure \@ref(fig:distn).
+Note that many of the continuous variables are highly skewed, and will therefore need to be modeled using methods that acknowledge and account for this.
+
+```{r distn, echo=FALSE, message=FALSE, warning=FALSE, fig.height=9, fig.width=6, out.extra='', fig.cap="Distribution of key variables in the HAVEN data set"}
+
+load("C:/Users/stephen.gerry/Dropbox/Steve work/VM/methods_plots.RData")
+
+library(cowplot)
+library(gridExtra)
+
+plot_grid(sbp_d, dbp_d, temp_d, hr_d, rr_d, spo2_d, fio2_d, avpu, o2th, cci_d, sex, age_d, ncol=3, align="v")
+
+
+```
+
+
+### Generalisability and validity of data
+
+It may be a concern that the population of the Oxford hospitals are different from hospitals in the rest of the country, and therefore analyses based on this data may not be generalisable.
+This is perhaps most likely when considering ethnicity.
+However, when comparing to the national figures for 2018-2019, the distribution of patients from different ethnicities is similar, with 77% of the national population being white, compared to 79% in the Oxford data set[@HES2018].
+Age and sex distributions are also similar[@HES2018].
+There are slightly greater proportion of female patients admitted nationally (54% vs 52%), however the national figures include women in labour, whereas the HAVEN dataset does not.
+
+Aside from the characteristics of the patients, the data used in this study can be expected to be representative of the data used in other hospitals in the UK.
+Vital sign monitoring has for a long time been standard care, as recommended by NICE guideline CG50 [@cg50].
+The guideline gives details on the frequency of monitoring, what vital signs should be monitored, and what the response to deterioration should be.
+Therefore we can reasonably expect that vital signs will be consistently monitored and recorded throughout the UK.
+Furthermore, the data are manually entered by nursing staff into an electronic device where data are recorded.
+After being extracted from the hospital server very little processing of the data is needed in order to carry out any analysis on it.
+This lack of complexity should mean that different EHR systems at different hospitals should have minimal effect.
+
+
+## Statistical methods {#sec:ch2s7}
+
+In this section I will introduce and describe some key statistical concepts relating to risk prediction modelling that will be used throughout the thesis.
+Risk prediction models use information on a person (predictors) to estimate the risk that a condition is present (diagnostic) or the risk that an outcome will occur in the future within a certain timeframe (prognostic)[@Collins2015;@Moons2014].
+They are used in clinical practice to make individualised risk predictions, and thus aid the patient or medical staff to make appropriate decisions about treatment.
+Risk prediction models are typically developed using multivariable regression models, such as logistic regression (for binary outcomes) or Cox regression (for time-to-event outcomes)[@Moons2014].
+For the purpose of this thesis the main interest is in prognosis, since the intention of EWSs is to predict future deterioration (and the associated events e.g. death, and ICU admission).
+
+### Study design considerations {#sec:ch2s8}
+
+Prediction (prognostic) models are typically developed using longitudinal cohort data sets, where a cohort of patients are followed up to ascertain their clinical outcomes.
+This could be achieved through a prospective study designed to gather the desired information on predictors and outcomes in the chosen population, however more commonly the data sets are obtained through the use of retrospective data sets.
+Examples of retrospective data sets include randomised clinical trials, registries, and electronic health records (EHR), i.e. primary of secondary care medical records.
+A limitation of using these retrospective data sets is that the data were collected for a different purpose and therefore may have certain deficiencies, for example missing data, strong inclusion/exclusion criteria, lack of key predictors, and biases in the data collection method.
+Whatever source of data is used, it is important that the patient population is representative of the population that the prediction model is intended for use in, otherwise the model may give poor predictions in practice[@Vergouwe2010a].
+Similarly it is preferable that the model should be developed in a multicentre population to make it more likely that the model will be generalizable, and work well in practice[@Wynants2019].
+
+The choice and appropriate measurement of predictors and outcomes is important.
+The predictors in the data set should ideally be measured at the time when the model will be used in clinical practice[@Moons2009].
+For example in a model that is intended to be used pre-operatively to predict post-operative survival it would not be useful to include any variables on the surgery itself, e.g. blood loss.
+The predictors should also be measured robustly and reliably.
+This means that there should not be too much missing data, they should be measured using standard equipment (where relevant) or techniques, and they should not be too 'noisy'[@Moons2009].
+When there are missing data for any predictor the patient would be removed from the data set in a 'complete-case' analysis.
+Whilst statistical imputation techniques can be used to fill in the missing data, these are only estimates, and not infallible[@Little1992; @Janssen2010].
+If predictors are measured using measurement techniques that are not typical the model may again lack generalizability.
+It 'noisy' predictors are included they are likely obscure any true relationship between the predictor and outcome, and thus the model coefficient will be biased towards the null.
+The outcome measures should be clinically meaningful and reliably recorded[@Moons2014].
+Ideally they should be 'hard' outcomes that are not subjectively measured[@Reitsma2009].
+The time-frame (or 'horizon') within which we are interested if the outcome occurs should be carefully chosen.
+If it is too short then we may under-predict the true risk to patients, whilst if it is too long then the model may giver poorer predictions for the shorter term risk.
+It is also important to consider the frequency of the outcome - are there enough recorded events to allow for the model to be developed whilst minimising issues such as over-fitting[@Riley2019].
+
+
+### Model development {#sec:ch2s9}
+
+Regression models are the most common methods used to develop risk prediction models, e.g. linear regression, logistic regression, or Cox regression[@Collins2015;@Moons2014].
+However, machine learning methods are increasingly being used as an alternative, for example neural networks, support vector machines, and random forests[@Christodoulou2019].
+This thesis will largely focus on statistical regression modelling techniques, since this is my area of expertise, and there are a number of limitations and complexities to machine learning approaches.
+For example, the algorithms are often 'black-box algorithms', which make external validation and implementation much more difficult[@Futoma2020].
+Furthermore the machine learning methods tend to be extremely 'data hungry', requiring large amounts of data to avoid overfitting[@Christodoulou2019].
+Whilst the data set I will be using is large, there are actually relatively few events for outcomes such as ICU admission.
+
+#### Outcomes {#sec:ch2s10}
+
+The majority of prediction models have binary or time-to-event outcome measures and therefore use either logistic regression or Cox regression[@Moons2014].
+For example a model may estimate a patients 10-year risk of cardiovascular disease.
+In this case a Cox regression model would be recommended since it is likely that some patients (in the development data set) will be lost-to-follow-up during the ten year follow-up period.
+A Cox regression (or other survival regression models) will allow these patients to still be included in the model.
+Logistic regression is typically used in cases where the time horizon is shorter, and the outcomes can be ascertained for all patients, for example prediction of post surgical complications.
+Note that I will using a Cox regression later in the thesis despite there being no censoring.
+This is because there are some potential gains in power by using the time-to-event data [@Staley2017].
+
+
+The complexity of the model should be considered with reference to the available sample size, in order to avoid overfitting[@Riley2019;@Steyerberg2009;@Collins2015;@Moons2014].
+Overfitting refers to developing models that identify idiosyncrasies of the development data set, rather than 'true' associations between predictors and the outcome.
+The result of overfitting is that models appear to perform well in the development data set, but do not perform as well in other data sets or in clinical practice[@Steyerberg2009].
+The complexity of the model is multi-factorial, but some of the important considerations are the number of predictors, the coding of the predictors (e.g. continuous or categorical), how the number of possible predictors is reduced (if at all), and other modelling complexities such as interaction terms.
+In terms of the sample size for binary or time-to-event outcomes it is the number of events that is most important, e.g. the number of patients being diagnosed with cardiovascular disease in the 10-year follow-up period[@Riley2019; @VanSmeden2019].
+Therefore if the event of interest is rare the total sample size may need to be much larger.
+A common way of quantifying the model complexity relative to the sample size is done by calculating the ratio of events-per-variable (EPV).
+For a long time a rule of thumb has been used suggesting that an EPV of at least ten is required for model development[@VanSmeden2016].
+However this has been proved to be unhelpful, and the reality is much more complex[@VanSmeden2019; @Riley2019].
+
+
+#### Predictors {#sec:ch2s11}
+
+Predictors are typically either categorical or continuous.
+Categorical variables may consist of two (e.g. sex) or more (e.g. ethnicity) categories.
+Typically when modelling categorical variables one category is chosen as a reference, and then a coefficient is estimated for all other categories compared to the reference category.
+Continuous variables (e.g. age or heart rate) are most commonly entered into the model by assuming a linear relationship, which means that the risk of the outcome is assumed to be linearly related to the predictor.
+For example a one year increase in age from 30 to 31 will have the same coefficient (i.e. the relative effect of the predictor) as a one year change from 90 to 91.
+There are clearly many examples where this linearity assumption may fail, and in these cases it is possible to allow for a non-linear relationship between predictor and outcome[@Collins2016a].
+This may be achieved through restricted cubic splines[@Herndon1990] or fractional polynomials[@Royston1994].
+These methods allow an increase in flexibility without too much complexity being added to the model.
+Note that it is generally discouraged to turn continuous predictors into categorical predictors through applying cut-points, e.g. decades of age.
+There is a large amount of literature which suggests that doing so loses valuable information[@Collins2016a; @Royston2006; @Altman2006; @Owen2005].
+If it is important that the model be simplified for ease of use, then categorisation of continuous variables can happen after the model has been developed[@Moons2014].
+
+In this thesis I will mainly use the fractional polynomial method to model any non-linear relationships[@Royston1994].
+Fractional polynomials are of the form:
+$$Y=B_0+B_1X^{P1}+B_2X^{P2}+B_3X^{P3}$$
+Where $P1$, $P2$, and $P3$ are powers from the set (−2, −1, −0.5, 0, 0.5, 1, 2, 3), where the zero power means a logarithmic transformation.
+For example a model with powers -1, 0, and 0.5 would be:
+$$Y=B_0+B_1X^{-1}+B_2ln(X)+B_3X^{0.5}$$
+The same power can be chosen multiple times.
+In this circumstance the convention is to multiply the second term by $ln(X)$.
+For example a model with repeated powers 2 and 2 would be:
+$$Y=B_0+B_1X^{2}+B_2ln(X)X^{2}$$
+The choice of powers is typically automated within standard software packages, but the user often chooses the number of powers to include in the model.
+Often two powers is sufficient[@Royston2017].
+
+Another common assumption in the traditional regression modelling framework is that of 'additivity', that the effect of one predictor is the same irrespective of the values of all the other predictors[@Steyerberg2009].
+This may not always hold true, for example some variables may be prognostic in younger patients but not in older patients, and vice-versa.
+This assumption can be dealt with through the inclusion of interaction terms in the regression model.
+
+
+#### Variable selection and shrinkage {#sec:ch2s12}
+
+Another issue that is common in risk prediction modelling studies is the need (or desire) to reduce the set of candidate predictors down to smaller number to be included in the final model.
+A common approach to do this is to use stepwise regression methods, however these methods have many flaws[@Heinze2017].
+In particular they tend to result in model coefficients that are too large, and models which are unstable.
+Another flawed approach is 'univariable screening', where each variable is in turn assessed in a univariable model, and only those with a low p-value are included in the final model[@Heinze2017a].
+This approach is not recommended because it may reject important predictors due to confounding or other biases to do with the data set, whereas when included in a multivariable model the variable may prove to be informative.
+It is better, where possible, to reduce the number of candidate variables beforehand using clinical knowledge[@Moons2014].
+
+
+A possible alternative is to use modern methods such as the 'least absolute shrinkage and selection operator' (LASSO) technique, which shrinks regression coefficients towards zero[@Steyerberg2014].
+In the case of the LASSO, some regression coefficients are shrunk to zero, thus removing them from the model.
+Shrinkage methods are useful in addition to simply removing variables, since due to overfitting there is a tendency for model coefficients to be over-estimated, and therefore the shrinkage of the coefficients will result in models which are more likely to be generalizable.
+There are a variety of ways in which shrinkage can be performed.
+Some of the more straight-forward approaches can be implemented as part of internal validation
+
+
+### Internal validation {#sec:ch2s13}
+
+A newly developed model is likely to perform better in the data set which is was developed in (called apparent performance) than when applied to external data, and therefore the assessment of model performance may be called 'optimistic'. 
+Internal validation is an approach which quantifies the level of optimism[@Steyerberg2001; @Moons2015].
+Therefore it enables the apparent performance to be corrected to give a better idea of the 'true' model performance, called 'optimism-corrected performance'.
+Although many studies randomly split their data set into two parts, one for model development and one for validation, this approach is weak and inefficient[@Steyerberg2001].
+It is much better to use re-sampling methods such as bootstrapping or cross-validation, which importantly keep the whole data set available for model development[@Steyerberg2001].
+In the thesis I will use bootstrap internal validation which is generally the preferred method of the two.
+This process works by creating many new data sets by sampling from the original data set, then developing models in each new data set.
+The optimism is then estimated by the average difference in performance of the bootstrap models tested in the bootstrap data sets and the original data set.
+The optimism corrected performance can then be calculated by subtracting the model optimism from the apparent performance.
+
+
+### External validation {#sec:ch2s14}
+
+As previously mentioned, the performance of model is likely to be optimistic when tested in the development data.
+Internal validation gives an estimate of how large the optimism is likely to be.
+However testing in a different and independent data set it often required before a model can be used in clinical practice[@Moons2014].
+This is called 'external validation' and may be carried out for example in data from a different hospital or country (geographical validation), or using data from the same centre but from a different time period (temporal validation).
+External validation gives the opportunity to directly compare the performance of two or more models if they exist.
+
+
+### Methods for dealing with missing data {#sec:ch2s15}
+
+Missing data is a common issue in prediction modelling studies.
+This could be where some values for predictors or outcomes are missing.
+The most common approach to this issue, the so called 'complete-case' approach, is to discard all patients with missing data.
+Discarding information is a wasteful and potentially biased approach.
+It makes the strong assumption that those with missing data are the same as those with complete data[@Little1992; @Janssen2010].
+
+An alternative and preferred approach is to impute missing data based on known information[@Ambler2007; @Little2002; @Vergouwe2010].
+Multiple imputation is a method used to do this.
+It is called multiple imputation where multiple data sets are created with missing values imputed, and results pooled after analysis, to allow for the uncertainty around the imputed missing data to be accounted for.
+However multiple imputation cannot automatically be used without considering its assumptions.
+Missing data are generally classified into one of three possible categories or scenarios[@Rubin1987]:
+
+* Missing completely at random (MCAR) is when the probability of an observation being missing is independent of all other data.
+* Missing at random (MAR) is when the probability of an observation being missing depends only on the observed data.
+* Missing not at random (MNAR) is when the probability of an observation being missing depends on both the observed and unobserved data.
+
+Multiple imputation methods rely on data being MAR in order to achieve unbiased estimates of model coefficients.
+However causal estimates are not of primary interest in prognostic research, but instead the main interest is to either generate a model that accurately predicts (development studies) or to get a true assessment of model performance (in an external validation studies)[@Sperrin2020].
+It is difficult to assess whether the data are MCAR/MAR/MNAR by merely interrogating the data.
+Instead the researcher needs to make a decision about the likely and plausible missing data scenarios, and base their analysis on this.
+
+The plausible analysis options that are available to researchers include: complete case analysis, mean imputation (where missing observations are imputed as the mean value over all participants with data), zero imputation (where missing values are assumed to be zero), multiple imputation, or missing a missing indicator approach (where extra variables are included in the model to indicate missing data in one or more variables - this may often be combined with multiple imputation)[@Groenwold2020].
+Each of these analysis methods comes with certain assumptions about the missing data scenario.
+
+The only source of missing data in the HAVEN data set is where individual vital sign observations are missing within an observation set (see Section \@ref(sec:ch2s6)).
+In total 16% of observation sets have at least one missing value.
+In the analyses in the following chapters I will use the multiple imputation approach.
+This is likely to be a valid approach since the data are probably MAR, i.e. missing data are dependent on observed data, especially since we have longitudinal data for most participants (this is described in more detail later).
+The rationale for this assumption is that data are likely to be missing either simply due to nursing error (which would be MCAR, and multiple imputation would therefore be unbiased [@Sperrin2020]), or that certain vital signs are not observed because they are expected to be 'normal' by the nurse (this should in the majority of cases be dependent on other observed data)[@Clifton2015].
+The missing data  could possibly be MNAR, but research has suggested that multiple imputation is still valid in this context[@Lin2008;@Wells2013].
+The missing indicator approach is promising in the context of prediction modelling studies[@Sperrin2020;@Groenwold2020], but I do not think it will be appropriate in my case, since the missing data mechanisms may well not be the same in other hospitals if the model were implemented in practice. 
+
+There are different ways of creating multiply imputed datasets.
+The most common is the 'multiple imputation by chained equations (MICE)' approach, which is where models are specified separately for each variable and then these imputed values are fed into the model for the next variable, and this is repeated multiple times[@Horton2007].
+However, I am going to use an alternative approach which uses a bootstrapping based algorithm developed by Honiker and King[@Honaker2010], which is implemented in the R Amelia II package[@Honaker2011].
+The reason for choosing this approach is that it is much better at accounting for the time series nature of the data than other approaches[@Zhang2016].
+This means that the imputation of missing values can be informed by observed values close in time from the same patient.
+The software also allows for polynomials of time to be included, such that potential changes of the value over time may be incorporated.
+Naturally this also accounts for the multiple observations within patients.
+
+Outcome data will not be missing, and therefore will not need to be imputed, however will be included in the imputation model[@Sperrin2020].
+The imputation models will also include all of the vital signs, as well as the patients’ age, sex, and Charlson Comorbidity Index.
+The time series nature of the of data will be accounted for and polynomials of time will be included to account for potential changes in vital signs over time.
+Following recommendations on handling missing data, 20 imputed data sets will be created[@Royston2005].
+Model coefficients and performance metrics will be pooled using Rubin’s Rule[@Rubin1987].
+
+### Methods for the assessment of model performance {#sec:ch2s16}
+
+When developing or externally validating a prediction model it is important to be able to test whether the model performs well[@Moons2014;@Steyerberg2009].
+There are a variety of metrics which describe different aspects of the models performance.
+These are now described.
+
+
+#### Discrimination {#sec:ch2s17}
+
+Discrimination reflects a prediction models ability to differentiate between those who have an outcome (e.g. death or ICU admission) and those who do not[@Collins2015].
+A model should predict a higher risk of an event in those who subsequently have the event than in those who do not.
+The most commonly used metric of discrimination is the c-index.
+This ranges from zero to one, although 0.5 is equivalent to a model that has no predictive power, e.g. tossing a coin.
+A value of one indicates perfect discrimination.
+For a logistic regression model the c-index is the same as the area under the ROC curve (AUROC), where the ROC curve is a plot of sensitivity against specificity for all of the observed risk estimates.
+The c-index can be interpreted by considering two subjects, one who will and one who will not have the event - the probability that the model will give a higher predicted risk for the event patient than the non-event patient is equivalent to the c-index. 
+
+\FloatBarrier
+#### Calibration {#sec:ch2s18}
+
+Calibration refers to the agreement between the observed outcomes and the predictions from the model[@VanCalster2016;@Gerds2014].
+This is an important evaluation that is often not reported in much of the prediction modelling literature.
+When calibration is assessed in the development data set, the model is generally perfectly calibrated, since the model coefficients have been estimated to fit that data set.
+There are exceptions to this rule, such as when shrinkage techniques (e.g. LASSO) are used to adjust the model coefficients.
+Therefore assessing calibration is of much greater value in validation studies than development studies.
+
+The preferred approach for assessing the calibration of a risk prediction model is graphically, in the form of a calibration plot (see for example Figure \ref{fig:calexam})[@Steyerberg2014;@VanCalster2016;@Gerds2014].
+The x-axis represents the predicted risk estimated from the model, and the y-axis represents the observed outcome.
+A smooth curve is then plotted to represent the average observed risk over the entire distribution of the predicted risks, along with the associated 95% confidence interval (the gray band).
+A model that is perfectly calibrated would see this smooth line close to the 45 degree line, which is often shown for reference.
+The plot can be easily interpreted by considering a group of 100 patients with a particular predicted risk.
+For example for a predicted risk of 25%, the model is said to be well calibrated if 25 of those patients with a predicted risk of 25% would go on to experience the outcome of interest.
+The calibration plot assesses this calibration over all observed values of predicted risk.
+
+
+```{r calexam, echo=FALSE, fig.cap="Calibration plot showing observed versus predicted risk", fig.width=6, message=FALSE, warning=FALSE, out.extra=''}
+
+library(ggplot2)
+
+load(file="C:/Users/stephen.gerry/Dropbox/Steve work/VM/Age/death_output.RData")
+
+calplot
+
+```
+
+Historically calibration plots have not used smooth or flexible curves, but rather split the risk probabilities into groups (typically ten groups) and plot the mean predicted risk against the proportion experiencing the event in each of those groups.
+Whilst this is a valid approach, the smooth or flexible curves are viewed as more informative and make better use of the information and is now the preferred method.
+
+Calibration can also be summarised by two numbers - the intercept and slope[@VanCalster2016].
+These are derived from a logistic regression model where the dependent variable is the outcome of interest (e.g. death) and the independent variable is the log-odds of the model predictions.
+In a perfectly calibrated model the intercept would be zero and the slope one. Note that, since these are calculated on the log-odds scale, they cannot directly be interpreted with reference to the calibration plot.
+However well calibrated models will have both a curve that is close to the reference line, as well as a zero intercept and slope of one.
+
+Figure \ref{fig:achilles} gives more details on how to interpret the calibration plot, and it gives examples of different types of miscalibration.
+It also gives an idea of how the calibration intercept and slope relate to those types of miscalibration.
+Generally, when the smoothed line falls below the reference line, this indicates that the model is under-predicting risk, and conversely when the smoothed line is above the reference line this means the model is over-predicting risk.
+It is possible that a model could under/over-predict for part of the risk probability distribution and not for other parts.
+As shown in Figure \ref{fig:achilles}b, this may be caused by models that give predictions that are too extreme of not extreme enough.
+It can also be helpful to include a histogram of predicted risks for those with and without the event of interest, typically underneath the x-axis.
+
+
+\FloatBarrier
+
+```{=latex}
+\begin{figure}[t]
+\centering
+
+```
+
+```{r achilles, echo=FALSE, out.width='80%', message=FALSE, warning=FALSE, out.extra=''}
+
+knitr::include_graphics("./calib.png")
+
+```
+
+```{=latex}
+\caption{Figure title. \label{fig:achilles}}
+
+\textit{Note:} This figure is a re-production of Figure 1 from Van Calster, B., McLernon, D.J., van Smeden, M. et al. Calibration: the Achilles heel of predictive analytics. \textit{BMC Med} \textbf{17}, 230 (2019). https://doi.org/10.1186/s12916-019-1466-7
+\end{figure}
+
+```
+
+\FloatBarrier
+
+### Decision curve analysis {#sec:ch2s19}
+
+Decision curve analysis (DCA) is a further way to evaluate the performance of a clinical prediction model[@Vickers2006].
+It is becoming increasingly popular, and is recommended as an important and necessary part of evaluating model performance[@RussellLocalio2012; @Fitzgerald2015; @Vickers2019; @Vickers2016; @Holmberg2013].
+The method has arisen due to a need to better understand which models are clinically useful.
+The standard metrics of discrimination and calibration do not always fully explain which model is optimal.
+For example, normally the model with best discrimination would be most useful, however, if it is poorly calibrated it may be of limited use.
+The DCA approach also inherently accounts for the trade off to be made between the benefit of finding true cases (i.e. true positives) and the cost of flagging up non-cases (i.e. false positives).
+
+A basic decision curve plots the threshold probability on the x-axis versus benefit on the y-axis.
+The threshold probability refers to the probability (of the outcome) at which the costs of intervening are felt be outweighed by the benefits of intervening.
+Benefit specifically refers to 'net benefit' since it is actually the benefit minus the harm (the cost of intervening).
+It is formulated as follows:
+
+$$Net\ Benefit = \frac{True\ positives}{N} - \frac{False\ positives}{N} \cdot \frac{p_t}{1 - p_t}$$
+
+So for example, when choosing a 10% threshold, this is an odds of 1:9, and so we are saying that it is nine times more important to identify a true case than it is to falsely flag a non-case.
+Or alternatively, we are happy to falsely flag nine non-cases for every true case we identify.
+The false positives are simply being translated to the same scale as the true positives.
+
+The metric of net benefit can sometimes be difficult to interpret, in part because it depends on the prevalence of the outcome.
+Therefore it may be easier to consider the *standardised* net benefit which is simply defined as $Standardised\ Net\ Benefit = \frac{Net\ Benefit}{P}$ where $P$ is the prevalence of the outcome.
+The highest possible net benefit is achieved when the true positive rate is one and the false positive rate is zero, which occurs when the threshold value is 0%.
+The net benefit at this point would be equal to $P$, and therefore the standardised net benefit would be one.
+
+In a decision curve analysis plot the (standardised) net benefit is plotted for all values of the threshold percentage.
+The threshold axis may be curtailed to show only the region which is of interest.
+The plot also typically includes two other curves, which are for the 'treat all' and 'treat none' policies.
+'Treat all' refers to a policy where all patients are treated.
+This policy may work well when the outcome is common and the cost of intervention is low (i.e. the threshold percentage is low).
+The 'treat all' curve is always a straight line which crosses the y-axis where the standardised net benefit is one (or net benefit is $P$) and the x-axis at the threshold percentage equal to $P$.
+The 'treat none' refers to a policy where no patient is treated.
+This net benefit of this policy is zero for all threshold percentages, and therefore the curve lies along the $Y=0$ line.
+This policy is typically used as the reference when we interpret the net benefit of a model.
+
+Consider \@ref(fig:dca) which shows an example DCA plot.
+In addition 'treat all' and 'treat none' this plot shows the curves for two different models.
+The simple interpretation is that both models are better than the treat all and treat none policies over the entire threshold probability range that is shown (0-50%).
+In addition, the age model is a better policy than the NEWS model over the entire range.
+Therefore the age model would be recommended for use in practice.
+To interpret what exactly is meant by the sNB let us consider the 10% threshold value.
+The sNB for the age model is 0.22 or 22%, which means that it is equivalent to a policy which identifies 22% of all cases and no controls.
+For the NEWS model the sNB is 15%, and therefore the benefit of the age model is that is identifies 7% of cases that the NEWS model misses and no extra controls.
+This is a relative increase of nearly 50%.
+
+The temptation may be to choose a lower threshold value because the NB (or sNB) is always higher.
+However this would be incorrect.
+The threshold probability must be chosen based on other considerations, such as the acceptable balance between the risk of avoiding treatment where it is needed and the unnecessarily giving treatment where it is not needed.
+Once the most appropriate threshold probability has been identified the DCA plot can then be used to see if the new model is beneficial compared to other approaches at that threshold value.
+
+
+```{r dcaintro, echo=FALSE, fig.cap="Decision curve analysis plot", fig.width=6, message=FALSE, warning=FALSE, out.extra=''}
+
+p1
+
+#p3$data
+#subset(p1$data,risk==0.007)
+
+```
+\FloatBarrier
+
+
+#### Other performance metrics {#sec:ch2s20}
+
+Other commonly used metrics include the Brier score, and the R^2^, which may be referred to as overall performance metrics[@Steyerberg2014].
+In both cases they represent a summary of the distance between the observed outcomes and the predicted risks.
+With better models having smaller distances.
+The Brier score is a quadratic scoring rule, where the average of the squared differences between the observed outcomes and the predictions is calculated.
+A perfect model would score zero, and poorer models would score higher values, where the upper limit depends on the outcome prevalence, but is typically 0.25 or lower.
+The R^2^ is a logarithmic scoring rule, that compares the log likelihood of the model to that of a null model.
+There are a number of variations of the R^2^, however I will use Nagelkerkes version, which is scaled so that the score can notionally range from zero to one[@Steyerberg2009].
+A higher score means better performance.
+
+
+The efficiency curve has been proposed as a useful metric to evaluate the performance of EWSs, apparently evaluating the workload associated with different EWSs[@Prytherch2010a].
+For each possible value of the EWS, it plots the sensitivity at that value versus the percentage of observation sets that achieve a score (or predicted risk) greater than or equal to that value.
+This is similar to the receiver operating characteristic curve which plots sensitivity against specificity.
+Both curves are shown in Figure \ref{fig:effintro}.
+
+
+```{r effintro, echo=FALSE, fig.cap="Example ROC Curve and Efficiency Curve", fig.width=6, fig.height=3, message=FALSE, warning=FALSE, out.extra=''}
+
+load("C:/Users/stephen.gerry/Dropbox/Steve work/VM/SimStudy/efficiency_examples.RData")
+
+grid.arrange(e1,e2,nrow=1)
+
+```
+
+In papers which include both types of curve, it is apparent that one is very similar to the other when transposed (since the standard practice is to place sensitivity on different axes for ROC and efficiency curves)[@Prytherch2010a; @Pimentel2019].
+Therefore one may question how the efficiency curve metric 'workload' differs from the ROC metric 'specificity', or more precisely 1 - specificity, since these are what appear to be identical when the axes are flipped.
+I will investigate this further in Chapter \@ref(simulation).
+
+
+
+
+
+
+
+
+
+
+
+
+

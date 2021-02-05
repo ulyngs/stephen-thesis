@@ -1,0 +1,359 @@
+---
+output:
+  pdf_document: default
+  word_document: default
+  html_document: default
+bibliography: ../EWS papers.bib
+---
+
+```{block type='savequote', include=knitr::opts_knit$get('rmarkdown.pandoc.to') == 'latex', quote_author='(ref:doyle-quote)'}
+
+It is a capital mistake to theorize before one has data. Insensibly one begins to twist facts to suit theories, instead of theories to suit facts
+
+<!-- ending a line with a lonely backslash inserts a linebreak -->
+```
+(ref:doyle-quote) --- Sir Arthur Conan Doyle
+
+
+# Vital-sign Trajectories Towards Key Events {#trajectories}
+\minitoc <!-- this will include a mini table of contents-->
+
+\newpage
+## Introduction {#sec:ch5s1}
+
+When Morgan developed the first EWS in 1997 there had been accumulating evidence that deterioration on hospital wards was preceded by several hours of documented changes in vital signs.
+This, coupled with evidence of unnecessary morbidity and mortality also occurring on the wards, led to the development of the early warning score.
+If vital signs were monitored and abnormalities identified, then deterioration, and thus harm could be prevented.
+
+Several studies have identified derangement in vital signs prior to adverse events occurring.
+Hillman and colleagues reviewed the notes of patients admitted to ICU in order to identify the frequency and timing of physiological abnormalities[@Hillman2002].
+They found that the most common early signs (8-48 hours before the event) were low SBP and high RR.
+These two were also common late signs (less than eight hours before the event) in addition to high HR.
+Kause and colleagues looked at the "antecedents" for ward patients who subsequently died, suffered a cardiac arrest or died [@Kause2004].
+More than half of patients with one of these events had antecedents in the previous 24 hours.
+The most common were low SBP and a reduced level of consciousness.
+Jacques and colleagues conducted a similar study[@Jacques2006].
+Looking at the same outcomes, plus respiratory failure, they found that the most frequent abnormalities were low SpO2 and low SBP.
+This was true when looking for early and late signs.
+
+The previous studies have identified that vital sign changes precede a variety of poor outcomes.
+However there were some limitations to these studies.
+There were relatively few patients with the events of interest in each study.
+This could have led to truly prognostic vital signs being considered not prognostic due to a lack of power.
+The lack of power would have been further exacerbated by the categorisation of vital signs, for example into low, normal and high.
+This categorisation also masks the magnitude of the vital sign changes.
+Similarly, time was also either categorised (e.g. early vs late) or ignored, which adds further uncertainty to the findings.
+Since there were no comparisons to earlier vital sign states within the same patients, it remains to be proven that vital signs change before the adverse events, as opposed to events occurring in people with chronically deranged vital signs (e.g. the elderly, or patients with COPD).
+
+In this chapter I will present the findings of an analysis of the physiological state of patients in the days leading up to poor outcomes.
+Keeping time as continuous will enable a full description of the vital sign trajectory from four days out, a relatively healthy state, until when the event occurs.
+The trajectory of patients discharged healthy will also be shown, to enable a comparison.
+This analysis will help to answer two important questions.
+\textbf{Firstly, what time frame does deterioration occur within?}
+This will help inform the currently unanswered question of what time horizon should be used to develop and validate EWSs.
+As the systematic review in Chapter \@ref(sr) showed, many different time horizons have been used in practice.
+\textbf{Secondly, are all vital signs equal?}
+The majority of the main EWSs in use give equal weighting to each vital sign when calculating the total score.
+This chapter will provide an idea of the magnitude of change within each vital sign according to the different outcomes.
+
+The answers to these two questions will be important in the rest of the thesis, as I seek to examine the predictive accuracy of current EWSs and develop a new, more sophisticated EWS.
+
+### Methods {#sec:ch5s2}
+
+Data for this chapter was derived from the HAVEN database, as described in Section \@ref(sec:ch2s6). 
+Admissions to the OUH which had at least one set of documented vital sign observations were eligible for inclusion. 
+All vital sign observation sets which were recorded between seven days and three hours prior to the first event of interest were included in the analysis population.
+An event was defined as one of the following: hospital discharge, admission to the intensive care unit, cardiac arrest or death.
+Any vital signs recorded after the first event of the admission were excluded from the analysis population.
+In addition, all data from admissions where the first event was a cardiac arrest were excluded, since there were too few events recorded to formally assess this outcome.
+Vital signs were recorded as part of routine clinical care and electronically documented using the SEND e-Obs software[@Wong2015a].
+
+
+#### Analysis {#sec:ch5s3}
+
+The characteristics of the study population were described using medians and quartiles for the continuous variables, and frequencies and percentages otherwise.
+
+Hospital admissions were split into three categories, according to whether the event ended in: hospital discharge, admission to ICU, or death. 
+The following vital signs were considered: systolic blood pressure (SBP), diastolic blood pressure (DBP), heart rate (HR), respiratory rate (RR), oxygen saturation (SpO2) and temperature.
+Separately within each event category, centiles were estimated using the Generalised Additive Models for Location, Scale and Shape framework (GAMLSS)[@Stasinopoulos2007].
+This semi-parametric method provides various options for fitting non-normal distributions to the data.
+To create smooth centiles across the age range, penalised splines and fractional polynomials were used as smoothing functions.
+For each vital sign, we assessed six different distributions within the GAMLSS framework: Box-Cox Cole and Green, Box-Cox Power Exponential, Box-Cox-t, Skew Power Exponential type 3, Skew t type 3, and Power Exponential.
+In addition, for SpO2, the Beta Inflated One Distribution was considered, since SpO2 is bounded between 0 and 100.
+The best fitting distribution was chosen based on a combination of model fit (Akaike information criterion and Bayesian information criterion)[@Akaike1974; @Schwarz1978] and a comparison of fitted versus empirical centiles.
+The median, and the 3rd, 10th, 90th and 97th centiles were calculated for each vital sign between seven days and three hours prior to the event.
+Centiles were plotted from four days to three hours, since centiles were stable from seven to four days.
+All analyses were undertaken using R and the GAMLSS package[@R-base; @R-gamlss].
+
+## Results {#sec:ch5s4}
+
+In total, there were 218521 admissions to the hospital trust between March 2014 and March 2018, which included at least one observation on the SEND e-Obs system.
+These admissions included 4089038 sets of vital sign observations.
+There were 1701094 observation sets excluded because they were outside of the seven day to three hour window, and 17657 admissions were effectively excluded because they contained no observation sets within that window.
+Only 299 of the remaining admissions recorded a cardiac arrest as the first event, too few to include in the analysis, and therefore these were excluded. 
+Therefore the final analysis cohort consisted of 200864 admissions, and 2382476 observation sets.
+
+```{r echo=FALSE, message=FALSE, warning=FALSE}
+base = read.csv("C:/Users/stephen.gerry/Dropbox/Steve work/VM/baseline_trajectory.csv", header = TRUE)
+
+#base <- base[-c(24:25),]
+
+library(kableExtra)
+
+kable(base, "latex", caption = "(\\#tab:baseline) Baseline characteristics", booktabs = T, col.names = c("","Discharged","Admitted to ICU","Died","Total")) %>%
+kableExtra::group_rows("Patient Characteristics", 2, 13, hline_before = T, latex_align = "c") %>%
+  kableExtra::group_rows("Sex", 2, 3, bold = F, hline_before = T) %>%
+  kableExtra::group_rows("Age (years)", 4, 13, bold = F) %>%
+kableExtra::group_rows("Admission Characteristics", 14, 17, hline_before = T, latex_align = "c") %>%
+  kableExtra::group_rows("Main Specialty", 14, 15, bold = F, hline_before = T) %>%
+  kableExtra::group_rows("Admission Method", 16, 17, bold = F) %>%
+  row_spec(0, bold = T) %>%
+kable_styling(latex_options = c("hold_position","scale_down"))
+
+```
+
+According to the event of interest, 195619 admissions ended in discharge (2276291 observation sets), 863 ended in ICU admission (16701 observation sets), and 4083 ended in death (89484 observation sets).
+Patient and hospital admission characteristics are shown in Table \ref{tab:baseline}.
+Figure \ref{fig:hist1} shows the relative frequency of observation sets in the seven days preceding the different events.
+The relative frequency refers to the number of observations per (three hour) period relative to the period with most observations.
+In all three groups the frequency of observations is greater near the event, and this is more apparent for ICU admission or discharge than it is for death.
+
+```{r hist1, echo=FALSE, fig.cap="Relative distribution of observations before key events", fig.width=6, message=FALSE, warning=FALSE, out.extra=''}
+
+library(ggplot2)
+library(gridExtra)
+library(cowplot)
+
+load(file="C:/Users/stephen.gerry/Dropbox/Steve work/VM/Precursor/precursor_results_data_feb19.RData")
+
+data <- subset(data, group != "CA")
+
+ggplot(data,aes(x=time,y = ..ncount..)) +
+  geom_histogram(binwidth=0.125, fill="#69b3a2") +
+  facet_grid(~group_f) +
+  scale_y_continuous(labels = scales::percent) +
+  ylab("Relative frequencies") +
+  xlab("Time from event (days)") +
+  theme_bw()
+
+
+```
+
+\FloatBarrier
+### Systolic Blood Pressure {#sec:ch5s5}
+
+Figure \ref{fig:sbp1} shows the trajectories of systolic blood pressure towards the three events of interest.
+The average SBP and variation is similar for all three categories four days before the event.
+For the admissions ending in ICU the average SBP and lower centiles decrease from around two days prior to the event, whilst the upper centiles increase.
+Admissions ending in death show a decrease in the average and lower centiles from two days out, whilst the upper centiles remain fairly constant.
+
+
+```{r sbp1, fig.cap = "Systolic blood pressure trajectories towards key events", echo=FALSE, message=FALSE, warning=FALSE, fig.width=6, out.extra = ''}
+
+plot_grid(SBP_discharged, SBP_ICU, SBP_died, align = "v", ncol= 3)
+
+```
+
+\FloatBarrier
+### Diastolic Blood Pressure {#sec:ch5s6}
+
+Figure \ref{fig:dbp1} shows the trajectories of diastolic blood pressure towards the three events of interest.
+The results are very similar to those seen for SBP.
+The average DBP and variation is similar for all three categories four days before the event.
+For the admissions ending in ICU the average DBP and lower centiles decrease from around two days prior to the event, whilst the upper centiles increase.
+For admissions that end in death the average and lower centiles start decreasing from two days out, whilst the upper centiles remain unchanged.
+
+
+```{r dbp1, fig.cap = "Diastolic blood pressure trajectories towards key events", echo=FALSE, message=FALSE, warning=FALSE, fig.width=6, out.extra = ''}
+
+plot_grid(DBP_discharged, DBP_ICU, DBP_died, align = "v", ncol= 3)
+
+```
+
+\FloatBarrier
+### Heart Rate {#sec:ch5s7}
+
+Figure \ref{fig:hr1} shows the trajectories of heart rate towards the three events of interest.
+Admissions ending in ICU or death compared to discharge have a higher average HR, and exhibit greater variability, for the entire four day period.
+For both ICU and death there is a slight increase in average HR near the event.
+
+
+```{r hr1, fig.cap = "Heart rate trajectories towards key events", echo=FALSE, message=FALSE, warning=FALSE, fig.width=6, out.extra = ''}
+
+plot_grid(HR_discharged, HR_ICU, HR_died, align = "v", ncol= 3)
+
+```
+
+\FloatBarrier
+### Respiratory Rate {#sec:ch5s8}
+
+Figure \ref{fig:rr1} shows the trajectories of respiratory rate towards the three events of interest.
+Admissions ending in ICU or death compared to discharge have a higher average RR, and greater variability, for the entire four day period.
+For both ICU and death there is a marked increase in average RR near the event.
+Whilst the 3rd and 10th centiles are relatively similar for all three categories, the 90th and 97th centiles show a steep trajectory towards death or ICU.
+
+
+```{r rr1, fig.cap = "Respiratory rate trajectories towards key events", echo=FALSE, message=FALSE, warning=FALSE, fig.width=6, out.extra = ''}
+
+plot_grid(RR_discharged, RR_ICU, RR_died, align = "v", ncol= 3)
+
+```
+
+\FloatBarrier
+### Oxygen Saturation {#sec:ch5s9}
+
+Figure \ref{fig:spo21} shows the trajectories of oxygen saturation towards the three events of interest.
+There is a marked difference in the trajectories of SpO2 between admissions ending in ICU and those ending in death.
+The ICU admissions have an SpO2 distribution very similar to the discharge admissions, apart from a slight decrease in average and lower centiles from around one day prior to the event.
+However the admissions ending in death show a slightly lower average SpO2 at four days out, and the 3rd, 10th and 50th centiles decrease from there towards death, with a sharp drop from one day out.
+The 9th and 97th centiles remain constant for all event categories.
+
+
+```{r spo21, fig.cap = "Oxygen saturation trajectories towards key events", echo=FALSE, message=FALSE, warning=FALSE, fig.width=6, out.extra = ''}
+
+plot_grid(SPO2_discharged, SPO2_ICU, SPO2_died, align = "v", ncol= 3)
+
+```
+
+\FloatBarrier
+### Temperature {#sec:ch5s10}
+
+Figure \ref{fig:temp1} shows the trajectories of temperature towards the three events of interest.
+Average temperature was consistently higher on average, and variation greater, for admissions ending in ICU, than those discharged or dying.
+There was little change in the average temperature over the four day period for any of the categories.
+However, for both death and ICU, the outer centiles diverged gradually from four days out, and then more markedly from one day out.
+
+
+```{r temp1, fig.cap = "Temperature trajectories towards key events", echo=FALSE, message=FALSE, warning=FALSE, fig.width=6, out.extra = ''}
+
+plot_grid(Temp_discharged, Temp_ICU, Temp_died, align = "v", ncol= 3)
+
+```
+
+
+
+## Discussion {#sec:ch5s11}
+
+### Summary of results {#sec:ch5s12}
+
+In this chapter I presented a descriptive analysis of vital sign distributions over the four days preceding discharge, ICU admission, and death.
+The results suggest that to varying extents all six vital signs show distributional changes over the four day period leading up to ICU or death.
+In some cases there were some very clear differences relative to the patients subsequently discharged, most notably for RR and SpO2.
+In the case of RR there is a sharp increase in the median and upper centiles for admissions ending in ICU admission or death.
+This rate of increase is particularly noticeably from around 24 hours prior to the event.
+Lower centiles remain much the same across the four day period, regardless of the outcome.
+In the case of SpO2, there is a decline in median and lower centiles from around 24 hours from ICU admission, and much more noticeably, from death.
+For HR, RR, SpO2, and temperature the distribution of the vital signs varies across the three outcome groups, even four days from the event.
+This is likely to be unrelated to the deterioration event, and more likely due to the fact that patients who will go on to ICU or death will be older and more frail, even several days from the event. 
+The vital sign which shows the most notable difference between the ICU and death groups is temperature. 
+Whilst the majority of dying patients show a slight decrease in temperature beforehand, the patients admitted to ICU have as much chance of showing an increasing temperature before the event.
+These may be patients with an ongoing infection.
+Along with temperature, SBP and DBP also show some degree of divergence in the outer centiles approaching the death, and particularly ICU events.
+This suggests that there is not a single way in which patients deteriorate, but potentially many different ways.
+
+
+### Implications for EWSs {#sec:ch5s13}
+
+
+#### *Death and ICU admission are different* {#sec:ch5s14}
+
+In the systematic review (Chapter \@ref(sr)) I found that ICU admission and mortality were both frequently used as outcome measures in the development and validation of EWSs. In addition, a composite of death and ICU, and potentially other events such as cardiac arrest, was also common. 
+Results from this chapter show that the modes of deterioration towards the two events vary, most notably in the case of SpO2 and temperature, and to a lesser extent SBP and DBP.
+This suggests that the use of a composite outcome including ICU and death is questionable.
+This may be particularly pertinent when comparing the ability of two or more models to predict the composite outcome.
+One model may better identify patients who may go to ICU, rather than dying patients, but if death is a more frequent event, then the other model may be favoured.
+It is therefore important that if a composite outcome is chosen to develop or test EWSs, the ability of the EWS to predict the individual components should also be assessed.
+Some have argued that ICU is a better outcome measure than death, because patients admitted to ICU are by definition "salvageable", whereas the majority of patients who die could never have been saved[@Churpek2013].
+If this argument is to be followed, and ICU is used as the sole outcome, then competing risk frameworks need to be used.
+This is because a patient can clearly not be admitted to ICU after they have died.
+Wolbers et al [@Wolbers2014] suggests that it may be difficult to achieve good model discrimination when the same covariates are predictors of the outcome event and the competing risk event.
+The results from this chapter show that, whilst there are some notable differences (DBP, HR, and temperature), many of the vital signs show similar trajectories towards death or ICU.
+Thus failing to account for competing risks may lead to inaccurate EWSs, particularly when EWSs move to providing predicted probabilities.
+
+
+#### *What timeframe can deterioration be detected within* {#sec:ch5s15}
+
+In the systematic review (Chapter \@ref(sr)) I highlighted the heterogeneity in outcome measures and time horizons used to develop and validate EWS.
+More than 60% of external validation studies used “in-hospital” as the time horizon for the outcome measure.
+These studies very often used the admission vital signs to assess whether the patient had the outcome of interest during their hospital stay.
+When the outcome is mortality, this becomes a question of whether the patient was discharged alive or died in hospital.
+This poses a potential problem, since the event of interest may be many days, or even weeks, from the event occurring.
+Therefore developing or validating EWSs in this context may favour models that pick up on characteristics of patients that are more likely to have the event in hospital, but not necessarily characteristics associated with a period of acute deterioration.
+For example, older patients are more likely to die in hospital, and therefore if an EWS were developed with in-hospital mortality as the outcome, the EWS would estimate high risk for patients with characteristics of older patients, such as high SBP (shown in Chapter \@ref(centiles)).
+However high SBP may not actually be associated with acute deterioration.
+Therefore it is important that the time horizon should reflect the potential time period in which acute deterioration may happen.
+This chapter helps answer what that reasonable time-frame may be.
+Each of the vital signs tested show some degree of changing distribution towards either ICU or death.
+In the case of RR, SpO2, and temperature these changes were visible from more than three days from the event.
+However the more noticeable changes mainly occurred within two days, and changes were additionally noticeable within one day of the event. Some differences in HR and temperature, relative to patients who were discharged, were seen from four days out.
+It seems that these are likely to be characteristics of patients generally more likely to have an event, than describing acute deterioration.
+Based on these findings the most appropriate time horizon would seem to be between 48 and 72 hours.
+There are clear signs of deterioration before 24 hours, and therefore this time horizon, which is also commonly used, is perhaps too narrow. 
+
+
+#### *Not all vital signs are of equal importance* {#sec:ch5s16}
+
+The most widely used, and the majority of, EWSs tend to give each vital sign the same weighting towards the total EWS.
+Usually each vital sign may score up to three points, and these are added together to get the total.
+This makes the bold assumption that each vital sign is of roughly equal importance in identifying deterioration.
+A possible argument against this criticism could be that whilst each vital sign has a potential maximum of three points, the boundaries may have been chosen such that certain vital signs are more likely to score points than others.
+However, the findings presented in this chapter suggest that there are in fact a hierarchy of vital signs in terms of how predictive they may be.
+It therefore seems foolish to restrict EWSs to the "three points" structures.
+
+
+#### *Deterioration can take different forms* {#sec:ch5s17}
+
+For patients subsequently admitted to ICU there is evidence that some vital signs, such as SBP, DBP and temperature, may either increase or decrease towards the event, as shown by the divergence in outer centiles.
+There is less evidence of this occurring for patients who will go on to die.
+This indicates that there are multiple ways in which patients can deteriorate.
+It is therefore important to have some flexibility in the modelling approaches used in creating the prediction models.
+In particular, allowing for non-linear relationships between predictors and outcomes, i.e. through fractional polynomials or restricted cubic splines.
+
+
+### Strengths and limitations {#sec:ch5s18}
+
+This chapter takes an in depth look at how vital signs change over the four days preceding important events.
+Early warning scores were designed and implemented based on the assumption that vital signs become increasingly deranged as a patient deteriorates.
+However, until now, there have been only a few fairly simple studies that have investigated this question[@Hillman2002;@Kause2004;@Jacques2006].
+This study shows that some vital signs do indeed change quite markedly prior to the key events (death and ICU admission), whilst others do not.
+This study was based on a large data set, totaling more than 200,000 patients, of whom 863 were admitted to ICU, and 4083 died.
+The statistical methods were also more sophisticated.
+I kept both time and vital signs continuous, and therefore avoided throwing away information unlike the earlier papers.
+Also, rather than simply showing the mean/median vital sign values over the preceding period, I presented a variety on centiles or the distribution.
+This was important as it helped demonstrate that some vital signs, for example blood pressure and temperature, may either increase or decrease towards the key events.
+
+
+The analyses included in this chapter are based on multiple vital sign measurements per patient.
+As is the nature of this type of data, some patients contribute more data than others.
+In the main analyses presented in the results section there is no adjustment made for this fact.
+This may introduce bias.
+For example the resulting vital sign trajectories may be more similar to the trajectory of those who are monitored more frequently.
+Patients may be monitored more frequently if they are sicker, have a certain disease, or are of a certain age group.
+The risk of bias is mitigated somewhat by only including data from the four days prior to the event (discharge, ICU admission or death).
+I carried out three sensitivity analyses to examine the robustness of the findings presented.
+The first was to use all the data, but apply a weighting inversely proportional to the number of vital signs that they contribute.
+The second was to randomly sample one observation set per patient for every four hour period.
+The third was to take the second approach, but to additionally only include data from patients who were in hospital for at least four days prior to their event.
+The results from all of these sensitivity analyses were consistent with the main analysis.
+
+In Section \@ref(sec:ch2s12) I highlighted the important of not using 'univariable screening' in order to choose which variables to include in prediction model.
+I also emphasised the importance of this in the systematic review in Chapter \@ref(sr).
+The problem with univariable screening is that useful predictors may be wasted - as they may be thrown away because they appear to offer no predictive value in a univariable analysis, however if they were included in a multivariable model they may add predictive value.
+The results of this chapter should therefore not be used to select variables for inclusion in development in Chapter \@ref(ageews).
+In reality I do not intend to use any variable selection methods in model building, since all vital signs are always recorded and the number of predictors is small relative to the number of outcomes.
+
+
+## Conclusion {#sec:ch5s19}
+
+
+This chapter presents several findings with implications for the rest of the thesis.
+First, the period over which deterioration can be detected using vital signs appears to be around 48 hours.
+Second, the results show that vital signs do change as a patient deteriorates.
+However the degree of change varies considerably between the different vital signs.
+Therefore it does not seem appropriate to give all vital signs an equal weighting, as happens with the majority of currently used EWSs (e.g. MEWS, NEWS).
+Third, death and ICU admission appear to have quite different vital sign trajectories preceding them.
+Therefore it does not seem appropriate to use a composite outcome which combines the two.
+As I move on to develop and validate EWSs in the remainder of the thesis I will use these findings to guide my approach, i.e. use a 48 hour time frame, allow the different vital signs to have different sized coefficients, and treat death and ICU admission as separate outcomes.
+
+
+
