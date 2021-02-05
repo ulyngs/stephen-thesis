@@ -6,7 +6,7 @@ output:
   bookdown::pdf_book:
     template: templates/template.tex
     keep_tex: true
-    citation_package: natbib
+    citation_package: biblatex
     pandoc_args: ["--lua-filter=scripts_and_filters/correction_filter.lua"] #comment out to stop applying blue background to inline corrections
   bookdown::gitbook:
     link-citations: true
@@ -19,9 +19,9 @@ title: |
   Improving the Development and Validation \
   of Early Warning Scores
 author: Stephen Gerry
-bibliography: EWSpapers.bib
+bibliography:
 #  - packages.bib
-#  - test.bib
+  - EWS papers.bib
 github-repo: 
 twitter-handle: 
 college: Green Templeton College
@@ -58,6 +58,23 @@ source('scripts_and_filters/create_chunk_options.R')
 - this adds code to create additional chunk options you need (e.g. for adding author references to the quotes you see at the top of chapter 1 and 4 with r markdown rather than latex syntax)
 - if you need to create additional chunk options for your own purposes, I recommend you do it in the file scripts/create_chunk_options.R to avoid clutter in index.Rmd
 -->
+
+```{r package_check, include=FALSE}
+# List of packages required
+pkg <- c("devtools", "bookdown")
+# Check if packages are not installed and assign the
+# names of the packages not installed to the variable new.pkg
+new.pkg <- pkg[!(pkg %in% installed.packages())]
+# If there are any packages in the list that aren't installed,
+# install them
+if (length(new.pkg))
+  install.packages(new.pkg, repos = "http://cran.rstudio.com")
+
+if (!("thesisdown" %in% installed.packages()))
+  devtools::install_github("ismayc/thesisdown")
+```
+
+
 
 
 
