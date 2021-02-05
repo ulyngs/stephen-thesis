@@ -21,7 +21,7 @@ title: |
 author: Stephen Gerry
 bibliography:
 #  - packages.bib
-  - EWS papers.bib
+  - EWSpapers.bib
 github-repo: 
 twitter-handle: 
 college: Green Templeton College
